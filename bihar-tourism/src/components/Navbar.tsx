@@ -10,6 +10,7 @@ export default function Navbar() {
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'Destinations', href: '/destinations' },
+    { name: 'History', href: '/history' },
     { name: 'Eco Tourism', href: '/eco-tourism' },
     { name: 'Cultural', href: '/cultural' },
     { name: 'About', href: '/about' },
