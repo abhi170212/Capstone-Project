@@ -13,6 +13,8 @@ export default function Navbar() {
     { name: 'History', href: '/history' },
     { name: 'Eco Tourism', href: '/eco-tourism' },
     { name: 'Cultural', href: '/cultural' },
+    { name: 'Smart Finder', href: '/smart-finder' },
+    { name: 'Trip Planner', href: '/trip-planner' },
     { name: 'About', href: '/about' },
     { name: 'Contact', href: '/contact' },
   ];

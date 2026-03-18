@@ -10,6 +10,7 @@ const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapCo
 const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
 const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
 const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
+import Link from 'next/link';
 
 interface MapComponentProps {
   destinations?: Destination[];
@@ -69,10 +70,20 @@ export default function MapComponent({ destinations = [], height = '400px' }: Ma
             key={index}
             position={[destination.coordinates.lat, destination.coordinates.lng]}
           >
-            <Popup>
-              <div className="p-2">
-                <h3 className="font-bold text-lg">{destination.name}</h3>
-                <p className="text-sm text-gray-600">{destination.description || 'Explore this amazing destination'}</p>
+            <Popup className="custom-popup">
+              <div className="p-0 w-48">
+                {destination.image && (
+                  <img src={destination.image} alt={destination.name} className="w-full h-32 object-cover rounded-t-lg" />
+                )}
+                <div className="p-3">
+                  <h3 className="font-bold text-md text-gray-900 mb-1">{destination.name}</h3>
+                  <p className="text-xs text-gray-600 line-clamp-2 mb-3">{destination.description || 'Explore this amazing destination'}</p>
+                  {destination.id && (
+                    <Link href={`/destinations/${destination.id}`} className="block w-full text-center text-xs font-semibold text-white bg-green-600 hover:bg-green-700 py-1.5 rounded transition-colors">
+                      View Details
+                    </Link>
+                  )}
+                </div>
               </div>
             </Popup>
           </Marker>

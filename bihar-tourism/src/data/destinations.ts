@@ -12,6 +12,11 @@ export interface Destination {
   };
   highlights: string[];
   bestTimeToVisit: string;
+  budget: 'low' | 'medium' | 'high';
+  season: string[];
+  interests: string[];
+  activities: string[];
+  ecoScore: number;
 }
 
 export const destinations: Destination[] = [
@@ -25,7 +30,12 @@ export const destinations: Destination[] = [
     rating: 4.8,
     coordinates: { lat: 24.6951, lng: 84.9914 },
     highlights: ['Mahabodhi Temple', 'Bodhi Tree', 'Great Buddha Statue', 'Monasteries'],
-    bestTimeToVisit: 'October to March'
+    bestTimeToVisit: 'October to March',
+    budget: 'medium',
+    season: ['winter', 'spring'],
+    interests: ['history', 'religious', 'culture'],
+    activities: ['Temple Visit', 'Meditation', 'Photography'],
+    ecoScore: 7
   },
   {
     id: 2,
@@ -37,7 +47,12 @@ export const destinations: Destination[] = [
     rating: 4.6,
     coordinates: { lat: 27.0544, lng: 84.0355 },
     highlights: ['Tiger Safari', 'Bird Watching', 'Nature Trails', 'River Gandak'],
-    bestTimeToVisit: 'November to April'
+    bestTimeToVisit: 'November to April',
+    budget: 'medium',
+    season: ['winter', 'spring'],
+    interests: ['wildlife', 'nature', 'photography'],
+    activities: ['Jungle Safari', 'Bird Watching', 'Trekking'],
+    ecoScore: 9
   },
   {
     id: 3,
@@ -49,7 +64,12 @@ export const destinations: Destination[] = [
     rating: 4.7,
     coordinates: { lat: 25.1381, lng: 85.4422 },
     highlights: ['Archaeological Site', 'Nalanda Museum', 'Hiuen Tsang Memorial', 'Ancient Viharas'],
-    bestTimeToVisit: 'October to March'
+    bestTimeToVisit: 'October to March',
+    budget: 'low',
+    season: ['winter', 'spring'],
+    interests: ['history', 'education', 'culture'],
+    activities: ['Sightseeing', 'Museum Visit', 'Photography'],
+    ecoScore: 6
   },
   {
     id: 4,
@@ -61,7 +81,12 @@ export const destinations: Destination[] = [
     rating: 4.5,
     coordinates: { lat: 26.3041, lng: 84.3567 },
     highlights: ['Wildlife Safari', 'Bird Sanctuary', 'Forest Trekking', 'Photography'],
-    bestTimeToVisit: 'December to May'
+    bestTimeToVisit: 'December to May',
+    budget: 'medium',
+    season: ['winter', 'spring', 'summer'],
+    interests: ['wildlife', 'nature'],
+    activities: ['Wildlife Viewing', 'Photography', 'Nature Walk'],
+    ecoScore: 9
   },
   {
     id: 5,
@@ -73,7 +98,12 @@ export const destinations: Destination[] = [
     rating: 4.4,
     coordinates: { lat: 25.3333, lng: 86.9667 },
     highlights: ['Excavation Site', 'Buddhist Artifacts', 'Temple Remains', 'Museum'],
-    bestTimeToVisit: 'October to February'
+    bestTimeToVisit: 'October to February',
+    budget: 'low',
+    season: ['winter'],
+    interests: ['history', 'culture', 'archaeology'],
+    activities: ['Heritage Walk', 'Museum Visit'],
+    ecoScore: 6
   },
   {
     id: 6,
@@ -85,7 +115,12 @@ export const destinations: Destination[] = [
     rating: 4.3,
     coordinates: { lat: 25.1167, lng: 86.1833 },
     highlights: ['Wildlife Spotting', 'Hot Springs', 'Hilly Terrain', 'Picnic Spots'],
-    bestTimeToVisit: 'November to March'
+    bestTimeToVisit: 'November to March',
+    budget: 'low',
+    season: ['winter', 'spring'],
+    interests: ['nature', 'wildlife', 'wellness'],
+    activities: ['Hot Spring Bathing', 'Trekking', 'Picnic'],
+    ecoScore: 8
   },
   {
     id: 7,
@@ -97,7 +132,12 @@ export const destinations: Destination[] = [
     rating: 4.9,
     coordinates: { lat: 25.6093, lng: 85.5355 },
     highlights: ['Main Shrine', 'Community Kitchen', 'Historical Artifacts', 'Prayer Halls'],
-    bestTimeToVisit: 'Year-round'
+    bestTimeToVisit: 'Year-round',
+    budget: 'low',
+    season: ['winter', 'spring', 'summer', 'monsoon'],
+    interests: ['religious', 'history', 'culture'],
+    activities: ['Pilgrimage', 'Langar', 'Sightseeing'],
+    ecoScore: 6
   },
   {
     id: 8,
@@ -109,7 +149,12 @@ export const destinations: Destination[] = [
     rating: 4.6,
     coordinates: { lat: 25.0333, lng: 85.4167 },
     highlights: ['Venu Vihara', 'Hot Springs', 'Gridhakuta Hill', 'Peace Pagoda'],
-    bestTimeToVisit: 'October to March'
+    bestTimeToVisit: 'October to March',
+    budget: 'medium',
+    season: ['winter', 'spring'],
+    interests: ['history', 'nature', 'religious'],
+    activities: ['Ropeway Ride', 'Sightseeing', 'Hot Spring Bathing'],
+    ecoScore: 7
   },
   {
     id: 9,
@@ -121,7 +166,12 @@ export const destinations: Destination[] = [
     rating: 4.4,
     coordinates: { lat: 24.9167, lng: 84.0833 },
     highlights: ['Waterfalls', 'Cave Paintings', 'Wildlife Photography', 'Trekking'],
-    bestTimeToVisit: 'October to June'
+    bestTimeToVisit: 'October to June',
+    budget: 'low',
+    season: ['winter', 'spring', 'summer'],
+    interests: ['nature', 'wildlife', 'adventure'],
+    activities: ['Trekking', 'Waterfall Visit', 'Photography'],
+    ecoScore: 8
   },
   {
     id: 10,
@@ -133,7 +183,12 @@ export const destinations: Destination[] = [
     rating: 4.5,
     coordinates: { lat: 25.9833, lng: 85.0833 },
     highlights: ['Ashoka Pillar', 'Buddhist Stupa', 'Jain Temple', 'Archaeological Museum'],
-    bestTimeToVisit: 'November to February'
+    bestTimeToVisit: 'November to February',
+    budget: 'low',
+    season: ['winter'],
+    interests: ['history', 'religious', 'archaeology'],
+    activities: ['Heritage Tour', 'Photography', 'Sightseeing'],
+    ecoScore: 6
   }
 ];
 
