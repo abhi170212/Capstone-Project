@@ -3,9 +3,11 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   const navLinks = [
     { name: 'Home', href: '/' },
@@ -53,7 +55,11 @@ export default function Navbar() {
               >
                 <Link
                   href={link.href}
-                  className="px-4 py-2 text-gray-700 hover:text-green-600 font-medium transition-colors duration-200 rounded-lg hover:bg-green-50"
+                  className={`px-4 py-2 transition-colors duration-200 rounded-lg ${
+                    pathname === link.href 
+                      ? 'bg-gradient-to-r from-green-500/10 to-blue-500/10 text-green-700 font-bold shadow-sm ring-1 ring-green-500/20'
+                      : 'text-gray-700 hover:text-green-600 font-medium hover:bg-green-50'
+                  }`}
                 >
                   {link.name}
                 </Link>
@@ -92,7 +98,11 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className="block px-4 py-3 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                className={`block px-4 py-3 rounded-lg transition-colors ${
+                  pathname === link.href
+                    ? 'bg-green-50 text-green-700 font-bold border-l-4 border-green-500 shadow-sm'
+                    : 'text-gray-700 hover:text-green-600 hover:bg-green-50 font-medium'
+                }`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 {link.name}
