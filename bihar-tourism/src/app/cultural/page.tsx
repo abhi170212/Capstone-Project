@@ -1,14 +1,35 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import DestinationCard from '@/components/DestinationCard';
 import MapComponent from '@/components/MapComponent';
-import { culturalDestinations } from '@/data/destinations';
+import { destinationApi } from '@/lib/api';
+import { Destination } from '@/types';
 
 export default function CulturalTourism() {
+  const [culturalSites, setCulturalSites] = useState<Destination[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchCulturalSites = async () => {
+      try {
+        const res = await destinationApi.getAll({ type: 'cultural' });
+        setCulturalSites(res.data);
+      } catch (err) {
+        setError('Failed to load cultural heritage sites. Please try again later.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCulturalSites();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      {/* Custom Hero */}
+      {/* ... (Hero section) ... */}
       <section className="relative h-[500px] overflow-hidden">
         <div className="absolute inset-0">
           <img
@@ -99,19 +120,27 @@ export default function CulturalTourism() {
             <div className="w-32 h-1.5 bg-gradient-to-r from-blue-600 to-purple-600 mx-auto mt-6 rounded-full"></div>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {culturalDestinations.map((destination, index) => (
-              <motion.div
-                key={destination.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <DestinationCard destination={destination} />
-              </motion.div>
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : error ? (
+            <div className="text-center py-20 text-red-600">{error}</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {culturalSites.map((destination, index) => (
+                <motion.div
+                  key={destination._id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <DestinationCard destination={destination} />
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -171,7 +200,7 @@ export default function CulturalTourism() {
               Locate all cultural and heritage sites
             </p>
           </motion.div>
-          <MapComponent destinations={culturalDestinations} height="500px" />
+          <MapComponent destinations={culturalSites} height="500px" />
         </div>
       </section>
     </div>
