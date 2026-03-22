@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import L from 'leaflet';
-import { Destination } from '@/data/destinations';
+import { Destination } from '@/types';
 
 // Dynamically import react-leaflet components
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });

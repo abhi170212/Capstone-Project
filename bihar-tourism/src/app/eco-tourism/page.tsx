@@ -1,15 +1,35 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import DestinationCard from '@/components/DestinationCard';
 import MapComponent from '@/components/MapComponent';
-import HeroSection from '@/components/HeroSection';
-import { ecoTourismDestinations } from '@/data/destinations';
+import { destinationApi } from '@/lib/api';
+import { Destination } from '@/types';
 
 export default function EcoTourism() {
+  const [ecoSites, setEcoSites] = useState<Destination[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchEcoSites = async () => {
+      try {
+        const res = await destinationApi.getAll({ type: 'eco' });
+        setEcoSites(res.data);
+      } catch (err) {
+        setError('Failed to load eco tourism sites. Please try again later.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEcoSites();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
-      {/* Custom Hero */}
+      {/* ... (Hero and Stats sections) ... */}
       <section className="relative h-[500px] overflow-hidden">
         <div className="absolute inset-0">
           <img
@@ -94,19 +114,27 @@ export default function EcoTourism() {
             <div className="w-32 h-1.5 bg-gradient-to-r from-green-600 to-blue-600 mx-auto mt-6 rounded-full"></div>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {ecoTourismDestinations.map((destination, index) => (
-              <motion.div
-                key={destination.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <DestinationCard destination={destination} />
-              </motion.div>
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <div className="w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : error ? (
+            <div className="text-center py-20 text-red-600">{error}</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {ecoSites.map((destination, index) => (
+                <motion.div
+                  key={destination._id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <DestinationCard destination={destination} />
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -126,7 +154,7 @@ export default function EcoTourism() {
               Locate all eco-tourism destinations across Bihar
             </p>
           </motion.div>
-          <MapComponent destinations={ecoTourismDestinations} height="500px" />
+          <MapComponent destinations={ecoSites} height="500px" />
         </div>
       </section>
 

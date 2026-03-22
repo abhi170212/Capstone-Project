@@ -1,15 +1,37 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import HeroSection from '@/components/HeroSection';
 import DestinationCard from '@/components/DestinationCard';
 import ImageGallery from '@/components/ImageGallery';
 import MapComponent from '@/components/MapComponent';
 import Link from 'next/link';
-import { featuredDestinations, destinations } from '@/data/destinations';
+import { destinationApi } from '@/lib/api';
+import { Destination } from '@/types';
 
 export default function Home() {
-  const galleryImages = destinations.slice(0, 6).map(d => d.image);
+  const [destinations, setDestinations] = useState<Destination[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchDestinations = async () => {
+      try {
+        const res = await destinationApi.getAll();
+        setDestinations(res.data);
+      } catch (err) {
+        console.error('Failed to fetch destinations:', err);
+        setError('Could not load destinations');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDestinations();
+  }, []);
+
+  const featuredDestinations = destinations.filter(d => d.rating >= 4.6);
+  const galleryImages = destinations.slice(0, 6).flatMap(d => d.images);
 
   return (
     <div className="overflow-x-hidden">
@@ -34,19 +56,29 @@ export default function Home() {
             <div className="w-32 h-1.5 bg-gradient-to-r from-green-600 to-blue-600 mx-auto mt-6 rounded-full"></div>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredDestinations.map((destination, index) => (
-              <motion.div
-                key={destination.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <DestinationCard destination={destination} />
-              </motion.div>
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <div className="w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : featuredDestinations.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredDestinations.map((destination, index) => (
+                <motion.div
+                  key={destination._id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <DestinationCard destination={destination} />
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-20 text-gray-500">
+              No featured destinations available at the moment.
+            </div>
+          )}
 
           <motion.div
             initial={{ opacity: 0 }}

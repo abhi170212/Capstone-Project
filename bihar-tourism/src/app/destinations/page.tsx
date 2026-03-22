@@ -1,22 +1,41 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import DestinationCard from '@/components/DestinationCard';
 import SearchBar from '@/components/SearchBar';
 import MapComponent from '@/components/MapComponent';
-import { destinations } from '@/data/destinations';
+import { destinationApi } from '@/lib/api';
+import { Destination } from '@/types';
 
 export default function Destinations() {
+  const [destinations, setDestinations] = useState<Destination[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+
+  useEffect(() => {
+    const fetchDestinations = async () => {
+      try {
+        const res = await destinationApi.getAll();
+        setDestinations(res.data);
+      } catch (err) {
+        setError('Failed to load destinations. Please try again later.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDestinations();
+  }, []);
 
   const filteredDestinations = destinations.filter((destination) => {
     const matchesSearch = destination.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          destination.location.toLowerCase().includes(searchQuery.toLowerCase());
     
     const matchesCategory = categoryFilter === 'all' || 
-                           destination.category === categoryFilter;
+                           destination.type === categoryFilter;
 
     return matchesSearch && matchesCategory;
   });
@@ -77,11 +96,25 @@ export default function Destinations() {
       {/* Destinations Grid */}
       <section className="py-8 px-4">
         <div className="max-w-7xl mx-auto">
-          {filteredDestinations.length > 0 ? (
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <div className="w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : error ? (
+            <div className="text-center py-20 bg-red-50 rounded-2xl border border-red-100">
+              <p className="text-red-600 font-medium">{error}</p>
+              <button 
+                onClick={() => window.location.reload()}
+                className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg text-sm"
+              >
+                Retry
+              </button>
+            </div>
+          ) : filteredDestinations.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredDestinations.map((destination, index) => (
                 <motion.div
-                  key={destination.id}
+                  key={destination._id}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
