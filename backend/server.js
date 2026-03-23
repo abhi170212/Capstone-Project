@@ -9,6 +9,8 @@ const ecoRoutes = require('./routes/ecoRoutes');
 const culturalRoutes = require('./routes/culturalRoutes');
 const festivalRoutes = require('./routes/festivalRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const recommendationRoutes = require('./routes/recommendationRoutes');
+const itineraryRoutes = require('./routes/itineraryRoutes');
 const notFound = require('./middleware/notFound');
 const errorHandler = require('./middleware/errorHandler');
 
@@ -38,6 +40,8 @@ app.get('/', (req, res) => {
       cultural: '/api/cultural',
       festivals: '/api/festivals',
       admin: '/api/admin',
+      recommendations: '/api/recommendations',
+      itineraries: '/api/itineraries',
     },
   });
 });
@@ -48,6 +52,8 @@ app.use('/api/ecotourism', ecoRoutes);
 app.use('/api/cultural', culturalRoutes);
 app.use('/api/festivals', festivalRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/recommendations', recommendationRoutes);
+app.use('/api/itineraries', itineraryRoutes);
 
 // ─── Error Handling ───────────────────────────────────────────────────────────
 app.use(notFound);

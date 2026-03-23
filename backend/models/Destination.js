@@ -39,6 +39,26 @@ const destinationSchema = new mongoose.Schema(
       max: 5,
       default: 0,
     },
+    ecoScore: {
+      type: Number,
+      min: 0,
+      max: 100,
+      default: 0,
+    },
+    interests: {
+      type: [String],
+      enum: ['Wildlife', 'History', 'Nature', 'Festivals', 'Architecture', 'Spiritual'],
+      default: [],
+    },
+    budget: {
+      type: String,
+      enum: ['Budget', 'Mid-range', 'Luxury'],
+      default: 'Mid-range',
+    },
+    activities: {
+      type: [String],
+      default: [],
+    },
     bestSeason: {
       type: String,
       default: '',
