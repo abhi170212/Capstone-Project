@@ -1,165 +1,222 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useEffect, useState, use } from 'react';
 import { motion } from 'framer-motion';
 import { destinationApi } from '@/lib/api';
 import { Destination } from '@/types';
 import MapComponent from '@/components/MapComponent';
+import ImageGallery from '@/components/ImageGallery';
+import { 
+  Calendar, 
+  MapPin, 
+  Navigation, 
+  Star, 
+  Leaf, 
+  Award, 
+  Activity,
+  ArrowLeft
+} from 'lucide-react';
+import Link from 'next/link';
 
-export default function DestinationDetails() {
-  const { id } = useParams();
+export default function DestinationDetail({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [destination, setDestination] = useState<Destination | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchDestination = async () => {
       try {
-        if (typeof id === 'string') {
-          const res = await destinationApi.getById(id);
-          setDestination(res.data);
-        }
+        const res = await destinationApi.getById(id);
+        setDestination(res.data);
       } catch (err) {
-        setError('Failed to load destination details. Please try again later.');
-        console.error(err);
+        console.error('Failed to fetch destination:', err);
       } finally {
         setLoading(false);
       }
     };
-
     fetchDestination();
   }, [id]);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="w-16 h-16 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
-  if (error || !destination) {
+  if (!destination) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4 text-center">
-        <h2 className="text-3xl font-bold text-gray-800 mb-4">Oops!</h2>
-        <p className="text-gray-600 mb-8 max-w-md">{error || 'Destination not found.'}</p>
-        <button 
-          onClick={() => window.location.href = '/destinations'}
-          className="px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700"
-        >
-          Back to Destinations
-        </button>
+      <div className="min-h-screen flex flex-col items-center justify-center">
+        <h1 className="text-2xl font-bold mb-4">Destination not found</h1>
+        <Link href="/destinations" className="text-green-600 hover:underline">Back to Destinations</Link>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pb-20">
       {/* Hero Section */}
-      <section className="relative h-[60vh] min-h-[400px]">
+      <div className="relative h-[60vh] min-h-[400px]">
         <img
-          src={destination.images?.[0] || 'https://images.unsplash.com/photo-1623945032589-1c7c8987f52e?w=1600&q=80'}
-          className="w-full h-full object-cover"
+          src={destination.images[0] || 'https://images.unsplash.com/photo-1623945032589-1c7c8987f52e?w=1200&q=80'}
           alt={destination.name}
+          className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-black/40"></div>
-        <div className="absolute inset-0 flex items-center justify-center text-center px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-4">{destination.name}</h1>
-            <p className="text-xl text-white/90 font-medium">
-              <span className="inline-flex items-center">
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                </svg>
-                {destination.location}
+        <div className="absolute inset-0 bg-black/40 flex items-end">
+          <div className="max-w-7xl mx-auto px-4 py-12 w-full">
+            <Link href="/destinations" className="inline-flex items-center text-white/80 hover:text-white mb-6 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full transition-all">
+              <ArrowLeft size={20} className="mr-2" /> Back to Explore
+            </Link>
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-5xl md:text-7xl font-bold text-white mb-4"
+            >
+              {destination.name}
+            </motion.h1>
+            <div className="flex flex-wrap gap-4 text-white">
+              <span className="flex items-center gap-1 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-sm">
+                <MapPin size={16} /> {destination.location}
               </span>
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Main Content */}
-      <section className="py-20 px-4">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
-          {/* Details */}
-          <div className="lg:col-span-2">
-            <h2 className="text-3xl font-bold text-gray-800 mb-6">About {destination.name}</h2>
-            <div className="prose prose-lg text-gray-600 max-w-none">
-              <p className="whitespace-pre-line leading-relaxed">{destination.description}</p>
+              <span className="flex items-center gap-1 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-sm">
+                <Star size={16} className="text-yellow-400 fill-yellow-400" /> {destination.rating} Rating
+              </span>
+              <span className="flex items-center gap-1 bg-green-600/80 backdrop-blur-md px-3 py-1 rounded-full text-sm">
+                <Award size={16} /> Eco Score: {destination.ecoScore}%
+              </span>
             </div>
+          </div>
+        </div>
+      </div>
 
-            {/* Gallery */}
-            {destination.images && destination.images.length > 1 && (
-              <div className="mt-12">
-                <h3 className="text-2xl font-bold text-gray-800 mb-6">Gallery</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {destination.images.slice(1).map((img, i) => (
-                    <div key={i} className="h-64 rounded-xl overflow-hidden shadow-lg">
-                      <img src={img} className="w-full h-full object-cover" alt={`${destination.name} ${i+2}`} />
+      <div className="max-w-7xl mx-auto px-4 pt-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-12">
+            <section>
+              <h2 className="text-3xl font-bold text-gray-800 mb-6">About the Destination</h2>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                {destination.description}
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-3xl font-bold text-gray-800 mb-6">Experience & Activities</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {destination.activities && destination.activities.map((activity, i) => (
+                  <div key={i} className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl border border-gray-100 italic transition-transform hover:scale-[1.02]">
+                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                      <Activity size={20} />
+                    </div>
+                    <span className="text-gray-700 font-medium">{activity}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-3xl font-bold text-gray-800 mb-6">Visual Journey</h2>
+              <ImageGallery images={destination.images} />
+            </section>
+
+            <section>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-3xl font-bold text-gray-800">Location Map</h2>
+                <a 
+                  href={`https://www.google.com/maps/search/?api=1&query=${destination.coordinates.lat},${destination.coordinates.lng}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 flex items-center gap-1 font-semibold hover:underline"
+                >
+                  <Navigation size={18} /> Open in Google Maps
+                </a>
+              </div>
+              <div className="rounded-3xl overflow-hidden border-4 border-gray-100 shadow-xl">
+                <MapComponent destinations={[destination]} height="400px" />
+              </div>
+            </section>
+          </div>
+
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-24 space-y-8">
+              <div className="bg-gray-50 rounded-3xl p-8 border border-gray-100 shadow-sm">
+                <h3 className="text-2xl font-bold text-gray-800 mb-6">Trip Essentials</h3>
+                
+                <div className="space-y-6">
+                  <div className="flex gap-4">
+                    <div className="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600 flex-shrink-0">
+                      <Calendar size={24} />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Best Time to Visit</p>
+                      <p className="text-lg font-bold text-gray-800">{destination.bestSeason}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4">
+                    <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 flex-shrink-0">
+                      <Calculator size={24} />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Entry Fee</p>
+                      <p className="text-lg font-bold text-gray-800">{destination.entryFee}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4">
+                    <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center text-green-600 flex-shrink-0">
+                      <Leaf size={24} />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Sustainability</p>
+                      <p className="text-lg font-bold text-gray-800">{destination.budget} Choice</p>
+                    </div>
+                  </div>
+                </div>
+
+                <Link
+                  href="/trip-planner"
+                  className="mt-10 block w-full bg-gradient-to-r from-green-600 to-blue-600 text-white text-center py-4 rounded-2xl font-bold text-lg hover:from-green-700 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl"
+                >
+                  Add to My Trip Plan
+                </Link>
+              </div>
+
+              <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-8 text-white">
+                <h3 className="text-xl font-bold mb-4">Why visit {destination.name}?</h3>
+                <div className="space-y-3">
+                  {destination.interests.map((interest, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                       <span className="opacity-80">{interest} Focused Experience</span>
                     </div>
                   ))}
                 </div>
               </div>
-            )}
-          </div>
-
-          {/* Sidebar Info */}
-          <div className="lg:col-span-1">
-            <div className="bg-gray-50 rounded-2xl p-8 sticky top-24 shadow-sm border border-gray-100">
-              <h3 className="text-xl font-bold text-gray-800 mb-6">Quick Information</h3>
-              
-              <div className="space-y-6">
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Category</h4>
-                  <div className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${
-                    destination.type === 'eco' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
-                  }`}>
-                    {destination.type === 'eco' ? 'Eco-Tourism' : 'Cultural Heritage'}
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Best Season</h4>
-                  <p className="text-gray-700 font-medium">{destination.bestSeason}</p>
-                </div>
-
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Entry Fee</h4>
-                  <p className="text-gray-700 font-medium">{destination.entryFee}</p>
-                </div>
-
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Visitor Rating</h4>
-                  <div className="flex items-center">
-                    <span className="text-2xl font-bold text-gray-800 mr-2">{destination.rating}</span>
-                    <div className="flex text-yellow-400">
-                      {[1, 2, 3, 4, 5].map((s) => (
-                        <svg key={s} className={`w-5 h-5 ${s <= Math.floor(destination.rating) ? 'fill-current' : 'text-gray-300'}`} viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
-      </section>
-
-      {/* Map Section */}
-      <section className="py-20 px-4 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Location on Map</h2>
-          <div className="bg-white p-4 rounded-2xl shadow-lg h-[400px]">
-            <MapComponent destinations={[destination] as any} height="100%" />
-          </div>
-        </div>
-      </section>
+      </div>
     </div>
+  );
+}
+
+// Simple Calculator icon replacement since I used Calculator by mistake in the sidebar loop
+function Calculator({ size }: { size: number }) {
+  return (
+    <svg 
+      width={size} 
+      height={size} 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+    >
+      <rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/>
+    </svg>
   );
 }

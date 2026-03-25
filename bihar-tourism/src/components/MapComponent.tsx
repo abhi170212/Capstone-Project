@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import L from 'leaflet';
+import Link from 'next/link';
 import { Destination } from '@/types';
 
 // Dynamically import react-leaflet components
@@ -70,9 +71,15 @@ export default function MapComponent({ destinations = [], height = '400px' }: Ma
             position={[destination.coordinates.lat, destination.coordinates.lng]}
           >
             <Popup>
-              <div className="p-2">
-                <h3 className="font-bold text-lg">{destination.name}</h3>
-                <p className="text-sm text-gray-600">{destination.description || 'Explore this amazing destination'}</p>
+              <div className="p-2 min-w-[200px]">
+                <h3 className="font-bold text-lg mb-1">{destination.name}</h3>
+                <p className="text-sm text-gray-600 mb-3 line-clamp-2">{destination.description || 'Explore this amazing destination'}</p>
+                <Link 
+                  href={`/destinations/${destination._id}`}
+                  className="text-xs font-bold text-blue-600 hover:underline flex items-center gap-1"
+                >
+                  View Full Details →
+                </Link>
               </div>
             </Popup>
           </Marker>

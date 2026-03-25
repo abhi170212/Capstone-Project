@@ -37,4 +37,43 @@ export const festivalApi = {
   },
 };
 
+export const recommendationApi = {
+  get: async (params: { travelType?: string; budget?: string; season?: string; interests?: string[] }) => {
+    const response = await api.get<{ success: boolean; count: number; data: Destination[] }>('/recommendations', { params });
+    return response.data;
+  },
+};
+
+export interface ItineraryData {
+  name: string;
+  description?: string;
+  startDate?: string;
+  endDate?: string;
+  days: {
+    day: number;
+    activities: {
+      time?: string;
+      location?: string;
+      description?: string;
+      destinationId?: string;
+    }[];
+  }[];
+  totalBudget?: number;
+}
+
+export const itineraryApi = {
+  create: async (data: ItineraryData) => {
+    const response = await api.post<{ success: boolean; data: any }>('/itineraries', data);
+    return response.data;
+  },
+  getAll: async () => {
+    const response = await api.get<{ success: boolean; count: number; data: any[] }>('/itineraries');
+    return response.data;
+  },
+  getById: async (id: string) => {
+    const response = await api.get<{ success: boolean; data: any }>(`/itineraries/${id}`);
+    return response.data;
+  },
+};
+
 export default api;
