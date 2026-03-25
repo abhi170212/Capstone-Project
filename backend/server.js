@@ -11,6 +11,9 @@ const festivalRoutes = require('./routes/festivalRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const recommendationRoutes = require('./routes/recommendationRoutes');
 const itineraryRoutes = require('./routes/itineraryRoutes');
+const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
 const notFound = require('./middleware/notFound');
 const errorHandler = require('./middleware/errorHandler');
 
@@ -54,6 +57,9 @@ app.use('/api/festivals', festivalRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/itineraries', itineraryRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 // ─── Error Handling ───────────────────────────────────────────────────────────
 app.use(notFound);
