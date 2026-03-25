@@ -8,6 +8,29 @@ const api = axios.create({
   },
 });
 
+// Request interceptor to add token
+api.interceptors.request.use(
+  (config) => {
+    if (typeof window !== "undefined") {
+      const userInfo = localStorage.getItem("userInfo");
+      if (userInfo) {
+        try {
+          const parsed = JSON.parse(userInfo);
+          if (parsed.token) {
+            config.headers.Authorization = `Bearer ${parsed.token}`;
+          }
+        } catch (e) {
+          console.error("Error parsing user info", e);
+        }
+      }
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 export const destinationApi = {
   getAll: async (params?: { type?: string }) => {
     const response = await api.get<{ success: boolean; count: number; data: Destination[] }>('/destinations', { params });
