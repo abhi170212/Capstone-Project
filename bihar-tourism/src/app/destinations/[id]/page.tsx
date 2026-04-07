@@ -2,10 +2,11 @@
 
 import { useEffect, useState, use } from 'react';
 import { motion } from 'framer-motion';
-import { destinationApi } from '@/lib/api';
+import api, { destinationApi } from '@/lib/api';
 import { Destination } from '@/types';
 import MapComponent from '@/components/MapComponent';
 import ImageGallery from '@/components/ImageGallery';
+import { useAuth } from '@/context/AuthContext';
 import { 
   Calendar, 
   MapPin, 
@@ -14,7 +15,8 @@ import {
   Leaf, 
   Award, 
   Activity,
-  ArrowLeft
+  ArrowLeft,
+  Heart
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -22,6 +24,68 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
   const { id } = use(params);
   const [destination, setDestination] = useState<Destination | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // New states for Auth & Reviews
+  const { user, updateUser } = useAuth();
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
+  const [submittingReview, setSubmittingReview] = useState(false);
+
+  useEffect(() => {
+    if (user && user.favorites) {
+      setIsFavorite(user.favorites.includes(id));
+    }
+  }, [user, id]);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const res = await api.get(`/reviews/${id}`);
+        setReviews(res.data);
+      } catch (err) {
+        console.error('Failed to fetch reviews', err);
+      }
+    };
+    fetchReviews();
+  }, [id]);
+
+  const toggleFavorite = async () => {
+    if (!user) {
+      alert("Please login to save favorites.");
+      return;
+    }
+    try {
+      const res = await api.post(`/users/favorites/${id}`);
+      updateUser({ favorites: res.data.favorites });
+      setIsFavorite(res.data.favorites.includes(id));
+    } catch (err: any) {
+      console.error('Failed to toggle favorite', err);
+      alert('Error saving favorite: ' + (err.response?.data?.message || err.message));
+    }
+  };
+
+  const submitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) {
+      alert("Please login to submit a review.");
+      return;
+    }
+    setSubmittingReview(true);
+    try {
+      const res = await api.post('/reviews', {
+        destinationId: id,
+        rating: newReview.rating,
+        comment: newReview.comment
+      });
+      setReviews([res.data, ...reviews]);
+      setNewReview({ rating: 5, comment: '' });
+    } catch (err) {
+      console.error('Failed to submit review', err);
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
 
   useEffect(() => {
     const fetchDestination = async () => {
@@ -68,13 +132,22 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
             <Link href="/destinations" className="inline-flex items-center text-white/80 hover:text-white mb-6 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full transition-all">
               <ArrowLeft size={20} className="mr-2" /> Back to Explore
             </Link>
-            <motion.h1 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-5xl md:text-7xl font-bold text-white mb-4"
-            >
-              {destination.name}
-            </motion.h1>
+            <div className="flex justify-between items-end">
+              <motion.h1 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-5xl md:text-7xl font-bold text-white mb-4"
+              >
+                {destination.name}
+              </motion.h1>
+              <button 
+                onClick={toggleFavorite}
+                className={`mb-4 px-6 py-3 rounded-full flex items-center font-semibold transition shadow-lg ${isFavorite ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-white text-gray-800 hover:bg-gray-100'}`}
+              >
+                <Heart size={20} className={`mr-2 ${isFavorite ? 'fill-white' : ''}`} />
+                {isFavorite ? 'Saved to Favorites' : 'Save to Favorites'}
+              </button>
+            </div>
             <div className="flex flex-wrap gap-4 text-white">
               <span className="flex items-center gap-1 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-sm">
                 <MapPin size={16} /> {destination.location}
@@ -134,6 +207,68 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
               </div>
               <div className="rounded-3xl overflow-hidden border-4 border-gray-100 shadow-xl">
                 <MapComponent destinations={[destination]} height="400px" />
+              </div>
+            </section>
+
+            {/* Reviews Section */}
+            <section className="bg-gray-50 rounded-3xl p-8 border border-gray-100 shadow-sm mt-12">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b pb-4">Traveler Reviews</h2>
+              
+              {/* Review Form */}
+              {user ? (
+                <form onSubmit={submitReview} className="mb-8 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                  <h3 className="font-semibold text-lg mb-4">Write a Review</h3>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Rating</label>
+                    <select 
+                      value={newReview.rating} 
+                      onChange={(e) => setNewReview({...newReview, rating: Number(e.target.value)})}
+                      className="w-full border-gray-300 rounded-lg shadow-sm focus:border-green-500 focus:ring-green-500 p-2 border bg-white"
+                    >
+                      {[5,4,3,2,1].map(num => <option key={num} value={num}>{num} Stars</option>)}
+                    </select>
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Your Experience</label>
+                    <textarea 
+                      required
+                      rows={3}
+                      value={newReview.comment}
+                      onChange={(e) => setNewReview({...newReview, comment: e.target.value})}
+                      className="w-full border-gray-300 rounded-lg shadow-sm focus:border-green-500 focus:ring-green-500 p-2 border"
+                      placeholder="Share your thoughts..."
+                    ></textarea>
+                  </div>
+                  <button 
+                    type="submit" 
+                    disabled={submittingReview}
+                    className="bg-green-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-green-700 transition disabled:opacity-50"
+                  >
+                    {submittingReview ? 'Submitting...' : 'Post Review'}
+                  </button>
+                </form>
+              ) : (
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8 text-center text-gray-600">
+                  Please <Link href="/login" className="text-green-600 font-semibold hover:underline">log in</Link> to leave a review.
+                </div>
+              )}
+
+              {/* Reviews List */}
+              <div className="space-y-4">
+                {reviews.length > 0 ? reviews.map(review => (
+                  <div key={review._id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="font-semibold text-gray-800">{review.userId?.name || 'Anonymous'}</div>
+                      <div className="flex text-yellow-400">
+                        {[...Array(review.rating)].map((_, i) => <Star key={i} size={16} className="fill-yellow-400" />)}
+                      </div>
+                    </div>
+                    <p className="text-gray-600 mt-2">{review.comment}</p>
+                    <div className="text-xs text-gray-400 mt-4">{new Date(review.date).toLocaleDateString()}</div>
+                  </div>
+                )) : (
+                  <p className="text-gray-500 italic text-center py-4">No reviews yet. Be the first to review!</p>
+                )}
               </div>
             </section>
           </div>
