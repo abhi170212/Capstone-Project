@@ -31,6 +31,33 @@ api.interceptors.request.use(
   }
 );
 
+// Response interceptor for error handling
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response) {
+      // Server responded with error status
+      console.error('API Error:', error.response.status, error.response.data?.message);
+      
+      // Handle 401 Unauthorized
+      if (error.response.status === 401) {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('userInfo');
+          window.location.href = '/login';
+        }
+      }
+    } else if (error.request) {
+      // Request made but no response
+      console.error('Network Error: No response from server');
+    } else {
+      // Something else happened
+      console.error('Error:', error.message);
+    }
+    
+    return Promise.reject(error);
+  }
+);
+
 export const destinationApi = {
   getAll: async (params?: { type?: string }) => {
     const response = await api.get<{ success: boolean; count: number; data: Destination[] }>('/destinations', { params });
@@ -95,6 +122,75 @@ export const itineraryApi = {
   },
   getById: async (id: string) => {
     const response = await api.get<{ success: boolean; data: any }>(`/itineraries/${id}`);
+    return response.data;
+  },
+};
+
+export const authApi = {
+  resetPasswordRequest: async (email: string) => {
+    const response = await api.post('/auth/reset-password-request', { email });
+    return response.data;
+  },
+  resetPassword: async (token: string, userId: string, newPassword: string) => {
+    const response = await api.post('/auth/reset-password', { token, userId, newPassword });
+    return response.data;
+  },
+  changePassword: async (currentPassword: string, newPassword: string) => {
+    const response = await api.put('/auth/change-password', { currentPassword, newPassword });
+    return response.data;
+  },
+};
+
+export const adminApi = {
+  // Destinations
+  addDestination: async (data: any) => {
+    const response = await api.post('/admin/add-destination', data);
+    return response.data;
+  },
+  updateDestination: async (id: string, data: any) => {
+    const response = await api.put(`/admin/update-destination/${id}`, data);
+    return response.data;
+  },
+  deleteDestination: async (id: string) => {
+    const response = await api.delete(`/admin/delete-destination/${id}`);
+    return response.data;
+  },
+  // Users
+  getAllUsers: async () => {
+    const response = await api.get('/admin/users');
+    return response.data;
+  },
+  getUserById: async (id: string) => {
+    const response = await api.get(`/admin/users/${id}`);
+    return response.data;
+  },
+  updateUserRole: async (id: string, role: string) => {
+    const response = await api.put(`/admin/users/${id}/role`, { role });
+    return response.data;
+  },
+  deleteUser: async (id: string) => {
+    const response = await api.delete(`/admin/users/${id}`);
+    return response.data;
+  },
+  // Reviews
+  getAllReviews: async () => {
+    const response = await api.get('/admin/reviews');
+    return response.data;
+  },
+  deleteReview: async (id: string) => {
+    const response = await api.delete(`/admin/reviews/${id}`);
+    return response.data;
+  },
+  // Analytics
+  getAnalytics: async () => {
+    const response = await api.get('/admin/analytics');
+    return response.data;
+  },
+};
+
+export const userApi = {
+  updateProfile: async (data: { name?: string; email?: string; password?: string }) => {
+    const response = await api.put('/users/profile', data);
     return response.data;
   },
 };
