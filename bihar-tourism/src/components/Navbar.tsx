@@ -17,6 +17,7 @@ export default function Navbar() {
     { name: 'Smart Finder', href: '/smart-finder' },
     { name: 'Interactive Map', href: '/map' },
     { name: 'Trip Planner', href: '/trip-planner' },
+    { name: 'Festivals', href: '/festivals' },
     { name: 'Eco Tourism', href: '/eco-tourism' },
     { name: 'Cultural', href: '/cultural' },
     { name: 'About', href: '/about' },

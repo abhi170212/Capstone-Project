@@ -47,7 +47,7 @@ const destinationSchema = new mongoose.Schema(
     },
     interests: {
       type: [String],
-      enum: ['Wildlife', 'History', 'Nature', 'Festivals', 'Architecture', 'Spiritual'],
+      enum: ['Wildlife', 'History', 'Nature', 'Festivals', 'Architecture', 'Spiritual', 'Photography'],
       default: [],
     },
     budget: {
