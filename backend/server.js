@@ -14,6 +14,9 @@ const itineraryRoutes = require('./routes/itineraryRoutes');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
+const weatherRoutes = require('./routes/weatherRoutes');
+const bookingRoutes = require('./routes/bookingRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 const notFound = require('./middleware/notFound');
 const errorHandler = require('./middleware/errorHandler');
 
@@ -45,6 +48,9 @@ app.get('/', (req, res) => {
       admin: '/api/admin',
       recommendations: '/api/recommendations',
       itineraries: '/api/itineraries',
+      weather: '/api/weather',
+      bookings: '/api/bookings',
+      notifications: '/api/notifications',
     },
   });
 });
@@ -60,6 +66,9 @@ app.use('/api/itineraries', itineraryRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/weather', weatherRoutes);
+app.use('/api/bookings', bookingRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // ─── Error Handling ───────────────────────────────────────────────────────────
 app.use(notFound);
