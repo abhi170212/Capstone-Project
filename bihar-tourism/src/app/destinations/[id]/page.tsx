@@ -1,11 +1,15 @@
 'use client';
 
 import { useEffect, useState, use } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import api, { destinationApi } from '@/lib/api';
 import { Destination } from '@/types';
 import MapComponent from '@/components/MapComponent';
 import ImageGallery from '@/components/ImageGallery';
+import WeatherWidget from '@/components/WeatherWidget';
+import ShareButton from '@/components/ShareButton';
+import NearbyAttractions from '@/components/NearbyAttractions';
+import BookingForm from '@/components/BookingForm';
 import { useAuth } from '@/context/AuthContext';
 import { 
   Calendar, 
@@ -20,6 +24,24 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
+// Calculator icon component
+function Calculator({ size }: { size: number }) {
+  return (
+    <svg 
+      width={size} 
+      height={size} 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+    >
+      <rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/>
+    </svg>
+  );
+}
+
 export default function DestinationDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [destination, setDestination] = useState<Destination | null>(null);
@@ -31,6 +53,7 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
   const [reviews, setReviews] = useState<any[]>([]);
   const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [showBookingForm, setShowBookingForm] = useState(false);
 
   useEffect(() => {
     if (user && user.favorites) {
@@ -140,13 +163,20 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
               >
                 {destination.name}
               </motion.h1>
-              <button 
-                onClick={toggleFavorite}
-                className={`mb-4 px-6 py-3 rounded-full flex items-center font-semibold transition shadow-lg ${isFavorite ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-white text-gray-800 hover:bg-gray-100'}`}
-              >
-                <Heart size={20} className={`mr-2 ${isFavorite ? 'fill-white' : ''}`} />
-                {isFavorite ? 'Saved to Favorites' : 'Save to Favorites'}
-              </button>
+              <div className="flex gap-3 mb-4">
+                <button 
+                  onClick={toggleFavorite}
+                  className={`px-6 py-3 rounded-full flex items-center font-semibold transition shadow-lg ${isFavorite ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-white text-gray-800 hover:bg-gray-100'}`}
+                >
+                  <Heart size={20} className={`mr-2 ${isFavorite ? 'fill-white' : ''}`} />
+                  {isFavorite ? 'Saved to Favorites' : 'Save to Favorites'}
+                </button>
+                <ShareButton 
+                  url={typeof window !== 'undefined' ? window.location.href : ''}
+                  title={`Visit ${destination.name} - Bihar Tourism`}
+                  description={destination.description}
+                />
+              </div>
             </div>
             <div className="flex flex-wrap gap-4 text-white">
               <span className="flex items-center gap-1 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-sm">
@@ -276,6 +306,19 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
           {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="sticky top-24 space-y-8">
+              {/* Weather Widget */}
+              <WeatherWidget 
+                lat={destination.coordinates.lat}
+                lng={destination.coordinates.lng}
+                location={destination.name}
+              />
+
+              {/* Nearby Attractions */}
+              <NearbyAttractions 
+                destinationId={destination._id}
+                radius={100}
+              />
+
               <div className="bg-gray-50 rounded-3xl p-8 border border-gray-100 shadow-sm">
                 <h3 className="text-2xl font-bold text-gray-800 mb-6">Trip Essentials</h3>
                 
@@ -311,9 +354,16 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
                   </div>
                 </div>
 
+                <button
+                  onClick={() => setShowBookingForm(true)}
+                  className="mt-6 block w-full bg-gradient-to-r from-orange-600 to-red-600 text-white text-center py-4 rounded-2xl font-bold text-lg hover:from-orange-700 hover:to-red-700 transition-all shadow-lg hover:shadow-xl"
+                >
+                  Book Now
+                </button>
+
                 <Link
                   href="/trip-planner"
-                  className="mt-10 block w-full bg-gradient-to-r from-green-600 to-blue-600 text-white text-center py-4 rounded-2xl font-bold text-lg hover:from-green-700 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl"
+                  className="mt-4 block w-full bg-gradient-to-r from-green-600 to-blue-600 text-white text-center py-4 rounded-2xl font-bold text-lg hover:from-green-700 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl"
                 >
                   Add to My Trip Plan
                 </Link>
@@ -334,24 +384,34 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
           </div>
         </div>
       </div>
-    </div>
-  );
-}
 
-// Simple Calculator icon replacement since I used Calculator by mistake in the sidebar loop
-function Calculator({ size }: { size: number }) {
-  return (
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round"
-    >
-      <rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/>
-    </svg>
+      {/* Booking Modal */}
+      <AnimatePresence>
+        {showBookingForm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowBookingForm(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-2xl"
+            >
+              <BookingForm
+                destinationId={destination._id}
+                destinationName={destination.name}
+                pricePerPerson={500}
+                onClose={() => setShowBookingForm(false)}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
