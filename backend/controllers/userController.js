@@ -205,6 +205,10 @@ const updateProfile = async (req, res) => {
     user.name = req.body.name || user.name;
     user.email = req.body.email || user.email;
     
+    if (req.body.avatar !== undefined) user.avatar = req.body.avatar;
+    if (req.body.bio !== undefined) user.bio = req.body.bio;
+    if (req.body.coverImage !== undefined) user.coverImage = req.body.coverImage;
+
     // Update password if provided
     if (req.body.password) {
       user.password = req.body.password;
@@ -217,6 +221,9 @@ const updateProfile = async (req, res) => {
       name: updatedUser.name,
       email: updatedUser.email,
       role: updatedUser.role,
+      avatar: updatedUser.avatar,
+      bio: updatedUser.bio,
+      coverImage: updatedUser.coverImage,
       token: require('jsonwebtoken').sign(
         { id: updatedUser._id },
         process.env.JWT_SECRET,
@@ -262,6 +269,33 @@ const unbanUser = async (req, res) => {
   }
 };
 
+// @desc    Generate AI Avatar
+// @route   POST /api/users/generate-avatar
+// @access  Private
+const generateAvatar = async (req, res) => {
+  try {
+    const { prompt } = req.body;
+    if (!prompt) return res.status(400).json({ message: 'Prompt is required' });
+
+    // Mocking Gemini / OpenAI API response utilizing Dicebear bottts API for instant resolution
+    const seed = encodeURIComponent(prompt.trim().replace(/\s+/g, '-'));
+    
+    // Different styles based on prompt keywords
+    let style = 'bottts'; // default
+    if (prompt.toLowerCase().includes('anime')) style = 'fun-emoji';
+    if (prompt.toLowerCase().includes('minimalist')) style = 'initials';
+    if (prompt.toLowerCase().includes('pixel')) style = 'pixel-art';
+    if (prompt.toLowerCase().includes('cyberpunk')) style = 'bottts-neutral';
+
+    const avatarUrl = `https://api.dicebear.com/7.x/${style}/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffdfbf,ffd5dc`;
+
+    res.json({ url: avatarUrl });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to generate avatar' });
+  }
+};
+
 module.exports = {
   getDashboardData,
   toggleFavorite,
@@ -270,6 +304,7 @@ module.exports = {
   deleteUser,
   updateUserRole,
   updateProfile,
+  generateAvatar,
   saveRoute,
   deleteRoute,
   banUser,

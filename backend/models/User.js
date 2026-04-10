@@ -45,6 +45,15 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String,
     default: "",
+  },
+  bio: {
+    type: String,
+    default: "Explorer of Bihar",
+    maxLength: 160
+  },
+  coverImage: {
+    type: String,
+    default: "",
   }
 }, { timestamps: true });
 
