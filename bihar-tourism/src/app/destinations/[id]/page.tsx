@@ -142,7 +142,7 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
   }
 
   return (
-    <div className="min-h-screen bg-white pb-20">
+    <div className="min-h-screen bg-[#FFF8EC] pb-20">
       {/* Hero Section */}
       <div className="relative h-[60vh] min-h-[400px]">
         <img
@@ -150,25 +150,25 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
           alt={destination.name}
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-black/40 flex items-end">
+        <div className="absolute inset-0 bg-[#FFF8EC]/60 backdrop-blur-[2px] flex items-end">
           <div className="max-w-7xl mx-auto px-4 py-12 w-full">
-            <Link href="/destinations" className="inline-flex items-center text-white/80 hover:text-white mb-6 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full transition-all">
+            <Link href="/destinations" className="inline-flex items-center text-black font-bold mb-6 bg-[#DCCCAC] border border-[#546B41] px-4 py-2 rounded-full hover:bg-[#99AD7A] transition-colors shadow-none">
               <ArrowLeft size={20} className="mr-2" /> Back to Explore
             </Link>
             <div className="flex justify-between items-end">
               <motion.h1 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-5xl md:text-7xl font-bold text-white mb-4"
+                className="text-5xl md:text-7xl font-bold text-black mb-4 drop-shadow-sm"
               >
                 {destination.name}
               </motion.h1>
               <div className="flex gap-3 mb-4">
                 <button 
                   onClick={toggleFavorite}
-                  className={`px-6 py-3 rounded-full flex items-center font-semibold transition shadow-lg ${isFavorite ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-white text-gray-800 hover:bg-gray-100'}`}
+                  className={`px-6 py-3 rounded-full flex items-center font-bold transition-colors shadow-none ${isFavorite ? 'bg-[#99AD7A] text-black border-2 border-[#546B41]' : 'bg-[#DCCCAC] text-black border border-[#546B41] hover:bg-[#FFF8EC]'}`}
                 >
-                  <Heart size={20} className={`mr-2 ${isFavorite ? 'fill-white' : ''}`} />
+                  <Heart size={20} className={`mr-2 stroke-black ${isFavorite ? 'fill-[#546B41]' : ''}`} />
                   {isFavorite ? 'Saved to Favorites' : 'Save to Favorites'}
                 </button>
                 <ShareButton 
@@ -178,14 +178,14 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
                 />
               </div>
             </div>
-            <div className="flex flex-wrap gap-4 text-white">
-              <span className="flex items-center gap-1 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-sm">
+            <div className="flex flex-wrap gap-4 text-black font-bold">
+              <span className="flex items-center gap-1 bg-[#DCCCAC] border border-[#546B41] px-3 py-1 rounded-full text-sm">
                 <MapPin size={16} /> {destination.location}
               </span>
-              <span className="flex items-center gap-1 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-sm">
-                <Star size={16} className="text-yellow-400 fill-yellow-400" /> {destination.rating} Rating
+              <span className="flex items-center gap-1 bg-[#FFF8EC] border border-[#546B41] px-3 py-1 rounded-full text-sm">
+                <Star size={16} className="text-black fill-black" /> {destination.rating} Rating
               </span>
-              <span className="flex items-center gap-1 bg-green-600/80 backdrop-blur-md px-3 py-1 rounded-full text-sm">
+              <span className="flex items-center gap-1 bg-[#99AD7A] border border-[#546B41] px-3 py-1 rounded-full text-sm">
                 <Award size={16} /> Eco Score: {destination.ecoScore}%
               </span>
             </div>
@@ -198,39 +198,39 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-12">
             <section>
-              <h2 className="text-3xl font-bold text-gray-800 mb-6">About the Destination</h2>
-              <p className="text-lg text-gray-600 leading-relaxed">
+              <h2 className="text-3xl font-bold text-black mb-6">About the Destination</h2>
+              <p className="text-lg text-black font-medium leading-relaxed">
                 {destination.description}
               </p>
             </section>
 
             <section>
-              <h2 className="text-3xl font-bold text-gray-800 mb-6">Experience & Activities</h2>
+              <h2 className="text-3xl font-bold text-black mb-6">Experience & Activities</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {destination.activities && destination.activities.map((activity, i) => (
-                  <div key={i} className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl border border-gray-100 italic transition-transform hover:scale-[1.02]">
-                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                  <div key={i} className="flex items-center gap-3 p-4 bg-[#DCCCAC] rounded-2xl border border-[#546B41]/30 italic transition-transform hover:-translate-y-0.5">
+                    <div className="w-10 h-10 bg-[#FFF8EC] border border-[#546B41] rounded-full flex items-center justify-center text-black">
                       <Activity size={20} />
                     </div>
-                    <span className="text-gray-700 font-medium">{activity}</span>
+                    <span className="text-black font-bold">{activity}</span>
                   </div>
                 ))}
               </div>
             </section>
 
             <section>
-              <h2 className="text-3xl font-bold text-gray-800 mb-6">Visual Journey</h2>
+              <h2 className="text-3xl font-bold text-black mb-6">Visual Journey</h2>
               <ImageGallery images={destination.images} />
             </section>
 
             <section>
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-3xl font-bold text-gray-800">Location Map</h2>
+                <h2 className="text-3xl font-bold text-black">Location Map</h2>
                 <a 
                   href={`https://www.google.com/maps/search/?api=1&query=${destination.coordinates.lat},${destination.coordinates.lng}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 flex items-center gap-1 font-semibold hover:underline"
+                  className="text-black font-bold hover:text-[#546B41] underline decoration-[#546B41] flex items-center gap-1"
                 >
                   <Navigation size={18} /> Open in Google Maps
                 </a>
@@ -241,63 +241,63 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
             </section>
 
             {/* Reviews Section */}
-            <section className="bg-gray-50 rounded-3xl p-8 border border-gray-100 shadow-sm mt-12">
-              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b pb-4">Traveler Reviews</h2>
+            <section className="bg-[#DCCCAC] rounded-3xl p-8 border border-[#546B41]/30 mt-12 shadow-none">
+              <h2 className="text-3xl font-bold text-black mb-6 border-b border-[#546B41]/20 pb-4">Traveler Reviews</h2>
               
               {/* Review Form */}
               {user ? (
-                <form onSubmit={submitReview} className="mb-8 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                  <h3 className="font-semibold text-lg mb-4">Write a Review</h3>
+                <form onSubmit={submitReview} className="mb-8 bg-[#FFF8EC] p-6 rounded-2xl shadow-none border border-[#546B41]/30">
+                  <h3 className="font-bold text-black text-lg mb-4">Write a Review</h3>
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Rating</label>
+                    <label className="block text-sm font-bold text-black mb-1">Rating</label>
                     <select 
                       value={newReview.rating} 
                       onChange={(e) => setNewReview({...newReview, rating: Number(e.target.value)})}
-                      className="w-full border-gray-300 rounded-lg shadow-sm focus:border-green-500 focus:ring-green-500 p-2 border bg-white"
+                      className="w-full border-[#546B41]/50 rounded-lg shadow-none focus:border-[#546B41] focus:ring-[#546B41] p-2 border bg-[#FFF8EC] font-bold text-black"
                     >
-                      {[5,4,3,2,1].map(num => <option key={num} value={num}>{num} Stars</option>)}
+                      {[5,4,3,2,1].map(num => <option key={num} value={num} className="font-bold">{num} Stars</option>)}
                     </select>
                   </div>
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Your Experience</label>
+                    <label className="block text-sm font-bold text-black mb-1">Your Experience</label>
                     <textarea 
                       required
                       rows={3}
                       value={newReview.comment}
                       onChange={(e) => setNewReview({...newReview, comment: e.target.value})}
-                      className="w-full border-gray-300 rounded-lg shadow-sm focus:border-green-500 focus:ring-green-500 p-2 border"
+                      className="w-full border-[#546B41]/50 rounded-lg shadow-none focus:border-[#546B41] focus:ring-[#546B41] p-2 border bg-[#FFF8EC] text-black font-medium placeholder:text-black/50"
                       placeholder="Share your thoughts..."
                     ></textarea>
                   </div>
                   <button 
                     type="submit" 
                     disabled={submittingReview}
-                    className="bg-green-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-green-700 transition disabled:opacity-50"
+                    className="bg-[#99AD7A] text-black border border-[#546B41] px-6 py-2 rounded-lg font-bold hover:bg-[#DCCCAC] transition-colors disabled:opacity-50"
                   >
                     {submittingReview ? 'Submitting...' : 'Post Review'}
                   </button>
                 </form>
               ) : (
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8 text-center text-gray-600">
-                  Please <Link href="/login" className="text-green-600 font-semibold hover:underline">log in</Link> to leave a review.
+                <div className="bg-[#FFF8EC] p-6 rounded-2xl shadow-none border border-[#546B41]/30 mb-8 text-center text-black font-medium mt-6">
+                  Please <Link href="/login" className="text-black font-bold underline decoration-[#546B41]">log in</Link> to leave a review.
                 </div>
               )}
 
               {/* Reviews List */}
               <div className="space-y-4">
                 {reviews.length > 0 ? reviews.map(review => (
-                  <div key={review._id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                  <div key={review._id} className="bg-[#FFF8EC] p-6 rounded-2xl shadow-none border border-[#546B41]/20">
                     <div className="flex justify-between items-start mb-2">
-                      <div className="font-semibold text-gray-800">{review.userId?.name || 'Anonymous'}</div>
-                      <div className="flex text-yellow-400">
-                        {[...Array(review.rating)].map((_, i) => <Star key={i} size={16} className="fill-yellow-400" />)}
+                      <div className="font-bold text-black">{review.userId?.name || 'Anonymous'}</div>
+                      <div className="flex text-black">
+                        {[...Array(review.rating)].map((_, i) => <Star key={i} size={16} className="fill-black" />)}
                       </div>
                     </div>
-                    <p className="text-gray-600 mt-2">{review.comment}</p>
-                    <div className="text-xs text-gray-400 mt-4">{new Date(review.date).toLocaleDateString()}</div>
+                    <p className="text-black font-medium mt-2">{review.comment}</p>
+                    <div className="text-xs text-black/70 font-bold mt-4">{new Date(review.date).toLocaleDateString()}</div>
                   </div>
                 )) : (
-                  <p className="text-gray-500 italic text-center py-4">No reviews yet. Be the first to review!</p>
+                  <p className="text-black font-bold italic text-center py-4">No reviews yet. Be the first to review!</p>
                 )}
               </div>
             </section>
@@ -319,63 +319,63 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
                 radius={100}
               />
 
-              <div className="bg-gray-50 rounded-3xl p-8 border border-gray-100 shadow-sm">
-                <h3 className="text-2xl font-bold text-gray-800 mb-6">Trip Essentials</h3>
+              <div className="bg-[#DCCCAC] rounded-3xl p-8 border border-[#546B41]/30 shadow-none">
+                <h3 className="text-2xl font-bold text-black mb-6">Trip Essentials</h3>
                 
                 <div className="space-y-6">
                   <div className="flex gap-4">
-                    <div className="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600 flex-shrink-0">
+                    <div className="w-12 h-12 bg-[#FFF8EC] border border-[#546B41] rounded-2xl flex items-center justify-center text-black flex-shrink-0">
                       <Calendar size={24} />
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Best Time to Visit</p>
-                      <p className="text-lg font-bold text-gray-800">{destination.bestSeason}</p>
+                      <p className="text-sm text-black font-bold uppercase tracking-wider">Best Time to Visit</p>
+                      <p className="text-lg font-bold text-black">{destination.bestSeason}</p>
                     </div>
                   </div>
 
                   <div className="flex gap-4">
-                    <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 flex-shrink-0">
+                    <div className="w-12 h-12 bg-[#FFF8EC] border border-[#546B41] rounded-2xl flex items-center justify-center text-black flex-shrink-0">
                       <Calculator size={24} />
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Entry Fee</p>
-                      <p className="text-lg font-bold text-gray-800">{destination.entryFee}</p>
+                      <p className="text-sm text-black font-bold uppercase tracking-wider">Entry Fee</p>
+                      <p className="text-lg font-bold text-black">{destination.entryFee}</p>
                     </div>
                   </div>
 
                   <div className="flex gap-4">
-                    <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center text-green-600 flex-shrink-0">
+                    <div className="w-12 h-12 bg-[#FFF8EC] border border-[#546B41] rounded-2xl flex items-center justify-center text-black flex-shrink-0">
                       <Leaf size={24} />
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Sustainability</p>
-                      <p className="text-lg font-bold text-gray-800">{destination.budget} Choice</p>
+                      <p className="text-sm text-black font-bold uppercase tracking-wider">Sustainability</p>
+                      <p className="text-lg font-bold text-black">{destination.budget} Choice</p>
                     </div>
                   </div>
                 </div>
 
                 <button
                   onClick={() => setShowBookingForm(true)}
-                  className="mt-6 block w-full bg-gradient-to-r from-orange-600 to-red-600 text-white text-center py-4 rounded-2xl font-bold text-lg hover:from-orange-700 hover:to-red-700 transition-all shadow-lg hover:shadow-xl"
+                  className="mt-6 block w-full bg-[#99AD7A] border border-[#546B41] text-black text-center py-4 rounded-2xl font-bold text-lg hover:bg-[#FFF8EC] transition-colors shadow-none"
                 >
                   Book Now
                 </button>
 
                 <Link
                   href="/trip-planner"
-                  className="mt-4 block w-full bg-gradient-to-r from-green-600 to-blue-600 text-white text-center py-4 rounded-2xl font-bold text-lg hover:from-green-700 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl"
+                  className="mt-4 block w-full bg-[#FFF8EC] border border-[#546B41] text-black text-center py-4 rounded-2xl font-bold text-lg hover:bg-[#99AD7A] transition-colors shadow-none"
                 >
                   Add to My Trip Plan
                 </Link>
               </div>
 
-              <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-8 text-white">
+              <div className="bg-[#99AD7A] border border-[#546B41]/30 rounded-3xl p-8 text-black">
                 <h3 className="text-xl font-bold mb-4">Why visit {destination.name}?</h3>
                 <div className="space-y-3">
                   {destination.interests.map((interest, i) => (
                     <div key={i} className="flex items-center gap-2">
-                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                       <span className="opacity-80">{interest} Focused Experience</span>
+                       <div className="w-2 h-2 bg-[#546B41] rounded-full"></div>
+                       <span className="font-bold">{interest} Focused Experience</span>
                     </div>
                   ))}
                 </div>
