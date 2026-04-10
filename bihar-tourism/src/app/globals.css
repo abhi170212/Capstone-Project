@@ -2,8 +2,14 @@
 @import 'leaflet/dist/leaflet.css';
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Strict User Defined Palette */
+  --primary-olive: #546B41;
+  --secondary-muted: #99AD7A;
+  --accent-sand: #DCCCAC;
+  --bg-cream: #FFF8EC;
+  
+  --background: var(--bg-cream);
+  --foreground: #000000;
 }
 
 @theme inline {
@@ -11,12 +17,17 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  --color-olive: var(--primary-olive);
+  --color-muted: var(--secondary-muted);
+  --color-sand: var(--accent-sand);
+  --color-cream: var(--bg-cream);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: var(--bg-cream); /* Forced light dark mode behavior for this palette */
+    --foreground: #000000;         /* Text strictly black in all modes */
   }
 }
 
@@ -32,16 +43,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--accent-sand);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, #16a34a, #2563eb);
+  background: var(--primary-olive);
   border-radius: 6px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to bottom, #15803d, #1d4ed8);
+  background: var(--secondary-muted);
 }
 
 /* Smooth scrolling */
@@ -62,6 +73,7 @@ html {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -72,6 +84,7 @@ html {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

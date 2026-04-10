@@ -1,71 +1,78 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-interface HeroSectionProps {
-  title?: string;
-  subtitle?: string;
-  backgroundImage?: string;
-}
+export default function HeroSection() {
+  const images = [
+    "/hero-images/1.png",
+    "/hero-images/2.png",
+    "/hero-images/3.png",
+    "/hero-images/4.png",
+    "/hero-images/5.png"
+  ];
 
-export default function HeroSection({ 
-  title = "Discover the Magic of Bihar", 
-  subtitle = "Experience eco-tourism and cultural heritage in the land of enlightenment",
-  backgroundImage = "https://images.unsplash.com/photo-1623945032589-1c7c8987f52e?w=1600&q=80"
-}: HeroSectionProps) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 5000); // Change slide every 5 seconds
+    return () => clearInterval(timer);
+  }, [images.length]);
+
   return (
     <div className="relative h-[600px] overflow-hidden">
-      {/* Background Image */}
-      <motion.div
-        initial={{ scale: 1.1 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 1.5 }}
-        className="absolute inset-0"
-      >
-        <img
-          src={backgroundImage}
-          alt="Bihar Tourism"
-          className="w-full h-full object-cover"
+      {/* Background Image Slider with fixed attachment */}
+      <AnimatePresence initial={false}>
+        <motion.div
+          key={currentIndex}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1.5, ease: "easeInOut" }}
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat bg-fixed"
+          style={{ backgroundImage: `url(${images[currentIndex]})` }}
+          aria-label={`Slide ${currentIndex + 1}`}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/50"></div>
-      </motion.div>
+      </AnimatePresence>
 
       {/* Content */}
       <div className="relative z-10 h-full flex items-center justify-center">
-        <div className="text-center px-4 max-w-5xl mx-auto">
+        <div className="text-center px-8 md:px-16 py-12 max-w-4xl mx-auto bg-[#FFF8EC]/40 backdrop-blur-sm rounded-3xl border border-[#FFF8EC]/50 shadow-xl">
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight"
+            className="text-5xl md:text-7xl font-bold text-black mb-6 leading-tight"
           >
-            {title}
+            Discover the Magic of Bihar
           </motion.h1>
-          
+
           <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto"
+            className="text-xl md:text-2xl text-black mb-8 max-w-3xl mx-auto font-medium"
           >
-            {subtitle}
+            Experience eco-tourism and cultural heritage in the land of enlightenment
           </motion.p>
 
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
+            className="flex flex-row gap-4 justify-center items-center"
           >
             <a
               href="/destinations"
-              className="px-8 py-4 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-full font-semibold text-lg hover:from-green-700 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              className="px-6 py-2.5 bg-[#DCCCAC] text-black rounded-full font-bold text-sm tracking-wide hover:bg-[#99AD7A] transition-colors shadow-none hover:-translate-y-0.5"
             >
               Explore Destinations
             </a>
             <a
               href="/about"
-              className="px-8 py-4 bg-white/20 backdrop-blur-md text-white border-2 border-white rounded-full font-semibold text-lg hover:bg-white/30 transition-all duration-300"
+              className="px-6 py-2.5 bg-[#FFF8EC] text-black border border-[#546B41] rounded-full font-semibold text-sm tracking-wide hover:bg-[#DCCCAC] transition-colors shadow-none hover:-translate-y-0.5"
             >
               Learn More
             </a>
@@ -73,19 +80,32 @@ export default function HeroSection({
         </div>
       </div>
 
+      {/* Slide Indicators */}
+      <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 z-10 flex gap-2">
+        {images.map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => setCurrentIndex(idx)}
+            className={`h-2 rounded-full transition-all duration-300 ${currentIndex === idx ? 'w-8 bg-[#546B41]' : 'w-2 bg-[#99AD7A]'
+              }`}
+            aria-label={`Go to slide ${idx + 1}`}
+          />
+        ))}
+      </div>
+
       {/* Scroll Indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2, duration: 0.8 }}
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10"
+        className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-10"
       >
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ repeat: Infinity, duration: 1.5 }}
-          className="w-6 h-10 border-2 border-white rounded-full flex justify-center pt-2"
+          className="w-6 h-10 border-2 border-[#546B41] rounded-full flex justify-center pt-2"
         >
-          <div className="w-1 h-3 bg-white rounded-full"></div>
+          <div className="w-1 h-3 bg-[#546B41] rounded-full"></div>
         </motion.div>
       </motion.div>
     </div>
