@@ -22,6 +22,8 @@ export default function Navbar() {
     { name: 'Contact', href: '/contact' },
   ];
 
+  if (pathname === '/login' || pathname === '/signup') return null;
+
   return (
     <nav className="bg-[#FFF8EC]/95 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-[#546B41]/20">
       <div className="w-full px-2 sm:px-4 lg:px-6">
@@ -46,7 +48,7 @@ export default function Navbar() {
           </motion.div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center flex-1 justify-center md:space-x-0.5 lg:space-x-1 xl:space-x-3 mx-1">
+          <div id="nav-links" className="hidden md:flex items-center flex-1 justify-center md:space-x-0.5 lg:space-x-1 xl:space-x-3 mx-1">
             {navLinks.map((link, index) => {
               const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
               return (
@@ -60,8 +62,8 @@ export default function Navbar() {
                   <Link
                     href={link.href}
                     className={`px-2.5 py-1.5 font-bold transition-all duration-300 rounded-lg text-[13px] lg:text-sm inline-block ${isActive
-                        ? 'text-black bg-[#DCCCAC] shadow-sm ring-1 ring-[#546B41]/30'
-                        : 'text-black hover:bg-[#99AD7A] hover:shadow-sm'
+                      ? 'text-black bg-[#DCCCAC] shadow-sm ring-1 ring-[#546B41]/30'
+                      : 'text-black hover:bg-[#99AD7A] hover:shadow-sm'
                       }`}
                   >
                     {link.name}
@@ -134,8 +136,8 @@ export default function Navbar() {
                   key={link.name}
                   href={link.href}
                   className={`block px-4 py-3 font-bold rounded-lg transition-all ${isActive
-                      ? 'text-black bg-[#DCCCAC] shadow-sm ring-1 ring-[#546B41]/30'
-                      : 'text-black hover:bg-[#99AD7A]'
+                    ? 'text-black bg-[#DCCCAC] shadow-sm ring-1 ring-[#546B41]/30'
+                    : 'text-black hover:bg-[#99AD7A]'
                     }`}
                   onClick={() => setIsMenuOpen(false)}
                 >

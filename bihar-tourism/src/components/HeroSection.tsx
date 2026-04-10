@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { driver } from 'driver.js';
+import 'driver.js/dist/driver.css';
 
 export default function HeroSection() {
   const images = [
@@ -20,6 +22,21 @@ export default function HeroSection() {
     }, 5000); // Change slide every 5 seconds
     return () => clearInterval(timer);
   }, [images.length]);
+
+  const startTour = () => {
+    const driverObj = driver({
+      showProgress: true,
+      animate: true,
+      steps: [
+        { element: '#nav-links', popover: { title: 'Navigation', description: 'Navigate the entire application from here.', side: "bottom", align: 'start' }},
+        { element: '#hero-explore', popover: { title: 'Destinations', description: 'Start browsing our curated destinations instantly.', side: "bottom", align: 'start' }},
+        { element: '#featured-destinations', popover: { title: 'Featured', description: 'Check out our top rated spots tailored for your eco and cultural tourism journey.', side: "top", align: 'start' }},
+        { element: '#interactive-map', popover: { title: 'Interactive Map', description: 'Pinpoint historical locations natively on our interactive map.', side: "top", align: 'start' }},
+        { element: '#image-gallery', popover: { title: 'Image Gallery', description: 'Browse stunning photography from across the region.', side: "top", align: 'start' }}
+      ]
+    });
+    driverObj.drive();
+  };
 
   return (
     <div className="relative h-[600px] overflow-hidden">
@@ -62,9 +79,10 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex flex-row gap-4 justify-center items-center"
+            className="flex flex-row flex-wrap gap-4 justify-center items-center"
           >
             <a
+              id="hero-explore"
               href="/destinations"
               className="px-6 py-2.5 bg-[#DCCCAC] text-black rounded-full font-bold text-sm tracking-wide hover:bg-[#99AD7A] transition-colors shadow-none hover:-translate-y-0.5"
             >
@@ -76,6 +94,12 @@ export default function HeroSection() {
             >
               Learn More
             </a>
+            <button
+              onClick={startTour}
+              className="px-6 py-2.5 bg-[#546B41] text-[#FFF8EC] border-none rounded-full font-bold text-sm tracking-wide hover:bg-[#99AD7A] transition-colors shadow-lg hover:-translate-y-0.5 cursor-pointer"
+            >
+              Learn to Use
+            </button>
           </motion.div>
         </div>
       </div>

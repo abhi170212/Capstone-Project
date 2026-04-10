@@ -39,7 +39,7 @@ export default function Home() {
       <HeroSection />
 
       {/* Featured Destinations */}
-      <section className="py-20 px-4 bg-[#FFF8EC]">
+      <section id="featured-destinations" className="py-20 px-4 bg-[#FFF8EC]">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -152,7 +152,7 @@ export default function Home() {
       </section>
 
       {/* Interactive Map */}
-      <section className="py-20 px-4 bg-[#DCCCAC]">
+      <section id="interactive-map" className="py-20 px-4 bg-[#DCCCAC]">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -172,7 +172,7 @@ export default function Home() {
       </section>
 
       {/* Image Gallery */}
-      <section className="py-20 px-4 bg-[#FFF8EC]">
+      <section id="image-gallery" className="py-20 px-4 bg-[#FFF8EC]">
         <div className="max-w-7xl mx-auto">
           <ImageGallery images={galleryImages} />
         </div>
