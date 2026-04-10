@@ -36,6 +36,11 @@ body {
   color: var(--foreground);
 }
 
+::selection {
+  background-color: var(--primary-olive);
+  color: var(--bg-cream);
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 12px;
