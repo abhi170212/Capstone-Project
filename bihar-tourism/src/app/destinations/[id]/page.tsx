@@ -56,6 +56,7 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
   const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
   const [submittingReview, setSubmittingReview] = useState(false);
   const [showBookingForm, setShowBookingForm] = useState(false);
+  const [communityPosts, setCommunityPosts] = useState<any[]>([]);
 
   useEffect(() => {
     if (user && user.favorites) {
@@ -149,6 +150,15 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
       try {
         const res = await destinationApi.getById(id);
         setDestination(res.data);
+        
+        // Fetch community posts relating to this location
+        try {
+          const postRes = await api.get(`/posts?location=${encodeURIComponent(res.data.name)}`);
+          setCommunityPosts(postRes.data);
+        } catch (postErr) {
+          console.error('Failed to fetch community posts', postErr);
+        }
+
       } catch (err) {
         console.error('Failed to fetch destination:', err);
       } finally {
@@ -342,6 +352,32 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
                 )}
               </div>
             </section>
+
+            {/* Smart Finder Community Features */}
+            {communityPosts.length > 0 && (
+              <section className="bg-white rounded-3xl p-8 shadow-xl mt-12 border-2 border-[#546B41]">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-3xl font-black text-black">Traveler Experiences</h2>
+                  <Link href="/community" className="text-[#546B41] font-bold hover:underline">View All &rarr;</Link>
+                </div>
+                <div className="flex overflow-x-auto gap-6 snap-x snap-mandatory pb-4">
+                  {communityPosts.map(post => {
+                    const imageUrl = Array.isArray(post.images) && post.images.length > 0 
+                      ? (typeof post.images[0] === 'string' ? post.images[0] : post.images[0].url) 
+                      : 'https://images.unsplash.com/photo-1596414272183-5ee9acabf333?q=80&w=800';
+                    return (
+                      <div key={post._id} className="min-w-[300px] flex-shrink-0 snap-center bg-black rounded-2xl overflow-hidden relative group h-[400px]">
+                        <img src={imageUrl} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="Post"/>
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-4">
+                          <p className="text-white font-bold mb-1 line-clamp-2">{post.caption || 'Exploring Bihar'}</p>
+                          <p className="text-gray-300 text-xs font-medium">By {post.user?.name || 'Traveler'}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
           </div>
 
           {/* Sidebar */}
