@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
 import Link from 'next/link';
-import { MapPin, Heart, Trash2, Route as RouteIcon, FileDown, Navigation, Camera, ShieldAlert, CheckCircle, Ban } from 'lucide-react';
+import { MapPin, Heart, Trash2, Route as RouteIcon, FileDown, Navigation, Camera, ShieldAlert, CheckCircle, Ban, Edit3, Image as ImageIcon, Sparkles, UploadCloud, User as UserIcon } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { jsPDF } from 'jspdf';
 import PostCard from '@/components/PostCard';
 
@@ -31,6 +32,22 @@ export default function DashboardPage() {
 
   // Pre-load location options to avoid mismatch
   const [destinations, setDestinations] = useState<any[]>([]);
+
+  // Profile State Setup (AI Avatar + Info)
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [activeProfileTab, setActiveProfileTab] = useState<'upload' | 'generate'>('upload');
+  const [editBio, setEditBio] = useState('');
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [profileAvatarFile, setProfileAvatarFile] = useState<File | null>(null);
+  const [previewAvatar, setPreviewAvatar] = useState('');
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+
+  useEffect(() => {
+    if(user) {
+      setPreviewAvatar(user.avatar || '');
+      setEditBio(user.bio || '');
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -174,6 +191,40 @@ export default function DashboardPage() {
     }
   };
 
+  const handleGenerateAvatar = async () => {
+    if(!aiPrompt.trim()) return alert("Enter an AI generation prompt style!");
+    setIsUpdatingProfile(true);
+    try {
+      const res = await api.post('/users/generate-avatar', { prompt: aiPrompt });
+      setPreviewAvatar(res.data.url);
+      setProfileAvatarFile(null); // Clear physical upload context
+    } catch(err) {
+      alert("AI Image generation failure");
+    } finally {
+      setIsUpdatingProfile(false);
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    setIsUpdatingProfile(true);
+    let finalAvatar = previewAvatar;
+    try {
+      if (profileAvatarFile) {
+        const formData = new FormData();
+        formData.append('images', profileAvatarFile);
+        const uploadRes = await api.post('/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' }});
+        finalAvatar = uploadRes.data.paths[0]; // Intercept file from standard multi-uploader bounds
+      }
+      const res = await api.put('/users/profile', { avatar: finalAvatar, bio: editBio });
+      updateUser({ ...user, avatar: res.data.avatar, bio: res.data.bio, name: res.data.name });
+      setShowProfileModal(false);
+    } catch(err) {
+      alert("Failed to commit profile updates");
+    } finally {
+      setIsUpdatingProfile(false);
+    }
+  };
+
   const generatePDF = (route: any) => {
     const doc = new jsPDF();
     const date = new Date(route.dateSaved).toLocaleDateString();
@@ -245,23 +296,83 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-[#FFF8EC] py-12 font-poppins text-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Header Ribbon */}
-        <div className="bg-[#546B41] rounded-3xl shadow-xl overflow-hidden mb-8 border-4 border-[#DCCCAC]">
-          <div className="px-6 py-8 sm:p-10 flex justify-between items-center flex-wrap gap-4">
-            <div>
-              <h1 className="text-4xl font-extrabold text-[#FFF8EC]">Welcome, {user.name}!</h1>
-              <p className="mt-2 text-[#DCCCAC] font-medium text-lg">Manage your trips, social profile, and settings.</p>
+        {/* Layered Profile Banner replacing basic Header Ribbon */}
+        <motion.div 
+           initial={{ opacity: 0, y: -20, filter: 'blur(10px)' }}
+           animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+           className="relative bg-[#546B41] rounded-3xl shadow-2xl mb-8 border-4 border-[#DCCCAC] overflow-hidden group"
+        >
+          {/* Layered Glass Map Background Component via SVG Data */}
+          <div 
+             className="absolute inset-0 opacity-[0.15] bg-cover bg-center transition-transform duration-[1500ms] group-hover:scale-110 ease-out mix-blend-overlay"
+             style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23FFF8EC' d='M44.7,-76.4C58.8,-69.2,71.8,-59.1,81.4,-46.2C91,-33.3,97.3,-16.6,98.1,0.5C98.9,17.6,94.2,35.2,84.1,50.1C74.1,65,58.7,77.3,42,83.8C25.3,90.3,7.3,91,-9.7,88C-26.7,85,-42.6,78.3,-56.9,67.8C-71.1,57.3,-83.7,43,-90.6,26.2C-97.4,9.4,-98.6,-9.9,-92.9,-27C-87.3,-44.1,-75,-59,-60.1,-66.5C-45.2,-74,-22.6,-74.1,-3.5,-68.2C15.6,-62.3,31.2,-60,44.7,-76.4Z' transform='translate(100 100)' /%3E%3C/svg%3E")` }}
+          />
+          <div className="absolute inset-x-0 bottom-0 top-1/2 bg-gradient-to-t from-black/80 to-transparent pointer-events-none"/>
+
+          <div className="relative px-6 py-12 sm:px-12 flex flex-col md:flex-row items-center gap-8 md:gap-12">
+            {/* Massive Extruded Avatar */}
+            <div className="relative z-10 flex-shrink-0">
+              <div className="w-32 h-32 md:w-44 md:h-44 rounded-full border-[6px] border-[#DCCCAC] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] bg-[#FFF8EC] group-hover:border-[#99AD7A] transition-colors duration-500">
+                {user.avatar ? (
+                   <img src={user.avatar} className="w-full h-full object-cover" alt="Profile"/>
+                ) : (
+                   <div className="w-full h-full flex items-center justify-center bg-black/10 text-[#546B41]">
+                     <UserIcon size={72}/>
+                   </div>
+                )}
+              </div>
+              <button 
+                onClick={() => setShowProfileModal(true)}
+                className="absolute bottom-2 right-2 bg-black text-[#DCCCAC] p-3 md:p-4 rounded-full shadow-[0_0_20px_rgba(0,0,0,0.5)] hover:bg-[#99AD7A] hover:text-black hover:scale-110 transition-all border-2 border-[#DCCCAC]"
+                title="Edit Identity Avatar"
+              >
+                <Edit3 size={20} />
+              </button>
             </div>
-            {user.role === 'admin' && (
-              <span className="bg-red-500 text-white px-4 py-2 rounded-full font-bold text-sm tracking-wider flex items-center gap-2 border-2 border-red-800 shadow-xl">
-                <ShieldAlert size={16}/> ADMIN ACCESS
-              </span>
-            )}
+
+            {/* Profile Info Metadata */}
+            <div className="text-center md:text-left flex-1 text-[#FFF8EC] z-10">
+               <h1 className="text-4xl md:text-6xl font-black mb-3 flex flex-col md:flex-row justify-center md:justify-start items-center gap-4 tracking-tighter">
+                 {user.name} 
+                 {user.role === 'admin' && (
+                    <span className="bg-red-600 text-white px-4 py-1.5 rounded-full text-[10px] sm:text-xs font-black tracking-[0.2em] shadow-lg inline-flex items-center gap-2 uppercase border border-red-400/50 -translate-y-1">
+                      <ShieldAlert size={14}/> Systems Administrator
+                    </span>
+                 )}
+               </h1>
+               <p className="text-[#FFF8EC] font-medium text-lg md:text-xl max-w-2xl mb-8 opacity-95 border-l-4 border-[#99AD7A] pl-5 md:pl-6 leading-relaxed">
+                 {user.bio || "Explorer of Bihar. Uncovering hidden histories and spiritual sanctuaries. Add a biography to introduce your traveler journey!"}
+               </p>
+               
+               <div className="flex flex-wrap justify-center md:justify-start gap-4 md:gap-6 w-full">
+                 <div className="bg-black/40 backdrop-blur-md px-6 py-3 rounded-2xl flex items-center gap-3 border border-white/10 shadow-lg group-hover:bg-black/60 transition-colors">
+                   <Navigation className="text-[#99AD7A]" size={20}/>
+                   <div>
+                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Navigations</p>
+                     <p className="font-black text-xl">{dashboardData?.savedRoutes?.length || 0}</p>
+                   </div>
+                 </div>
+                 <div className="bg-black/40 backdrop-blur-md px-6 py-3 rounded-2xl flex items-center gap-3 border border-white/10 shadow-lg group-hover:bg-black/60 transition-colors">
+                   <Camera className="text-[#DCCCAC]" size={20}/>
+                   <div>
+                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Publications</p>
+                     <p className="font-black text-xl">{myPosts.length}</p>
+                   </div>
+                 </div>
+                 <div className="bg-black/40 backdrop-blur-md px-6 py-3 rounded-2xl flex items-center gap-3 border border-white/10 shadow-lg group-hover:bg-black/60 transition-colors">
+                   <MapPin className="text-red-400" size={20}/>
+                   <div>
+                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Bookmarked</p>
+                     <p className="font-black text-xl">{dashboardData?.favorites?.length || 0}</p>
+                   </div>
+                 </div>
+               </div>
+            </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Tab Navigation */}
-        <div className="flex gap-2 overflow-x-auto mb-8 border-b-2 border-[#546B41]/10 pb-4">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-2 overflow-x-auto mb-8 border-b-2 border-[#546B41]/10 pb-4 no-scrollbar">
           <button 
             onClick={() => setActiveTab('routes')}
             className={`px-6 py-3 rounded-full font-bold whitespace-nowrap transition-colors ${activeTab === 'routes' ? 'bg-[#546B41] text-[#FFF8EC] shadow-md' : 'bg-white text-gray-500 hover:bg-gray-100'}`}
@@ -283,216 +394,320 @@ export default function DashboardPage() {
               <ShieldAlert size={18}/> Moderation Panel
             </button>
           )}
-        </div>
+        </motion.div>
 
-        {/* TAB 1: ROUTES AND SAVES */}
-        {activeTab === 'routes' && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Favorites Section */}
-            <div className="bg-white rounded-3xl shadow-md p-6 border-2 border-[#546B41]/10 h-max">
-              <h2 className="text-xl font-bold text-black mb-6 border-b border-[#546B41]/20 pb-4 flex items-center">
-                <Heart className="w-6 h-6 mr-3 text-red-500 fill-current" /> My Saved Destinations
-              </h2>
-              {dashboardData?.favorites && dashboardData.favorites.length > 0 ? (
-                <ul className="divide-y divide-gray-100">
-                  {dashboardData.favorites.map((dest: any) => (
-                    <li key={dest._id} className="py-4 flex flex-col group">
-                      <div className="flex justify-between items-start w-full">
-                        <div>
-                          <Link href={`/destinations/${dest._id}`} className="hover:text-[#546B41] font-bold text-gray-800 text-lg block transition">
-                            {dest.name}
-                          </Link>
-                          <span className="text-sm text-gray-500 flex items-center mt-1 font-medium">
-                            <MapPin className="w-4 h-4 mr-1 inline" /> {dest.location || dest.type}
-                          </span>
-                        </div>
-                        <button onClick={() => removeFavorite(dest._id)}  className="text-gray-400 hover:text-red-500 p-2 rounded-full hover:bg-red-50 transition" title="Remove Destination">
-                          <Trash2 className="w-5 h-5" />
-                        </button>
-                      </div>
-                      <button onClick={() => generateDestinationPDF(dest)} className="mt-3 w-full bg-[#DCCCAC]/50 hover:bg-[#DCCCAC] text-black border border-[#546B41]/20 p-2 rounded-xl flex items-center justify-center gap-2 text-sm font-bold transition-colors shadow-sm">
-                        <FileDown size={14} /> Download PDF Guide
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-gray-500 font-medium px-2">You haven't saved any destinations yet.</p>
-              )}
-            </div>
-
-            {/* Saved Routes Section */}
-            <div className="bg-white rounded-3xl shadow-md p-6 border-2 border-[#546B41]/10 lg:col-span-2">
-              <h2 className="text-xl font-bold text-black mb-6 border-b border-[#546B41]/20 pb-4 flex items-center">
-                <RouteIcon className="w-6 h-6 mr-3 text-[#546B41]" /> My Saved Routes
-              </h2>
-              {dashboardData?.savedRoutes && dashboardData.savedRoutes.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {dashboardData.savedRoutes.slice().reverse().map((route: any) => (
-                    <div key={route._id} className="bg-[#FFF8EC] rounded-2xl p-5 border border-[#546B41]/30 hover:shadow-lg transition-shadow relative overflow-hidden group">
-                      <div className="absolute top-0 left-0 w-full h-1 bg-[#546B41]"></div>
-                      <div className="flex justify-between items-start mb-1">
-                        <h3 className="font-extrabold text-lg text-black line-clamp-1 flex items-center gap-2">
-                          <Navigation size={18} className="text-[#546B41]"/> {route.destinationName}
-                        </h3>
-                        <button onClick={() => removeRoute(route._id)} className="text-gray-400 hover:text-red-500 p-1.5 rounded-full hover:bg-red-50 transition opacity-0 group-hover:opacity-100" title="Delete Route">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                      <p className="text-xs text-black/60 font-bold uppercase tracking-wider mb-4 border-b border-[#546B41]/10 pb-2">Travel Mode: {route.mode}</p>
-                      <button onClick={() => generatePDF(route)} className="w-full bg-[#546B41] hover:bg-[#99AD7A] text-[#FFF8EC] hover:text-black py-2 rounded-xl flex items-center justify-center gap-2 font-bold transition-colors shadow-sm">
-                        <FileDown size={16} /> Export PDF
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center p-8 bg-[#FFF8EC] rounded-2xl border border-[#546B41]/20 border-dashed">
-                  <p className="text-black font-bold text-lg mb-2">No Routes Saved</p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* TAB 2: SOCIAL */}
-        {activeTab === 'social' && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            {/* Upload Module */}
-            <div className="bg-white rounded-3xl shadow-md p-6 border-2 border-[#546B41]/10 h-max lg:col-span-1">
-              <h2 className="text-xl font-bold text-black mb-6 border-b border-[#546B41]/20 pb-4 flex items-center">
-                <Camera className="w-6 h-6 mr-3 text-[#546B41]" /> Create Post
-              </h2>
-              <form onSubmit={handleCreatePost} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-bold text-black mb-1">Select Images (Max 10)</label>
-                  <input 
-                    type="file" 
-                    accept="image/*"
-                    multiple
-                    className="w-full text-sm text-black file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#546B41]/10 file:text-[#546B41] hover:file:bg-[#546B41]/20 cursor-pointer"
-                    onChange={(e) => {
-                       if(e.target.files) {
-                         const files = Array.from(e.target.files).slice(0, 10);
-                         setSelectedFiles(files);
-                       }
-                    }}
-                  />
-                  {selectedFiles.length > 0 && (
-                    <p className="text-xs font-bold text-gray-500 mt-2">{selectedFiles.length} file(s) selected</p>
+        <AnimatePresence mode="wait">
+          <motion.div 
+             key={activeTab}
+             initial={{ opacity: 0, y: 30 }}
+             animate={{ opacity: 1, y: 0 }}
+             exit={{ opacity: 0, scale: 0.98 }}
+             transition={{ duration: 0.3 }}
+          >
+            {/* TAB 1: ROUTES AND SAVES */}
+            {activeTab === 'routes' && (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Favorites Section */}
+                <div className="bg-white rounded-3xl shadow-xl p-6 border border-[#546B41]/10 h-max">
+                  <h2 className="text-xl font-black text-black mb-6 border-b-2 border-gray-100 pb-4 flex items-center tracking-tight">
+                    <Heart className="w-6 h-6 mr-3 text-red-500 fill-current" /> Saved Destinations
+                  </h2>
+                  {dashboardData?.favorites && dashboardData.favorites.length > 0 ? (
+                    <ul className="divide-y divide-gray-100">
+                      {dashboardData.favorites.map((dest: any) => (
+                        <li key={dest._id} className="py-4 flex flex-col group">
+                          <div className="flex justify-between items-start w-full">
+                            <div>
+                              <Link href={`/destinations/${dest._id}`} className="hover:text-[#546B41] font-bold text-gray-800 text-lg block transition">
+                                {dest.name}
+                              </Link>
+                              <span className="text-sm text-gray-500 flex items-center mt-1 font-medium bg-gray-50 w-max px-2 py-0.5 rounded-md">
+                                <MapPin className="w-3 h-3 mr-1 inline text-[#546B41]" /> {dest.location || dest.type}
+                              </span>
+                            </div>
+                            <button onClick={() => removeFavorite(dest._id)}  className="text-gray-300 hover:text-red-500 p-2 rounded-full hover:bg-red-50 transition" title="Remove Destination">
+                              <Trash2 className="w-5 h-5" />
+                            </button>
+                          </div>
+                          <button onClick={() => generateDestinationPDF(dest)} className="mt-4 w-full bg-[#DCCCAC]/20 hover:bg-[#546B41] text-black hover:text-[#FFF8EC] border border-[#546B41]/10 p-2.5 rounded-xl flex items-center justify-center gap-2 text-sm font-bold transition-all shadow-sm">
+                            <FileDown size={14} /> Download PDF Guide
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-gray-500 font-medium px-2 py-8 text-center bg-gray-50 rounded-2xl">You haven't bookmarked anything yet.</p>
                   )}
                 </div>
 
-                <div>
-                  <label className="block text-sm font-bold text-black mb-1">Destination Location</label>
-                  <select 
-                    value={newPost.location} 
-                    onChange={e => setNewPost({...newPost, location: e.target.value})} 
-                    className="w-full border-[#546B41]/30 rounded-lg p-2 border bg-[#FFF8EC] text-sm text-black outline-none focus:border-[#546B41]" 
-                    required
-                  >
-                    <option value="" disabled>Select exact location</option>
-                    {destinations.map(d => (
-                       <option key={d._id} value={d.name}>{d.name}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-black mb-1">Caption</label>
-                  <textarea rows={3} value={newPost.caption} onChange={e => setNewPost({...newPost, caption: e.target.value})} className="w-full border-[#546B41]/30 rounded-lg p-2 border bg-[#FFF8EC] text-sm text-black outline-none focus:border-[#546B41]" placeholder="Share your experience..."/>
-                </div>
-
-                <div className="pt-2">
-                  <button type="submit" disabled={isPosting} className="w-full py-3 bg-[#546B41] text-[#FFF8EC] rounded-xl font-bold hover:bg-[#99AD7A] hover:text-black transition-colors disabled:opacity-50">
-                    {isPosting ? 'Uploading...' : 'Publish Post'}
-                  </button>
-                </div>
-              </form>
-            </div>
-
-            {/* My Feed */}
-            <div className="lg:col-span-2 space-y-6">
-              <h2 className="text-xl font-bold text-black mb-2 flex items-center">
-                Your Digital Album
-              </h2>
-              {myPosts.length > 0 ? (
-                myPosts.map(post => (
-                  <PostCard 
-                    key={post._id} 
-                    post={post} 
-                    currentUser={user} 
-                    onDelete={deletePost}
-                  />
-                ))
-              ) : (
-                <div className="bg-white rounded-3xl p-12 text-center border-2 border-dashed border-[#546B41]/20">
-                  <Camera size={48} className="mx-auto text-gray-300 mb-4" />
-                  <p className="text-gray-500 font-bold text-lg">You haven't posted anything yet.</p>
-                </div>
-              )}
-            </div>
-            
-          </div>
-        )}
-
-        {/* TAB 3: ADMIN MODERATION */}
-        {activeTab === 'admin' && user.role === 'admin' && (
-          <div className="bg-white border-2 border-red-500/20 rounded-3xl shadow-xl overflow-hidden p-6">
-            <h2 className="text-2xl font-black text-black mb-6 flex items-center gap-3 border-b-2 border-gray-100 pb-4">
-              <ShieldAlert className="text-red-500"/> Social Moderation Enforcement Matrix
-            </h2>
-            
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-gray-50 text-gray-600 text-sm uppercase tracking-wider">
-                    <th className="p-4 border-b font-bold rounded-tl-xl">User Name</th>
-                    <th className="p-4 border-b font-bold">Email</th>
-                    <th className="p-4 border-b font-bold">Role</th>
-                    <th className="p-4 border-b font-bold">Status</th>
-                    <th className="p-4 border-b font-bold rounded-tr-xl">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {allUsers.map((u: any) => (
-                    <tr key={u._id} className="hover:bg-gray-50 transition-colors">
-                      <td className="p-4 font-bold text-black">{u.name}</td>
-                      <td className="p-4 text-gray-500">{u.email}</td>
-                      <td className="p-4">
-                        <span className={`px-2 py-1 rounded-full text-xs font-bold ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
-                          {u.role.toUpperCase()}
-                        </span>
-                      </td>
-                      <td className="p-4">
-                        {u.isBanned ? (
-                          <span className="flex items-center gap-1 text-red-600 font-bold text-sm bg-red-50 px-2 py-1 rounded-lg w-max">
-                            <Ban size={14}/> Banned
-                          </span>
-                        ) : (
-                          <span className="flex items-center gap-1 text-green-600 font-bold text-sm bg-green-50 px-2 py-1 rounded-lg w-max">
-                            <CheckCircle size={14}/> Safe
-                          </span>
-                        )}
-                      </td>
-                      <td className="p-4">
-                        {u.role !== 'admin' && (
-                          <button 
-                            onClick={() => toggleBan(u._id, !!u.isBanned)}
-                            className={`px-4 py-1.5 rounded-lg font-bold text-xs transition-colors border ${u.isBanned ? 'bg-gray-800 text-white border-black hover:bg-black' : 'bg-red-50 text-red-600 border-red-200 hover:bg-red-500 hover:text-white'}`}
-                          >
-                           {u.isBanned ? 'RESTORE ACCESS' : 'BAN USER'}
+                {/* Saved Routes Section */}
+                <div className="bg-white rounded-3xl shadow-xl p-6 border border-[#546B41]/10 lg:col-span-2">
+                  <h2 className="text-xl font-black text-black mb-6 border-b-2 border-gray-100 pb-4 flex items-center tracking-tight">
+                    <RouteIcon className="w-6 h-6 mr-3 text-[#546B41]" /> Generated Navigations
+                  </h2>
+                  {dashboardData?.savedRoutes && dashboardData.savedRoutes.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      {dashboardData.savedRoutes.slice().reverse().map((route: any) => (
+                        <div key={route._id} className="bg-[#FFF8EC] rounded-2xl p-6 border border-[#546B41]/20 hover:shadow-xl hover:border-[#546B41]/50 transition-all relative overflow-hidden group">
+                          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#546B41] to-[#DCCCAC]"></div>
+                          <div className="flex justify-between items-start mb-2">
+                            <h3 className="font-extrabold text-lg text-black line-clamp-1 flex items-center gap-2">
+                              <Navigation size={18} className="text-[#546B41]"/> {route.destinationName}
+                            </h3>
+                            <button onClick={() => removeRoute(route._id)} className="text-gray-300 hover:text-red-500 p-1.5 rounded-full bg-white hover:bg-red-50 transition opacity-0 group-hover:opacity-100 shadow-sm" title="Delete Route">
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                          <p className="text-xs text-[#546B41] font-black uppercase tracking-widest mb-5 border-b border-[#546B41]/10 pb-3">Mode: {route.mode}</p>
+                          <button onClick={() => generatePDF(route)} className="w-full bg-black hover:bg-[#99AD7A] text-[#FFF8EC] hover:text-black py-3 rounded-xl flex items-center justify-center gap-2 font-bold transition-colors shadow-md">
+                            <FileDown size={16} /> Export Route Matrix
                           </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center p-12 bg-[#FFF8EC] rounded-3xl border-2 border-[#546B41]/20 border-dashed">
+                      <RouteIcon size={48} className="mx-auto text-[#DCCCAC] mb-4"/>
+                      <p className="text-black font-extrabold text-xl mb-2">No Routes Available</p>
+                      <p className="text-gray-500">Go to Destinations to generate your first travel map.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* TAB 2: SOCIAL */}
+            {activeTab === 'social' && (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                {/* Upload Module */}
+                <div className="bg-white rounded-3xl shadow-xl p-8 border border-[#546B41]/10 h-max lg:col-span-1">
+                  <h2 className="text-xl font-black text-black mb-6 border-b-2 border-gray-100 pb-4 flex items-center tracking-tight">
+                    <Camera className="w-6 h-6 mr-3 text-[#546B41]" /> Deploy Content
+                  </h2>
+                  <form onSubmit={handleCreatePost} className="space-y-6">
+                    <div>
+                      <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">Select Media (Max 10)</label>
+                      <input 
+                        type="file" 
+                        accept="image/*"
+                        multiple
+                        className="w-full text-sm text-black file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-black file:bg-[#546B41]/10 file:text-[#546B41] hover:file:bg-[#546B41] hover:file:text-white cursor-pointer transition-colors"
+                        onChange={(e) => {
+                           if(e.target.files) {
+                             setSelectedFiles(Array.from(e.target.files).slice(0, 10));
+                           }
+                        }}
+                      />
+                      {selectedFiles.length > 0 && <p className="text-sm font-bold text-[#546B41] mt-3">✔️ {selectedFiles.length} file(s) attached</p>}
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">Pin Location</label>
+                      <select 
+                        value={newPost.location} 
+                        onChange={e => setNewPost({...newPost, location: e.target.value})} 
+                        className="w-full border-2 border-gray-100 rounded-xl p-3.5 bg-gray-50 text-sm font-bold text-black outline-none focus:border-[#546B41] focus:bg-white transition-all shadow-inner" 
+                        required
+                      >
+                        <option value="" disabled>Exact Database Match Required</option>
+                        {destinations.map(d => (
+                           <option key={d._id} value={d.name}>{d.name}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">Caption Story</label>
+                      <textarea rows={4} value={newPost.caption} onChange={e => setNewPost({...newPost, caption: e.target.value})} className="w-full border-2 border-gray-100 rounded-xl p-3.5 bg-gray-50 text-sm font-bold text-black outline-none focus:border-[#546B41] focus:bg-white transition-all shadow-inner resize-none" placeholder="What did you discover today?"/>
+                    </div>
+
+                    <div className="pt-4">
+                      <button type="submit" disabled={isPosting} className="w-full py-4 bg-[#546B41] text-[#FFF8EC] rounded-2xl font-black text-lg tracking-widest hover:bg-black transition-all disabled:opacity-50 shadow-xl hover:shadow-2xl hover:-translate-y-1">
+                        {isPosting ? 'UPLOADING...' : 'PUBLISH LIVE'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+                {/* My Feed */}
+                <div className="lg:col-span-2 space-y-8">
+                  <h2 className="text-3xl font-black text-black mb-4 flex items-center">
+                    Digital Experience Feed
+                  </h2>
+                  {myPosts.length > 0 ? (
+                    <div className="space-y-8">
+                      {myPosts.map(post => (
+                        <PostCard 
+                          key={post._id} 
+                          post={post} 
+                          currentUser={user} 
+                          onDelete={deletePost}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="bg-white rounded-3xl p-16 text-center border-2 border-dashed border-[#546B41]/20 shadow-sm">
+                      <Camera size={64} className="mx-auto text-[#DCCCAC] mb-6" />
+                      <p className="text-black font-black text-2xl mb-2">Empty Gallery</p>
+                      <p className="text-gray-500 font-medium">Publish your first travel snapshot to build your identity.</p>
+                    </div>
+                  )}
+                </div>
+                
+              </div>
+            )}
+
+            {/* TAB 3: ADMIN MODERATION */}
+            {activeTab === 'admin' && user.role === 'admin' && (
+              <div className="bg-white border-2 border-red-500/20 rounded-3xl shadow-2xl overflow-hidden p-8 relative">
+                <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-red-600 to-orange-500"></div>
+                <h2 className="text-3xl font-black text-black mb-8 flex items-center gap-4 pb-6 border-b-2 border-gray-100">
+                  <ShieldAlert className="text-red-500 w-10 h-10"/> Administrative Enforcements
+                </h2>
+                
+                <div className="overflow-x-auto rounded-2xl border border-gray-100">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-gray-100 text-gray-500 text-xs font-black uppercase tracking-widest">
+                        <th className="p-5 border-b">Matrix ID</th>
+                        <th className="p-5 border-b">Communications</th>
+                        <th className="p-5 border-b">Override</th>
+                        <th className="p-5 border-b">Status</th>
+                        <th className="p-5 border-b">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {allUsers.map((u: any) => (
+                        <tr key={u._id} className="hover:bg-gray-50 transition-colors">
+                          <td className="p-5 font-black text-[#546B41] text-sm tabular-nums">{u.name}</td>
+                          <td className="p-5 text-gray-500 font-medium text-sm">{u.email}</td>
+                          <td className="p-5">
+                            <span className={`px-3 py-1.5 rounded-lg text-xs font-black tracking-wider ${u.role === 'admin' ? 'bg-purple-100 text-purple-700 shadow-sm' : 'bg-blue-50 text-blue-600'}`}>
+                              {u.role.toUpperCase()}
+                            </span>
+                          </td>
+                          <td className="p-5">
+                            {u.isBanned ? (
+                              <span className="flex items-center gap-1.5 text-red-600 font-black text-xs bg-red-100 px-3 py-1.5 rounded-lg shadow-sm w-max uppercase tracking-wider">
+                                <Ban size={14}/> Banned Layer
+                              </span>
+                            ) : (
+                              <span className="flex items-center gap-1.5 text-emerald-600 font-black text-xs bg-emerald-100 px-3 py-1.5 rounded-lg shadow-sm w-max uppercase tracking-wider">
+                                <CheckCircle size={14}/> Secure
+                              </span>
+                            )}
+                          </td>
+                          <td className="p-5">
+                            {u.role !== 'admin' && (
+                              <button 
+                                onClick={() => toggleBan(u._id, !!u.isBanned)}
+                                className={`px-5 py-2.5 rounded-xl font-black text-[10px] tracking-widest uppercase transition-all shadow-md ${u.isBanned ? 'bg-black text-white hover:bg-gray-800' : 'bg-red-500 text-white hover:bg-red-600 hover:-translate-y-0.5'}`}
+                              >
+                               {u.isBanned ? 'Authorize Key' : 'Initiate Ban'}
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Modal Interceptor Profile Editor */}
+        <AnimatePresence>
+           {showProfileModal && (
+             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
+                <motion.div 
+                   initial={{ scale: 0.9, y: 20, opacity: 0 }}
+                   animate={{ scale: 1, y: 0, opacity: 1 }}
+                   exit={{ scale: 0.9, y: 20, opacity: 0 }}
+                   className="bg-[#FFF8EC] rounded-[2rem] w-full max-w-xl shadow-[0_30px_60px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col relative border border-[#546B41]/20"
+                >
+                  {/* Modal Header */}
+                  <div className="bg-[#546B41] text-[#FFF8EC] px-8 py-6 flex justify-between items-center relative overflow-hidden">
+                    <div className="absolute -right-4 -top-10 opacity-20"><Sparkles size={120}/></div>
+                    <h3 className="text-2xl font-black flex items-center gap-3 relative z-10 tracking-tight">Studio Configuration</h3>
+                    <button onClick={() => setShowProfileModal(false)} className="relative z-10 text-[#DCCCAC] hover:text-white font-black text-sm uppercase tracking-widest transition-colors bg-black/20 px-4 py-2 rounded-full hover:bg-black/40">Close</button>
+                  </div>
+                  
+                  <div className="p-8 flex flex-col gap-6 relative">
+                    {/* Live Preview Display Engine */}
+                    <div className="mx-auto w-36 h-36 rounded-full border-4 border-[#546B41] bg-[#DCCCAC] overflow-hidden shadow-xl mb-4 relative z-10">
+                       {previewAvatar ? (
+                          <img src={previewAvatar} className="w-full h-full object-cover" />
+                       ) : (
+                          <div className="w-full h-full flex items-center justify-center"><UserIcon size={48} className="text-[#546B41]"/></div>
+                       )}
+                       
+                       {/* Upload Spinner Overlay */}
+                       <AnimatePresence>
+                         {isUpdatingProfile && (
+                           <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center rounded-full">
+                             <div className="animate-spin rounded-full border-4 border-[#DCCCAC] border-t-transparent w-10 h-10"></div>
+                           </motion.div>
+                         )}
+                       </AnimatePresence>
+                    </div>
+
+                    {/* Mode Switching Tabs */}
+                    <div className="grid grid-cols-2 bg-[#DCCCAC]/30 p-1.5 rounded-2xl">
+                      <button onClick={() => setActiveProfileTab('generate')} className={`py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeProfileTab === 'generate' ? 'bg-[#546B41] text-[#FFF8EC] shadow-[0_5px_15px_rgba(84,107,65,0.4)]' : 'text-[#546B41] hover:bg-[#DCCCAC]/50'}`}>AI Prompt</button>
+                      <button onClick={() => setActiveProfileTab('upload')} className={`py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeProfileTab === 'upload' ? 'bg-[#546B41] text-[#FFF8EC] shadow-[0_5px_15px_rgba(84,107,65,0.4)]' : 'text-[#546B41] hover:bg-[#DCCCAC]/50'}`}>Disk Upload</button>
+                    </div>
+
+                    <div className="min-h-[140px]">
+                      <AnimatePresence mode="wait">
+                        {activeProfileTab === 'generate' ? (
+                           <motion.div key="generate" initial={{opacity:0, x:-20}} animate={{opacity:1, x:0}} exit={{opacity:0, x:20}} className="flex flex-col gap-3">
+                             <label className="text-xs font-black text-[#546B41] uppercase tracking-widest">Generative AI Persona Configurator</label>
+                             <div className="flex gap-2">
+                               <input type="text" value={aiPrompt} onChange={e => setAiPrompt(e.target.value)} placeholder="Wait! Type 'anime' or 'cyberpunk'..." className="flex-1 border-2 border-[#546B41]/20 rounded-2xl p-4 outline-none focus:border-[#546B41] bg-white text-black font-bold shadow-inner placeholder:font-normal"/>
+                               <button onClick={handleGenerateAvatar} disabled={isUpdatingProfile} className="bg-black text-[#DCCCAC] px-6 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-gray-800 disabled:opacity-50 flex items-center gap-2 shadow-lg hover:shadow-xl transition-all"><Sparkles size={16}/> Render</button>
+                             </div>
+                             <div className="flex items-center gap-1.5 text-xs text-gray-500 font-bold mt-1">
+                               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                               API Mock Pipeline Active
+                             </div>
+                           </motion.div>
+                        ) : (
+                           <motion.div key="upload" initial={{opacity:0, x:20}} animate={{opacity:1, x:0}} exit={{opacity:0, x:-20}} className="flex flex-col gap-3">
+                             <label className="text-xs font-black text-[#546B41] uppercase tracking-widest">Manual Data Payload Transfer</label>
+                             <div className="border-2 border-dashed border-[#546B41]/40 rounded-2xl p-8 bg-white text-center hover:bg-[#DCCCAC]/20 transition-colors cursor-pointer relative shadow-inner group">
+                               <input type="file" accept="image/*" onChange={(e)=>{
+                                  if(e.target.files && e.target.files[0]) {
+                                    setProfileAvatarFile(e.target.files[0]);
+                                    setPreviewAvatar(URL.createObjectURL(e.target.files[0]));
+                                  }
+                               }} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"/>
+                               <UploadCloud size={40} className="mx-auto text-[#546B41] mb-2 group-hover:scale-110 transition-transform" />
+                               <p className="text-sm font-black tracking-tight text-[#546B41]">Drag & Drop High-Resolution Asset</p>
+                               {profileAvatarFile && <p className="text-xs text-emerald-600 font-bold mt-2">File Locked: {profileAvatarFile.name}</p>}
+                             </div>
+                           </motion.div>
                         )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+                      </AnimatePresence>
+                    </div>
+
+                    <div className="flex flex-col gap-3 pt-6 border-t-2 border-[#DCCCAC]/50">
+                       <label className="text-xs font-black text-[#546B41] uppercase tracking-widest">Public Biography Display</label>
+                       <textarea value={editBio} onChange={e => setEditBio(e.target.value)} maxLength={160} rows={2} className="w-full border-2 border-[#546B41]/20 rounded-2xl p-4 outline-none focus:border-[#546B41] focus:bg-[#546B41]/5 bg-white text-black font-medium resize-none shadow-inner" placeholder="Tell the traveler community about your history..."></textarea>
+                    </div>
+
+                    <button onClick={handleSaveProfile} disabled={isUpdatingProfile} className="w-full py-5 mt-4 bg-[#546B41] text-[#FFF8EC] rounded-2xl font-black tracking-widest uppercase hover:bg-black hover:text-[#DCCCAC] transition-all disabled:opacity-50 shadow-[0_10px_20px_rgba(84,107,65,0.3)] hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(84,107,65,0.4)] relative overflow-hidden text-lg group">
+                      <div className="absolute inset-0 w-full bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out skew-x-12"></div>
+                      {isUpdatingProfile ? 'Applying Secure Overrides...' : 'Publish Identity Update'}
+                    </button>
+                  </div>
+                </motion.div>
+             </div>
+           )}
+        </AnimatePresence>
+
       </div>
     </div>
   );
