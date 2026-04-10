@@ -30,6 +30,13 @@ const userSchema = new mongoose.Schema({
   createdTrips: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Itinerary'
+  }],
+  savedRoutes: [{
+    destinationName: String,
+    mode: String,
+    distance: String,
+    duration: String,
+    dateSaved: { type: Date, default: Date.now }
   }]
 }, { timestamps: true });
 

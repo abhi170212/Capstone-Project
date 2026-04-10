@@ -3,6 +3,7 @@ export interface Destination {
   name: string;
   description: string;
   location: string;
+  category?: string;
   type: 'eco' | 'cultural' | 'historical';
   images: string[];
   coordinates: {

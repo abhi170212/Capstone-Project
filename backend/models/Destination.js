@@ -20,6 +20,10 @@ const destinationSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Location is required'],
     },
+    category: {
+      type: String,
+      default: 'All'
+    },
     type: {
       type: String,
       enum: ['eco', 'cultural', 'historical'],

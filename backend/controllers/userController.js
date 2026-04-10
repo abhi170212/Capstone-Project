@@ -19,6 +19,7 @@ const getDashboardData = async (req, res) => {
       email: user.email,
       favorites: user.favorites,
       createdTrips: user.createdTrips,
+      savedRoutes: user.savedRoutes || [],
     });
   } catch (error) {
     console.error(error);
@@ -49,6 +50,47 @@ const toggleFavorite = async (req, res) => {
     await user.save();
     
     res.json({ favorites: user.favorites });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// @desc    Save a route for navigation
+// @route   POST /api/users/routes
+// @access  Private
+const saveRoute = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const exists = user.savedRoutes.some(r => r.destinationName === req.body.destinationName);
+    if (exists) {
+      return res.status(400).json({ message: 'Route for this destination is already saved.' });
+    }
+
+    user.savedRoutes.push(req.body);
+    await user.save();
+    
+    res.json({ savedRoutes: user.savedRoutes });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// @desc    Delete a saved route
+// @route   DELETE /api/users/routes/:routeId
+// @access  Private
+const deleteRoute = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    user.savedRoutes = user.savedRoutes.filter(route => route._id.toString() !== req.params.routeId);
+    await user.save();
+    
+    res.json({ savedRoutes: user.savedRoutes });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
@@ -195,4 +237,6 @@ module.exports = {
   deleteUser,
   updateUserRole,
   updateProfile,
+  saveRoute,
+  deleteRoute,
 };
