@@ -17,8 +17,11 @@ const reviewRoutes = require('./routes/reviewRoutes');
 const weatherRoutes = require('./routes/weatherRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const postRoutes = require('./routes/postRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
 const notFound = require('./middleware/notFound');
 const errorHandler = require('./middleware/errorHandler');
+const path = require('path');
 
 // Connect to MongoDB
 connectDB();
@@ -51,6 +54,7 @@ app.get('/', (req, res) => {
       weather: '/api/weather',
       bookings: '/api/bookings',
       notifications: '/api/notifications',
+      posts: '/api/posts',
     },
   });
 });
@@ -69,6 +73,11 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/weather', weatherRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/posts', postRoutes);
+app.use('/api/upload', uploadRoutes);
+
+// Static routing for images
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ─── Error Handling ───────────────────────────────────────────────────────────
 app.use(notFound);

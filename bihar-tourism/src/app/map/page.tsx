@@ -24,6 +24,7 @@ export default function InteractiveMapPage() {
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
   const [clickedLocation, setClickedLocation] = useState<{lat: number, lng: number} | null>(null);
   const [activeDestination, setActiveDestination] = useState<Destination | null>(null);
+  const [communityPosts, setCommunityPosts] = useState<any[]>([]);
   const [travelMode, setTravelMode] = useState<'driving' | 'walking' | 'cycling' | 'train' | 'plane'>('driving');
   
   const [routeInfo, setRouteInfo] = useState<{ distance: number, duration: number, mode: string } | null>(null);
@@ -56,9 +57,16 @@ export default function InteractiveMapPage() {
     });
   }, [destinations, searchQuery, activeCategory]);
 
-  const handleDestinationSelect = (destination: Destination) => {
+  const handleDestinationSelect = async (destination: Destination) => {
     setActiveDestination(destination);
     setClickedLocation(destination.coordinates);
+
+    try {
+      const postRes = await api.get(`/posts?location=${encodeURIComponent(destination.name)}`);
+      setCommunityPosts(postRes.data);
+    } catch (err) {
+      console.error('Failed to load social posts for this location', err);
+    }
 
     if (!userLocation) {
       setShowLocationPrompt(true);
@@ -344,6 +352,32 @@ export default function InteractiveMapPage() {
               {activeDestination.images && activeDestination.images.length > 0 && (
                 <div className="h-32 w-full rounded-2xl overflow-hidden mb-4 border border-[#546B41]/30">
                   <img src={activeDestination.images[0]} alt={activeDestination.name} className="w-full h-full object-cover" />
+                </div>
+              )}
+
+              {/* Social Media Feed Injection */}
+              {communityPosts.length > 0 && (
+                <div className="mb-6">
+                  <p className="text-black font-bold mx-1 mb-2">Traveler Experiences</p>
+                  <div className="flex overflow-x-auto gap-4 snap-x snap-mandatory pb-2">
+                    {communityPosts.map(post => {
+                      const handle = post.user?.name ? `@${post.user.name.replace(/\s+/g, '').toLowerCase()}` : '@user';
+                      // Strict fallback evaluating unstructured data requests
+                      const imageUrl = Array.isArray(post.images) && post.images.length > 0 
+                        ? (typeof post.images[0] === 'string' ? post.images[0] : post.images[0].url) 
+                        : 'https://images.unsplash.com/photo-1596414272183-5ee9acabf333?q=80&w=400';
+                      
+                      return (
+                        <div key={post._id} className="min-w-[200px] w-[200px] flex-shrink-0 snap-center bg-black rounded-2xl overflow-hidden relative group h-[250px] shadow-lg border border-[#546B41]/20">
+                          <img src={imageUrl} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="Post"/>
+                          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-3">
+                            <p className="text-[#FFF8EC] font-bold text-xs mb-1 line-clamp-2">{post.caption || 'Beautiful destination'}</p>
+                            <p className="text-[#99AD7A] font-extrabold text-[10px] tracking-wider">{handle}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
 

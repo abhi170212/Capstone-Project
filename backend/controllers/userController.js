@@ -225,7 +225,40 @@ const updateProfile = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error updating profile' });
+  }
+};
+
+// @desc    Ban User
+// @route   PUT /api/admin/users/:id/ban
+// @access  Private/Admin
+const banUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (user.role === 'admin') return res.status(400).json({ message: 'Cannot ban an admin' });
+
+    user.isBanned = true;
+    await user.save();
+    res.json({ message: 'User has been banned successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error banning user' });
+  }
+};
+
+// @desc    Unban User
+// @route   PUT /api/admin/users/:id/unban
+// @access  Private/Admin
+const unbanUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    user.isBanned = false;
+    await user.save();
+    res.json({ message: 'User has been unbanned successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error unbanning user' });
   }
 };
 
@@ -239,4 +272,6 @@ module.exports = {
   updateProfile,
   saveRoute,
   deleteRoute,
+  banUser,
+  unbanUser
 };

@@ -1,11 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { recommendationApi } from '@/lib/api';
 import { Destination } from '@/types';
 import DestinationCard from '@/components/DestinationCard';
-import { Sparkles, MapPin, Calculator, Wind, Search, Info } from 'lucide-react';
+import { Sparkles, MapPin, Calculator, Wind, Search, Info, Camera, Heart, MessageCircle } from 'lucide-react';
+import api from '@/lib/api';
+import PostCard from '@/components/PostCard';
+import { useAuth } from '@/context/AuthContext';
 
 const TRAVEL_TYPES = ['Eco Tourism', 'Cultural Tourism', 'Religious'];
 const BUDGET_OPTIONS = ['Budget', 'Mid-range', 'Luxury'];
@@ -13,6 +16,7 @@ const SEASONS = ['Spring', 'Summer', 'Monsoon', 'Autumn', 'Winter'];
 const INTEREST_OPTIONS = ['Wildlife', 'History', 'Nature', 'Festivals', 'Architecture', 'Spiritual'];
 
 export default function SmartFinder() {
+  const { user } = useAuth();
   const [step, setStep] = useState(1);
   const [preferences, setPreferences] = useState({
     travelType: '',
@@ -24,6 +28,22 @@ export default function SmartFinder() {
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
+
+  // Global Community Posts State
+  const [communityPosts, setCommunityPosts] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchCommunityPosts();
+  }, []);
+
+  const fetchCommunityPosts = async () => {
+    try {
+      const res = await api.get('/posts');
+      setCommunityPosts(res.data);
+    } catch(err) {
+      console.error('Failed to fetch community inspirations', err);
+    }
+  };
 
   const handleInterestToggle = (interest: string) => {
     setPreferences(prev => ({
@@ -290,6 +310,25 @@ export default function SmartFinder() {
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Community Inspirations Mirroring Dashboard */}
+      {communityPosts.length > 0 && (
+        <div className="max-w-5xl mx-auto mt-20">
+          <div className="flex items-center gap-3 mb-8 px-4">
+            <Camera className="text-[#546B41]" size={32} />
+            <h2 className="text-3xl font-black text-black">Authentic Traveler Inspirations</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-4">
+            {communityPosts.map(post => (
+              <PostCard 
+                key={post._id}
+                post={post}
+                currentUser={user}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Info Modal */}
       <AnimatePresence>
