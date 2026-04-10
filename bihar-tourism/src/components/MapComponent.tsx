@@ -10,8 +10,8 @@ const MapComponentInner = dynamic(
   { 
     ssr: false, 
     loading: () => (
-      <div className="bg-gray-200 rounded-2xl flex items-center justify-center w-full min-h-[400px]">
-        <p className="text-gray-600 font-medium">Loading Map Data...</p>
+      <div className="bg-[#FFF8EC] rounded-2xl flex items-center justify-center w-full h-full min-h-[400px]">
+        <p className="text-[#546B41] font-bold">Loading Map Data...</p>
       </div>
     )
   }
@@ -19,7 +19,12 @@ const MapComponentInner = dynamic(
 
 interface MapComponentProps {
   destinations?: any[];
-  height?: string;
+  onDestinationSelect?: (destination: any) => void;
+  travelMode?: 'driving' | 'walking' | 'cycling' | 'train' | 'plane';
+  userLocation?: { lat: number, lng: number } | null;
+  clickedLocation?: { lat: number, lng: number } | null;
+  onRouteCalculated?: (route: any) => void;
+  isDarkMode?: boolean;
 }
 
 export default function MapComponent(props: MapComponentProps) {

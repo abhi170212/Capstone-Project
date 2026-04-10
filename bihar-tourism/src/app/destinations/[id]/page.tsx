@@ -20,9 +20,11 @@ import {
   Award, 
   Activity,
   ArrowLeft,
-  Heart
+  Heart,
+  FileDown
 } from 'lucide-react';
 import Link from 'next/link';
+import { jsPDF } from 'jspdf';
 
 // Calculator icon component
 function Calculator({ size }: { size: number }) {
@@ -75,7 +77,7 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
 
   const toggleFavorite = async () => {
     if (!user) {
-      alert("Please login to save favorites.");
+      alert("Please login to save destinations.");
       return;
     }
     try {
@@ -84,8 +86,40 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
       setIsFavorite(res.data.favorites.includes(id));
     } catch (err: any) {
       console.error('Failed to toggle favorite', err);
-      alert('Error saving favorite: ' + (err.response?.data?.message || err.message));
+      alert('Error saving destination: ' + (err.response?.data?.message || err.message));
     }
+  };
+
+  const downloadDestinationPDF = () => {
+    if (!destination) return;
+    const doc = new jsPDF();
+    
+    doc.setFillColor(84, 107, 65);
+    doc.rect(0, 0, 210, 40, 'F');
+    
+    doc.setTextColor(255, 248, 236);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text("Bihar Tourism - Destination Guide", 105, 25, { align: "center" });
+
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(18);
+    doc.text(destination.name, 20, 60);
+
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Location: ${destination.location}`, 20, 75);
+    doc.text(`Best Season: ${destination.bestSeason}`, 20, 85);
+    doc.text(`Entry Fee: ${destination.entryFee}`, 20, 95);
+
+    doc.setFont("helvetica", "bold");
+    doc.text(`About:`, 20, 115);
+    
+    doc.setFont("helvetica", "normal");
+    const splitDescription = doc.splitTextToSize(destination.description, 170);
+    doc.text(splitDescription, 20, 125);
+
+    doc.save(`Destination-${destination.name.replace(/\s+/g, '-')}.pdf`);
   };
 
   const submitReview = async (e: React.FormEvent) => {
@@ -169,7 +203,14 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
                   className={`px-6 py-3 rounded-full flex items-center font-bold transition-colors shadow-none ${isFavorite ? 'bg-[#99AD7A] text-black border-2 border-[#546B41]' : 'bg-[#DCCCAC] text-black border border-[#546B41] hover:bg-[#FFF8EC]'}`}
                 >
                   <Heart size={20} className={`mr-2 stroke-black ${isFavorite ? 'fill-[#546B41]' : ''}`} />
-                  {isFavorite ? 'Saved to Favorites' : 'Save to Favorites'}
+                  {isFavorite ? 'Destination Saved' : 'Save Destination'}
+                </button>
+                <button
+                  onClick={downloadDestinationPDF}
+                  className="px-6 py-3 rounded-full flex items-center font-bold transition-colors shadow-none bg-[#DCCCAC] text-black border border-[#546B41] hover:bg-[#FFF8EC]"
+                >
+                  <FileDown size={20} className="mr-2" />
+                  PDF Guide
                 </button>
                 <ShareButton 
                   url={typeof window !== 'undefined' ? window.location.href : ''}
