@@ -9,12 +9,12 @@ interface ImageGalleryProps {
 
 export default function ImageGallery({ 
   images = [
-    "https://images.unsplash.com/photo-1623945032589-1c7c8987f52e?w=800&q=80",
-    "https://images.unsplash.com/photo-1547970810-dcdde07fb819?w=800&q=80",
-    "https://images.unsplash.com/photo-1623945032589-1c7c8987f52e?w=800&q=80",
-    "https://images.unsplash.com/photo-1547970810-dcdde07fb819?w=800&q=80",
-    "https://images.unsplash.com/photo-1623945032589-1c7c8987f52e?w=800&q=80",
-    "https://images.unsplash.com/photo-1547970810-dcdde07fb819?w=800&q=80",
+    "/destinations/bodh_gaya.png",
+    "/destinations/nalanda.png",
+    "/destinations/rajgir.png",
+    "/destinations/vaishali.png",
+    "/destinations/vikramshila.png",
+    "/destinations/patna_sahib.png",
   ],
   title = "Explore Bihar's Beauty"
 }: ImageGalleryProps) {
