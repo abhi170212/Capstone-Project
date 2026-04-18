@@ -10,6 +10,9 @@ export interface User {
   token?: string;
   favorites?: string[];
   createdTrips?: string[];
+  avatar?: string;
+  bio?: string;
+  coverImage?: string;
 }
 
 interface AuthContextType {

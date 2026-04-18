@@ -1,18 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Share2, Copy, Check, Mail, Link } from 'lucide-react';
+import { Share2, Copy, Check, Mail, Link as LinkIcon } from 'lucide-react';
 
 interface ShareButtonProps {
   url?: string;
   title?: string;
   description?: string;
+  image?: string;
 }
 
-export default function ShareButton({ url, title = 'Check this out!', description = '' }: ShareButtonProps) {
+export default function ShareButton({ url, title = 'Check this out!', description = '', image }: ShareButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const shareUrl = url || (typeof window !== 'undefined' ? window.location.href : '');
 
@@ -80,49 +87,82 @@ export default function ShareButton({ url, title = 'Check this out!', descriptio
   ];
 
   return (
-    <div className="relative">
+    <>
       {/* Share Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all text-gray-700 font-medium text-sm"
+        onClick={() => setIsOpen(true)}
+        className="px-6 py-3 rounded-full flex items-center font-bold transition-colors shadow-none bg-[#DCCCAC] text-black border border-[#546B41] hover:bg-[#FFF8EC]"
       >
-        <Share2 size={16} />
+        <Share2 size={20} className="mr-2" />
         Share
       </button>
 
-      {/* Share Menu */}
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            {/* Backdrop */}
-            <div
-              className="fixed inset-0 z-40"
-              onClick={() => setIsOpen(false)}
-            />
-
-            {/* Menu */}
+      {/* Share Modal Portal */}
+      {mounted && createPortal(
+        <AnimatePresence>
+          {isOpen && (
             <motion.div
-              initial={{ opacity: 0, y: 10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              className="absolute right-0 top-full mt-2 w-72 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden"
+              initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setIsOpen(false)}
+          >
+            {/* Modal Container */}
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-md bg-[#FFF8EC] border-2 border-[#546B41] rounded-3xl overflow-hidden shadow-2xl relative"
             >
-              <div className="p-4">
-                <h4 className="font-bold text-gray-800 mb-3">Share this destination</h4>
+              {/* Close Button */}
+              <button 
+                onClick={() => setIsOpen(false)}
+                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-[#DCCCAC] border border-[#546B41] rounded-full text-black hover:bg-[#99AD7A] z-10 transition-colors cursor-pointer"
+              >
+                ✕
+              </button>
+
+              {/* Header Image */}
+              {image && (
+                <div className="h-48 w-full relative border-b-2 border-[#546B41]">
+                  <img src={image} alt="Preview" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 flex items-end p-6">
+                    <h3 className="text-2xl font-black text-white leading-tight">
+                      {title.replace(' - Bihar Tourism', '').replace('Visit ', '')}
+                    </h3>
+                  </div>
+                </div>
+              )}
+
+              <div className="p-6">
+                {!image && (
+                  <h3 className="text-2xl font-black text-black mb-2">Share this destination</h3>
+                )}
+
+                {/* Brief description */}
+                {description && (
+                  <p className="text-black font-medium mb-6 line-clamp-2 text-sm italic bg-[#DCCCAC]/30 p-3 rounded-xl border border-[#546B41]/20">
+                    "{description}"
+                  </p>
+                )}
 
                 {/* Native Share (Mobile) */}
                 {'share' in navigator && (
                   <button
                     onClick={handleNativeShare}
-                    className="w-full flex items-center gap-3 p-3 mb-3 bg-gradient-to-r from-green-500 to-blue-500 text-white rounded-xl hover:shadow-lg transition-all"
+                    className="w-full flex items-center justify-center gap-3 p-3 mb-4 bg-[#99AD7A] border border-[#546B41] text-black font-bold rounded-xl hover:bg-[#DCCCAC] transition-colors"
                   >
                     <Share2 size={20} />
-                    <span className="font-medium">Share via...</span>
+                    Share directly via device
                   </button>
                 )}
 
+                <div className="text-xs font-bold text-[#546B41] uppercase tracking-wider mb-3">Share to</div>
+
                 {/* Social Links */}
-                <div className="grid grid-cols-2 gap-2 mb-3">
+                <div className="grid grid-cols-4 gap-3 mb-6">
                   {socialLinks.map((social) => {
                     const Icon = social.icon;
                     return (
@@ -132,35 +172,39 @@ export default function ShareButton({ url, title = 'Check this out!', descriptio
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={() => setIsOpen(false)}
-                        className={`flex items-center gap-2 p-3 ${social.color} text-white rounded-xl transition-all`}
+                        className="flex flex-col items-center justify-center gap-2 p-3 bg-[#DCCCAC] border border-[#546B41] text-black rounded-xl hover:bg-[#99AD7A] hover:-translate-y-1 transition-all"
+                        title={social.name}
                       >
-                        <Icon size={18} />
-                        <span className="text-sm font-medium">{social.name}</span>
+                        <Icon size={24} />
                       </a>
                     );
                   })}
                 </div>
 
+                <div className="text-xs font-bold text-[#546B41] uppercase tracking-wider mb-2">Or copy link</div>
                 {/* Copy Link */}
-                <button
-                  onClick={handleCopy}
-                  className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
-                >
-                  <div className="flex items-center gap-2">
-                    <Link size={18} className="text-gray-600" />
-                    <span className="text-sm font-medium text-gray-700">Copy Link</span>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 bg-white border border-[#546B41] rounded-xl px-3 py-3 text-sm text-black truncate font-medium">
+                    {shareUrl}
                   </div>
-                  {copied ? (
-                    <Check size={18} className="text-green-600" />
-                  ) : (
-                    <Copy size={18} className="text-gray-400" />
-                  )}
-                </button>
+                  <button
+                    onClick={handleCopy}
+                    className="flex-shrink-0 flex items-center justify-center w-12 h-12 bg-[#DCCCAC] border border-[#546B41] hover:bg-[#99AD7A] rounded-xl transition-colors"
+                  >
+                    {copied ? (
+                      <Check size={20} className="text-black" />
+                    ) : (
+                      <Copy size={20} className="text-black" />
+                    )}
+                  </button>
+                </div>
               </div>
             </motion.div>
-          </>
+          </motion.div>
         )}
-      </AnimatePresence>
-    </div>
+      </AnimatePresence>,
+      document.body
+    )}
+    </>
   );
 }
