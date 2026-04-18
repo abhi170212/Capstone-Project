@@ -43,19 +43,19 @@ export default function WeatherWidget({ lat, lng, location }: WeatherWidgetProps
 
   if (loading) {
     return (
-      <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white animate-pulse">
-        <div className="h-6 bg-white/20 rounded w-3/4 mb-4"></div>
-        <div className="h-12 bg-white/20 rounded w-1/2 mb-2"></div>
-        <div className="h-4 bg-white/20 rounded w-full"></div>
+      <div className="bg-[#99AD7A] border border-[#546B41] rounded-3xl p-6 text-black animate-pulse shadow-none">
+        <div className="h-6 bg-[#546B41]/20 rounded w-3/4 mb-4"></div>
+        <div className="h-12 bg-[#546B41]/20 rounded w-1/2 mb-2"></div>
+        <div className="h-4 bg-[#546B41]/20 rounded w-full"></div>
       </div>
     );
   }
 
   if (error || !weather) {
     return (
-      <div className="bg-gray-100 rounded-2xl p-6 text-center">
-        <AlertCircle size={32} className="mx-auto text-gray-400 mb-2" />
-        <p className="text-gray-600 text-sm">Weather data unavailable</p>
+      <div className="bg-[#DCCCAC] border border-[#546B41] rounded-3xl p-6 text-center shadow-none">
+        <AlertCircle size={32} className="mx-auto text-black/50 mb-2" />
+        <p className="text-black font-semibold text-sm">Weather data unavailable</p>
       </div>
     );
   }
@@ -67,10 +67,10 @@ export default function WeatherWidget({ lat, lng, location }: WeatherWidgetProps
       className="space-y-4"
     >
       {/* Current Weather */}
-      <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg">
+      <div className="bg-[#99AD7A] border border-[#546B41] rounded-3xl p-6 text-black shadow-none">
         <div className="flex justify-between items-start mb-4">
           <div>
-            <p className="text-blue-100 text-sm mb-1">
+            <p className="text-[#546B41] font-bold text-sm mb-1 uppercase tracking-wider">
               {location || 'Current Location'}
             </p>
             <div className="flex items-center gap-3">
@@ -80,38 +80,38 @@ export default function WeatherWidget({ lat, lng, location }: WeatherWidgetProps
           </div>
         </div>
         
-        <p className="text-blue-50 text-lg capitalize mb-4">
+        <p className="text-black font-bold text-lg capitalize mb-4">
           {weather.current.description}
         </p>
 
-        <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/20">
+        <div className="grid grid-cols-3 gap-4 pt-4 border-t border-[#546B41]/30">
           <div className="flex items-center gap-2">
             <Thermometer size={18} />
             <div>
-              <p className="text-xs text-blue-100">Feels Like</p>
-              <p className="font-semibold">{weather.current.feels_like}°C</p>
+              <p className="text-xs font-bold text-[#546B41] uppercase">Feels Like</p>
+              <p className="font-black">{weather.current.feels_like}°C</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Droplets size={18} />
             <div>
-              <p className="text-xs text-blue-100">Humidity</p>
-              <p className="font-semibold">{weather.current.humidity}%</p>
+              <p className="text-xs font-bold text-[#546B41] uppercase">Humidity</p>
+              <p className="font-black">{weather.current.humidity}%</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Wind size={18} />
             <div>
-              <p className="text-xs text-blue-100">Wind</p>
-              <p className="font-semibold">{weather.current.wind_speed} km/h</p>
+              <p className="text-xs font-bold text-[#546B41] uppercase">Wind</p>
+              <p className="font-black">{weather.current.wind_speed} km/h</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* 7-Day Forecast */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-        <h4 className="font-bold text-gray-800 mb-3">7-Day Forecast</h4>
+      <div className="bg-[#FFF8EC] border border-[#546B41] rounded-3xl p-4 shadow-none">
+        <h4 className="font-black text-black mb-3">7-Day Forecast</h4>
         <div className="space-y-2">
           {weather.forecast.map((day: any, index: number) => (
             <motion.div
@@ -119,14 +119,14 @@ export default function WeatherWidget({ lat, lng, location }: WeatherWidgetProps
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg transition-colors"
+              className="flex items-center justify-between p-2 hover:bg-[#DCCCAC] rounded-xl transition-colors border border-transparent hover:border-[#546B41]/30"
             >
-              <span className="text-sm font-medium text-gray-700 w-20">{day.day}</span>
+              <span className="text-sm font-bold text-black w-20">{day.day}</span>
               <div className="flex items-center gap-2 flex-1 justify-center">
                 {getWeatherIcon(day.icon, 20)}
-                <span className="text-xs text-gray-500 capitalize hidden sm:inline">{day.description}</span>
+                <span className="text-xs font-bold text-black capitalize hidden sm:inline">{day.description}</span>
               </div>
-              <span className="text-sm font-bold text-gray-800 w-12 text-right">{day.temp}°C</span>
+              <span className="text-sm font-black text-black w-12 text-right">{day.temp}°C</span>
             </motion.div>
           ))}
         </div>
@@ -134,19 +134,19 @@ export default function WeatherWidget({ lat, lng, location }: WeatherWidgetProps
 
       {/* Recommendations */}
       {weather.recommendation && (
-        <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl p-4 border border-green-100">
-          <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
-            <Sun size={20} className="text-green-600" />
+        <div className="bg-[#DCCCAC] border border-[#546B41] rounded-3xl p-4 shadow-none">
+          <h4 className="font-black text-black mb-3 flex items-center gap-2">
+            <Sun size={20} className="text-[#546B41]" />
             Travel Tips
           </h4>
           <div className="space-y-2">
-            <p className="text-sm text-gray-700">
-              <span className="font-semibold">Best time:</span> {weather.recommendation.bestTimeToVisit}
+            <p className="text-sm font-bold text-black">
+              <span className="uppercase tracking-wider text-[#546B41]">Best time: </span> {weather.recommendation.bestTimeToVisit}
             </p>
             <ul className="space-y-1">
               {weather.recommendation.tips.map((tip: string, index: number) => (
-                <li key={index} className="flex items-start gap-2 text-sm text-gray-600">
-                  <span className="text-green-600 mt-1">•</span>
+                <li key={index} className="flex items-start gap-2 text-sm text-black font-semibold">
+                  <span className="text-[#546B41] mt-1">•</span>
                   <span>{tip}</span>
                 </li>
               ))}

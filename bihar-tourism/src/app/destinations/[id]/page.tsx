@@ -226,6 +226,7 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
                   url={typeof window !== 'undefined' ? window.location.href : ''}
                   title={`Visit ${destination.name} - Bihar Tourism`}
                   description={destination.description}
+                  image={destination.images[0] || 'https://images.unsplash.com/photo-1623945032589-1c7c8987f52e?w=1200'}
                 />
               </div>
             </div>

@@ -19,6 +19,7 @@ const bookingRoutes = require('./routes/bookingRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const postRoutes = require('./routes/postRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
+const aiRoutes = require('./routes/aiRoutes');
 const notFound = require('./middleware/notFound');
 const errorHandler = require('./middleware/errorHandler');
 const path = require('path');
@@ -75,6 +76,7 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/ai', aiRoutes);
 
 // Static routing for images
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
