@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { AuthProvider } from "@/context/AuthContext";
+import VoiceAssistant from "@/components/VoiceAssistant";
 
 const poppins = Poppins({
   weight: ['300', '400', '500', '600', '700', '800', '900'],
@@ -27,6 +28,7 @@ export default function RootLayout({
         <AuthProvider>
           <Navbar />
           <main className="min-h-screen">{children}</main>
+          <VoiceAssistant />
           <Footer />
         </AuthProvider>
       </body>
