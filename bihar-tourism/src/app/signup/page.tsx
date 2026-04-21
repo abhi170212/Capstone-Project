@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const pingLocations = [
   { name: 'Patna Matrix', top: '45%', left: '35%' },
@@ -16,17 +16,75 @@ const pingLocations = [
   { name: 'Bhagalpur Node', top: '48%', left: '78%' },
 ];
 
+const PASSWORD_MIN_LENGTH = 8;
+const PASSWORD_MAX_LENGTH = 64;
+
+interface PasswordRequirement {
+  key: string;
+  label: string;
+  test: (pw: string) => boolean;
+}
+
+const passwordRequirements: PasswordRequirement[] = [
+  { key: 'minLength', label: `At least ${PASSWORD_MIN_LENGTH} characters`, test: (pw) => pw.length >= PASSWORD_MIN_LENGTH },
+  { key: 'maxLength', label: `Maximum ${PASSWORD_MAX_LENGTH} characters`, test: (pw) => pw.length > 0 && pw.length <= PASSWORD_MAX_LENGTH },
+  { key: 'uppercase', label: 'One uppercase letter (A-Z)', test: (pw) => /[A-Z]/.test(pw) },
+  { key: 'lowercase', label: 'One lowercase letter (a-z)', test: (pw) => /[a-z]/.test(pw) },
+  { key: 'number', label: 'One number (0-9)', test: (pw) => /[0-9]/.test(pw) },
+  { key: 'special', label: 'One special character (!@#$%...)', test: (pw) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(pw) },
+];
+
+const strengthLevels = [
+  { label: 'Too Weak', color: '#ef4444', bg: 'rgba(239,68,68,0.15)', border: 'rgba(239,68,68,0.4)' },
+  { label: 'Weak', color: '#f97316', bg: 'rgba(249,115,22,0.15)', border: 'rgba(249,115,22,0.4)' },
+  { label: 'Fair', color: '#eab308', bg: 'rgba(234,179,8,0.15)', border: 'rgba(234,179,8,0.4)' },
+  { label: 'Good', color: '#22c55e', bg: 'rgba(34,197,94,0.15)', border: 'rgba(34,197,94,0.4)' },
+  { label: 'Strong', color: '#DCCCAC', bg: 'rgba(220,204,172,0.15)', border: 'rgba(220,204,172,0.4)' },
+];
+
 export default function SignupPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
   const router = useRouter();
   const { login } = useAuth();
 
+  // Compute password strength
+  const passwordAnalysis = useMemo(() => {
+    const results = passwordRequirements.map((req) => ({
+      ...req,
+      passed: req.test(password),
+    }));
+    const passedCount = results.filter((r) => r.passed).length;
+    const total = results.length;
+    const allPassed = passedCount === total;
+
+    // Strength index: 0-4
+    let strengthIndex = 0;
+    if (passedCount >= 2) strengthIndex = 1;
+    if (passedCount >= 3) strengthIndex = 2;
+    if (passedCount >= 5) strengthIndex = 3;
+    if (allPassed) strengthIndex = 4;
+
+    const percentage = (passedCount / total) * 100;
+
+    return { results, passedCount, total, allPassed, strengthIndex, percentage };
+  }, [password]);
+
+  const currentStrength = strengthLevels[passwordAnalysis.strengthIndex];
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!passwordAnalysis.allPassed) {
+      setError('Please meet all password requirements before signing up.');
+      return;
+    }
+
     setLoading(true);
     setError('');
 
@@ -144,21 +202,128 @@ export default function SignupPage() {
 
               <div>
                 <label className="block text-xs font-black text-[#546B41] uppercase tracking-widest mb-2">Password</label>
-                <input
-                  type="password"
-                  required
-                  className="w-full px-5 py-4 bg-white/5 border-2 border-white/10 rounded-2xl text-[#FFF8EC] placeholder-white/20 focus:outline-none focus:border-[#DCCCAC] focus:bg-white/10 transition-all font-medium backdrop-blur-sm"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    maxLength={PASSWORD_MAX_LENGTH}
+                    className="w-full px-5 py-4 pr-14 bg-white/5 border-2 border-white/10 rounded-2xl text-[#FFF8EC] placeholder-white/20 focus:outline-none focus:border-[#DCCCAC] focus:bg-white/10 transition-all font-medium backdrop-blur-sm"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    onFocus={() => setPasswordFocused(true)}
+                    onBlur={() => setPasswordFocused(false)}
+                  />
+                  {/* Show/Hide Toggle */}
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-[#DCCCAC] transition-colors focus:outline-none"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-5 0-9.27-3.11-11-7.5a11.72 11.72 0 013.168-4.477M6.343 6.343A9.97 9.97 0 0112 5c5 0 9.27 3.11 11 7.5a11.72 11.72 0 01-4.168 4.477M6.343 6.343L3 3m3.343 3.343l2.829 2.829m4.243 4.243l2.829 2.829M6.343 6.343l11.314 11.314M14.121 14.121A3 3 0 009.879 9.879" />
+                      </svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+
+                {/* Character Count */}
+                {password.length > 0 && (
+                  <div className="flex justify-between items-center mt-2 px-1">
+                    <span className="text-[10px] font-bold tracking-widest uppercase" style={{ color: currentStrength.color }}>
+                      {currentStrength.label}
+                    </span>
+                    <span className={`text-[10px] font-bold tracking-wider ${password.length > PASSWORD_MAX_LENGTH ? 'text-red-400' : 'text-white/30'}`}>
+                      {password.length}/{PASSWORD_MAX_LENGTH}
+                    </span>
+                  </div>
+                )}
+
+                {/* Strength Meter Bar */}
+                {password.length > 0 && (
+                  <div className="mt-2 h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                    <motion.div
+                      className="h-full rounded-full"
+                      initial={{ width: 0 }}
+                      animate={{
+                        width: `${passwordAnalysis.percentage}%`,
+                        backgroundColor: currentStrength.color,
+                      }}
+                      transition={{ duration: 0.4, ease: 'easeOut' }}
+                      style={{
+                        boxShadow: `0 0 10px ${currentStrength.color}40`,
+                      }}
+                    />
+                  </div>
+                )}
+
+                {/* Password Requirements Checklist */}
+                <AnimatePresence>
+                  {(passwordFocused || password.length > 0) && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="mt-3 rounded-xl overflow-hidden"
+                      style={{
+                        backgroundColor: currentStrength.bg,
+                        border: `1px solid ${password.length > 0 ? currentStrength.border : 'rgba(255,255,255,0.08)'}`,
+                      }}
+                    >
+                      <div className="p-4 space-y-2">
+                        <p className="text-[10px] font-black uppercase tracking-[0.15em] text-white/40 mb-3">
+                          Password Requirements
+                        </p>
+                        {passwordAnalysis.results.map((req) => (
+                          <motion.div
+                            key={req.key}
+                            className="flex items-center gap-2.5"
+                            initial={false}
+                            animate={{ opacity: 1 }}
+                          >
+                            <motion.div
+                              className="flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center"
+                              animate={{
+                                backgroundColor: req.passed ? currentStrength.color : 'rgba(255,255,255,0.08)',
+                                scale: req.passed ? [1, 1.2, 1] : 1,
+                              }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              {req.passed ? (
+                                <svg className="w-2.5 h-2.5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                </svg>
+                              ) : (
+                                <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
+                              )}
+                            </motion.div>
+                            <span
+                              className="text-[11px] font-semibold tracking-wider transition-colors duration-200"
+                              style={{ color: req.passed ? currentStrength.color : 'rgba(255,255,255,0.35)' }}
+                            >
+                              {req.label}
+                            </span>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
 
             <div>
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !passwordAnalysis.allPassed}
                 className="w-full py-5 bg-[#546B41] text-[#FFF8EC] rounded-2xl font-black uppercase tracking-[0.2em] hover:bg-[#DCCCAC] hover:text-black transition-all duration-300 shadow-[0_10px_30px_rgba(84,107,65,0.4)] hover:shadow-[0_15px_40px_rgba(220,204,172,0.4)] hover:-translate-y-1 disabled:opacity-50 disabled:hover:translate-y-0 text-sm mt-4"
               >
                 {loading ? 'Creating account...' : 'Sign Up'}
