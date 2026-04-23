@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import ImageGallery from '@/components/ImageGallery';
 import PanoramaViewer from '@/components/PanoramaViewer';
+import FamousPersonalities from '@/components/FamousPersonalities';
 
 export default function About() {
   return (
@@ -11,13 +12,13 @@ export default function About() {
         <div className="max-w-7xl mx-auto h-[400px] md:h-[600px] relative rounded-3xl overflow-hidden shadow-2xl bg-black border-4 border-[#546B41]">
           {/* Background Video */}
           <div className="absolute inset-0 w-[150%] h-[150%] md:w-full md:h-[180%] -left-[25%] -top-[25%] md:left-0 md:-top-[40%] pointer-events-none">
-             <iframe
-               src="https://www.youtube.com/embed/yGp_o04GYF8?autoplay=1&mute=1&controls=0&loop=1&playlist=yGp_o04GYF8&modestbranding=1&rel=0&playsinline=1"
-               title="Bihar Tourism Background"
-               className="w-full h-full object-cover opacity-80"
-               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-               allowFullScreen
-             />
+            <iframe
+              src="https://www.youtube.com/embed/yGp_o04GYF8?autoplay=1&mute=1&controls=0&loop=1&playlist=yGp_o04GYF8&modestbranding=1&rel=0&playsinline=1"
+              title="Bihar Tourism Background"
+              className="w-full h-full object-cover opacity-80"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
           </div>
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/20"></div>
           <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
@@ -51,19 +52,19 @@ export default function About() {
               </h2>
               <div className="space-y-6">
                 <p className="text-lg text-black font-medium leading-relaxed bg-white p-6 rounded-2xl shadow-sm border border-[#546B41]/10 border-l-4 border-l-[#546B41]">
-                  Bihar, one of the world's oldest continuously inhabited regions, is a land of profound 
-                  spiritual significance and natural beauty. This is where Lord Buddha attained enlightenment, 
-                  where Mahavira preached his message of non-violence, and where ancient universities like 
+                  Bihar, one of the world's oldest continuously inhabited regions, is a land of profound
+                  spiritual significance and natural beauty. This is where Lord Buddha attained enlightenment,
+                  where Mahavira preached his message of non-violence, and where ancient universities like
                   Nalanda attracted scholars from across the globe.
                 </p>
                 <p className="text-lg text-black font-medium leading-relaxed">
-                  Our Smart Digital Platform for Eco & Cultural Tourism aims to showcase the incredible 
-                  diversity of Bihar - from its pristine wildlife sanctuaries and tiger reserves to its 
+                  Our Smart Digital Platform for Eco & Cultural Tourism aims to showcase the incredible
+                  diversity of Bihar - from its pristine wildlife sanctuaries and tiger reserves to its
                   sacred pilgrimage sites and archaeological wonders.
                 </p>
                 <p className="text-lg text-[#546B41] font-bold leading-relaxed tracking-wide">
-                  Whether you seek spiritual enlightenment, adventure in nature, or a journey through 
-                  history, Bihar offers an experience that will transform your understanding of India's 
+                  Whether you seek spiritual enlightenment, adventure in nature, or a journey through
+                  history, Bihar offers an experience that will transform your understanding of India's
                   rich heritage.
                 </p>
               </div>
@@ -102,8 +103,8 @@ export default function About() {
             </div>
             <h2 className="text-5xl font-black mb-8 text-[#FFF8EC] tracking-tighter">OUR MISSION</h2>
             <p className="text-2xl text-[#DCCCAC] leading-relaxed max-w-4xl mx-auto font-medium">
-              To promote sustainable tourism that preserves Bihar's natural and cultural heritage 
-              while providing authentic experiences that benefit local communities and create 
+              To promote sustainable tourism that preserves Bihar's natural and cultural heritage
+              while providing authentic experiences that benefit local communities and create
               lasting memories for visitors.
             </p>
           </motion.div>
@@ -204,14 +205,17 @@ export default function About() {
         </div>
       </section>
 
+      {/* Famous Personalities Section */}
+      <FamousPersonalities />
+
       {/* Gallery Section */}
       <section className="py-32 px-4 bg-[#FFF8EC]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-             <h2 className="text-4xl md:text-5xl font-black text-black mb-4 tracking-tight">
-               VISUAL <span className="text-[#546B41]">DOCUMENTATION</span>
-             </h2>
-             <div className="w-32 h-1.5 bg-[#DCCCAC] mx-auto mt-4 mb-6 rounded-full shadow-lg"></div>
+            <h2 className="text-4xl md:text-5xl font-black text-black mb-4 tracking-tight">
+              VISUAL <span className="text-[#546B41]">DOCUMENTATION</span>
+            </h2>
+            <div className="w-32 h-1.5 bg-[#DCCCAC] mx-auto mt-4 mb-6 rounded-full shadow-lg"></div>
           </div>
           <ImageGallery />
         </div>

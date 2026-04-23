@@ -40,7 +40,7 @@ export default function SmartFinder() {
     try {
       const res = await api.get('/posts');
       setCommunityPosts(res.data);
-    } catch(err) {
+    } catch (err) {
       console.error('Failed to fetch community inspirations', err);
     }
   };
@@ -106,11 +106,10 @@ export default function SmartFinder() {
                     setPreferences({ ...preferences, travelType: type });
                     setStep(2);
                   }}
-                  className={`p-6 rounded-2xl border-2 transition-all duration-300 text-left shadow-none ${
-                    preferences.travelType === type
+                  className={`p-6 rounded-2xl border-2 transition-all duration-300 text-left shadow-none ${preferences.travelType === type
                       ? 'border-[#546B41] bg-[#99AD7A] text-black'
                       : 'border-[#546B41]/30 bg-[#FFF8EC] text-black hover:bg-[#99AD7A]/50'
-                  }`}
+                    }`}
                 >
                   <span className="text-xl font-bold">{type}</span>
                 </button>
@@ -137,11 +136,10 @@ export default function SmartFinder() {
                     setPreferences({ ...preferences, budget: opt });
                     setStep(3);
                   }}
-                  className={`p-6 rounded-2xl border-2 transition-all duration-300 text-left shadow-none ${
-                    preferences.budget === opt
+                  className={`p-6 rounded-2xl border-2 transition-all duration-300 text-left shadow-none ${preferences.budget === opt
                       ? 'border-[#546B41] bg-[#99AD7A] text-black'
                       : 'border-[#546B41]/30 bg-[#FFF8EC] text-black hover:bg-[#99AD7A]/50'
-                  }`}
+                    }`}
                 >
                   <span className="text-xl font-bold">{opt}</span>
                 </button>
@@ -169,11 +167,10 @@ export default function SmartFinder() {
                     setPreferences({ ...preferences, season: s });
                     setStep(4);
                   }}
-                  className={`p-4 rounded-2xl border-2 transition-all duration-300 text-center shadow-none ${
-                    preferences.season === s
+                  className={`p-4 rounded-2xl border-2 transition-all duration-300 text-center shadow-none ${preferences.season === s
                       ? 'border-[#546B41] bg-[#99AD7A] text-black'
                       : 'border-[#546B41]/30 bg-[#FFF8EC] text-black hover:bg-[#99AD7A]/50'
-                  }`}
+                    }`}
                 >
                   <span className="font-bold">{s}</span>
                 </button>
@@ -198,11 +195,10 @@ export default function SmartFinder() {
                 <button
                   key={opt}
                   onClick={() => handleInterestToggle(opt)}
-                  className={`p-4 rounded-2xl border-2 transition-all duration-300 text-center shadow-none ${
-                    preferences.interests.includes(opt)
+                  className={`p-4 rounded-2xl border-2 transition-all duration-300 text-center shadow-none ${preferences.interests.includes(opt)
                       ? 'border-[#546B41] bg-[#99AD7A] text-black'
                       : 'border-[#546B41]/30 bg-[#FFF8EC] text-black hover:bg-[#99AD7A]/50'
-                  }`}
+                    }`}
                 >
                   <span className="font-bold">{opt}</span>
                 </button>
@@ -245,10 +241,11 @@ export default function SmartFinder() {
                 <div className="w-12 h-12 border-4 border-[#546B41] border-t-transparent rounded-full animate-spin"></div>
               </div>
             ) : recommendations.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 overflow-x-auto snap-x snap-mandatory pb-8 pt-4 -mx-4 px-4 sm:mx-0 sm:px-0 hide-scrollbar scroll-smooth">
                 {recommendations.map((dest, idx) => (
                   <motion.div
                     key={dest._id}
+                    className="min-w-[85vw] sm:min-w-[45vw] md:min-w-0 snap-center shrink-0 h-full"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.1 }}
@@ -284,9 +281,8 @@ export default function SmartFinder() {
               {[1, 2, 3, 4].map(s => (
                 <div
                   key={s}
-                  className={`w-1/4 h-2 rounded-full mx-1 transition-all duration-500 ${
-                    s <= step ? 'bg-[#546B41]' : 'bg-[#FFF8EC] border border-[#546B41]/30'
-                  }`}
+                  className={`w-1/4 h-2 rounded-full mx-1 transition-all duration-500 ${s <= step ? 'bg-[#546B41]' : 'bg-[#FFF8EC] border border-[#546B41]/30'
+                    }`}
                 />
               ))}
             </div>
@@ -295,7 +291,7 @@ export default function SmartFinder() {
         )}
 
         <div className="bg-[#DCCCAC] rounded-3xl shadow-none border border-[#546B41]/30 p-8 md:p-12 min-h-[400px] flex flex-col justify-center relative">
-          <button 
+          <button
             onClick={() => setShowInfoModal(true)}
             className="absolute top-6 right-6 p-2 rounded-full border border-[#546B41]/50 bg-[#FFF8EC] text-black hover:bg-[#99AD7A] hover:border-[#546B41] transition-all flex items-center justify-center flex-shrink-0 group cursor-pointer"
           >
@@ -304,7 +300,7 @@ export default function SmartFinder() {
               How to use Smart Finder
             </span>
           </button>
-          
+
           <AnimatePresence mode="wait">
             {renderStep()}
           </AnimatePresence>
@@ -320,7 +316,7 @@ export default function SmartFinder() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-4">
             {communityPosts.map(post => (
-              <PostCard 
+              <PostCard
                 key={post._id}
                 post={post}
                 currentUser={user}

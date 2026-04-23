@@ -48,10 +48,10 @@ export default function Destinations() {
 
   const filteredDestinations = destinations.filter((destination) => {
     const matchesSearch = destination.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         destination.location.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesCategory = categoryFilter === 'all' || 
-                           destination.type === categoryFilter;
+      destination.location.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesCategory = categoryFilter === 'all' ||
+      destination.type === categoryFilter;
 
     return matchesSearch && matchesCategory;
   });
@@ -96,9 +96,8 @@ export default function Destinations() {
             <button
               key={idx}
               onClick={() => setCurrentIndex(idx)}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                currentIndex === idx ? 'w-8 bg-[#546B41]' : 'w-2 bg-[#99AD7A]'
-              }`}
+              className={`h-2 rounded-full transition-all duration-300 ${currentIndex === idx ? 'w-8 bg-[#546B41]' : 'w-2 bg-[#99AD7A]'
+                }`}
               aria-label={`Go to slide ${idx + 1}`}
             />
           ))}
@@ -147,7 +146,7 @@ export default function Destinations() {
           ) : error ? (
             <div className="text-center py-20 bg-[#DCCCAC] rounded-2xl border border-[#546B41]/30">
               <p className="text-black font-bold">{error}</p>
-              <button 
+              <button
                 onClick={() => window.location.reload()}
                 className="mt-4 px-4 py-2 bg-[#99AD7A] text-black border border-[#546B41] font-bold rounded-lg text-sm hover:bg-[#FFF8EC] transition-colors shadow-none"
               >
@@ -155,7 +154,7 @@ export default function Destinations() {
               </button>
             </div>
           ) : filteredDestinations.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 overflow-x-auto snap-x snap-mandatory pb-8 pt-4 -mx-4 px-4 sm:mx-0 sm:px-0 hide-scrollbar scroll-smooth">
               {filteredDestinations.map((destination, index) => (
                 <motion.div
                   key={destination._id}
@@ -163,6 +162,7 @@ export default function Destinations() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
+                  className="min-w-[85vw] sm:min-w-[45vw] md:min-w-0 snap-center shrink-0 h-full"
                 >
                   <DestinationCard destination={destination} />
                 </motion.div>

@@ -11,13 +11,13 @@ import ShareButton from '@/components/ShareButton';
 import NearbyAttractions from '@/components/NearbyAttractions';
 import BookingForm from '@/components/BookingForm';
 import { useAuth } from '@/context/AuthContext';
-import { 
-  Calendar, 
-  MapPin, 
-  Navigation, 
-  Star, 
-  Leaf, 
-  Award, 
+import {
+  Calendar,
+  MapPin,
+  Navigation,
+  Star,
+  Leaf,
+  Award,
   Activity,
   ArrowLeft,
   Heart,
@@ -29,17 +29,17 @@ import { jsPDF } from 'jspdf';
 // Calculator icon component
 function Calculator({ size }: { size: number }) {
   return (
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/>
+      <rect width="16" height="20" x="4" y="2" rx="2" ry="2" /><line x1="8" x2="16" y1="6" y2="6" /><line x1="16" x2="16" y1="14" y2="18" /><path d="M16 10h.01" /><path d="M12 10h.01" /><path d="M8 10h.01" /><path d="M12 14h.01" /><path d="M8 14h.01" /><path d="M12 18h.01" /><path d="M8 18h.01" />
     </svg>
   );
 }
@@ -94,10 +94,10 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
   const downloadDestinationPDF = () => {
     if (!destination) return;
     const doc = new jsPDF();
-    
+
     doc.setFillColor(84, 107, 65);
     doc.rect(0, 0, 210, 40, 'F');
-    
+
     doc.setTextColor(255, 248, 236);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(22);
@@ -115,7 +115,7 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
 
     doc.setFont("helvetica", "bold");
     doc.text(`About:`, 20, 115);
-    
+
     doc.setFont("helvetica", "normal");
     const splitDescription = doc.splitTextToSize(destination.description, 170);
     doc.text(splitDescription, 20, 125);
@@ -150,7 +150,7 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
       try {
         const res = await destinationApi.getById(id);
         setDestination(res.data);
-        
+
         // Fetch community posts relating to this location
         try {
           const postRes = await api.get(`/posts?location=${encodeURIComponent(res.data.name)}`);
@@ -200,7 +200,7 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
               <ArrowLeft size={20} className="mr-2" /> Back to Explore
             </Link>
             <div className="flex justify-between items-end">
-              <motion.h1 
+              <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="text-5xl md:text-7xl font-bold text-black mb-4 drop-shadow-sm"
@@ -208,7 +208,7 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
                 {destination.name}
               </motion.h1>
               <div className="flex gap-3 mb-4">
-                <button 
+                <button
                   onClick={toggleFavorite}
                   className={`px-6 py-3 rounded-full flex items-center font-bold transition-colors shadow-none ${isFavorite ? 'bg-[#99AD7A] text-black border-2 border-[#546B41]' : 'bg-[#DCCCAC] text-black border border-[#546B41] hover:bg-[#FFF8EC]'}`}
                 >
@@ -222,7 +222,7 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
                   <FileDown size={20} className="mr-2" />
                   PDF Guide
                 </button>
-                <ShareButton 
+                <ShareButton
                   url={typeof window !== 'undefined' ? window.location.href : ''}
                   title={`Visit ${destination.name} - Bihar Tourism`}
                   description={destination.description}
@@ -278,7 +278,7 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
             <section>
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-3xl font-bold text-black">Location Map</h2>
-                <a 
+                <a
                   href={`https://www.google.com/maps/search/?api=1&query=${destination.coordinates.lat},${destination.coordinates.lng}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -295,34 +295,34 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
             {/* Reviews Section */}
             <section className="bg-[#DCCCAC] rounded-3xl p-8 border border-[#546B41]/30 mt-12 shadow-none">
               <h2 className="text-3xl font-bold text-black mb-6 border-b border-[#546B41]/20 pb-4">Traveler Reviews</h2>
-              
+
               {/* Review Form */}
               {user ? (
                 <form onSubmit={submitReview} className="mb-8 bg-[#FFF8EC] p-6 rounded-2xl shadow-none border border-[#546B41]/30">
                   <h3 className="font-bold text-black text-lg mb-4">Write a Review</h3>
                   <div className="mb-4">
                     <label className="block text-sm font-bold text-black mb-1">Rating</label>
-                    <select 
-                      value={newReview.rating} 
-                      onChange={(e) => setNewReview({...newReview, rating: Number(e.target.value)})}
+                    <select
+                      value={newReview.rating}
+                      onChange={(e) => setNewReview({ ...newReview, rating: Number(e.target.value) })}
                       className="w-full border-[#546B41]/50 rounded-lg shadow-none focus:border-[#546B41] focus:ring-[#546B41] p-2 border bg-[#FFF8EC] font-bold text-black"
                     >
-                      {[5,4,3,2,1].map(num => <option key={num} value={num} className="font-bold">{num} Stars</option>)}
+                      {[5, 4, 3, 2, 1].map(num => <option key={num} value={num} className="font-bold">{num} Stars</option>)}
                     </select>
                   </div>
                   <div className="mb-4">
                     <label className="block text-sm font-bold text-black mb-1">Your Experience</label>
-                    <textarea 
+                    <textarea
                       required
                       rows={3}
                       value={newReview.comment}
-                      onChange={(e) => setNewReview({...newReview, comment: e.target.value})}
+                      onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
                       className="w-full border-[#546B41]/50 rounded-lg shadow-none focus:border-[#546B41] focus:ring-[#546B41] p-2 border bg-[#FFF8EC] text-black font-medium placeholder:text-black/50"
                       placeholder="Share your thoughts..."
                     ></textarea>
                   </div>
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     disabled={submittingReview}
                     className="bg-[#99AD7A] text-black border border-[#546B41] px-6 py-2 rounded-lg font-bold hover:bg-[#DCCCAC] transition-colors disabled:opacity-50"
                   >
@@ -363,12 +363,12 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
                 </div>
                 <div className="flex overflow-x-auto gap-6 snap-x snap-mandatory pb-4">
                   {communityPosts.map(post => {
-                    const imageUrl = Array.isArray(post.images) && post.images.length > 0 
-                      ? (typeof post.images[0] === 'string' ? post.images[0] : post.images[0].url) 
+                    const imageUrl = Array.isArray(post.images) && post.images.length > 0
+                      ? (typeof post.images[0] === 'string' ? post.images[0] : post.images[0].url)
                       : 'https://images.unsplash.com/photo-1596414272183-5ee9acabf333?q=80&w=800';
                     return (
                       <div key={post._id} className="min-w-[300px] flex-shrink-0 snap-center bg-black rounded-2xl overflow-hidden relative group h-[400px]">
-                        <img src={imageUrl} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="Post"/>
+                        <img src={imageUrl} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="Post" />
                         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-4">
                           <p className="text-white font-bold mb-1 line-clamp-2">{post.caption || 'Exploring Bihar'}</p>
                           <p className="text-gray-300 text-xs font-medium">By {post.user?.name || 'Traveler'}</p>
@@ -385,21 +385,21 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
           <div className="lg:col-span-1">
             <div className="sticky top-24 space-y-8">
               {/* Weather Widget */}
-              <WeatherWidget 
+              <WeatherWidget
                 lat={destination.coordinates.lat}
                 lng={destination.coordinates.lng}
                 location={destination.name}
               />
 
               {/* Nearby Attractions */}
-              <NearbyAttractions 
+              <NearbyAttractions
                 destinationId={destination._id}
                 radius={100}
               />
 
               <div className="bg-[#DCCCAC] rounded-3xl p-8 border border-[#546B41]/30 shadow-none">
                 <h3 className="text-2xl font-bold text-black mb-6">Trip Essentials</h3>
-                
+
                 <div className="space-y-6">
                   <div className="flex gap-4">
                     <div className="w-12 h-12 bg-[#FFF8EC] border border-[#546B41] rounded-2xl flex items-center justify-center text-black flex-shrink-0">
@@ -452,8 +452,8 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
                 <div className="space-y-3">
                   {destination.interests.map((interest, i) => (
                     <div key={i} className="flex items-center gap-2">
-                       <div className="w-2 h-2 bg-[#546B41] rounded-full"></div>
-                       <span className="font-bold">{interest} Focused Experience</span>
+                      <div className="w-2 h-2 bg-[#546B41] rounded-full"></div>
+                      <span className="font-bold">{interest} Focused Experience</span>
                     </div>
                   ))}
                 </div>

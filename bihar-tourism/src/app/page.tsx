@@ -61,7 +61,7 @@ export default function Home() {
               <div className="w-12 h-12 border-4 border-[#546B41] border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : featuredDestinations.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 overflow-x-auto snap-x snap-mandatory pb-8 pt-4 -mx-4 px-4 sm:mx-0 sm:px-0 hide-scrollbar scroll-smooth">
               {featuredDestinations.map((destination, index) => (
                 <motion.div
                   key={destination._id}
@@ -69,6 +69,7 @@ export default function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
+                  className="min-w-[85vw] sm:min-w-[45vw] md:min-w-0 snap-center shrink-0 h-full"
                 >
                   <DestinationCard destination={destination} />
                 </motion.div>

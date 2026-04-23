@@ -27,7 +27,7 @@ export default function RootLayout({
       <body className={`${poppins.className} antialiased`}>
         <AuthProvider>
           <Navbar />
-          <main className="min-h-screen">{children}</main>
+          <main className="min-h-screen pb-20 md:pb-0">{children}</main>
           <VoiceAssistant />
           <Footer />
         </AuthProvider>

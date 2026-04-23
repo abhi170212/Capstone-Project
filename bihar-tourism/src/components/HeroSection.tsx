@@ -28,11 +28,11 @@ export default function HeroSection() {
       showProgress: true,
       animate: true,
       steps: [
-        { element: '#nav-links', popover: { title: 'Navigation', description: 'Navigate the entire application from here.', side: "bottom", align: 'start' }},
-        { element: '#hero-explore', popover: { title: 'Destinations', description: 'Start browsing our curated destinations instantly.', side: "bottom", align: 'start' }},
-        { element: '#featured-destinations', popover: { title: 'Featured', description: 'Check out our top rated spots tailored for your eco and cultural tourism journey.', side: "top", align: 'start' }},
-        { element: '#interactive-map', popover: { title: 'Interactive Map', description: 'Pinpoint historical locations natively on our interactive map.', side: "top", align: 'start' }},
-        { element: '#image-gallery', popover: { title: 'Image Gallery', description: 'Browse stunning photography from across the region.', side: "top", align: 'start' }}
+        { element: '#nav-links', popover: { title: 'Navigation', description: 'Navigate the entire application from here.', side: "bottom", align: 'start' } },
+        { element: '#hero-explore', popover: { title: 'Destinations', description: 'Start browsing our curated destinations instantly.', side: "bottom", align: 'start' } },
+        { element: '#featured-destinations', popover: { title: 'Featured', description: 'Check out our top rated spots tailored for your eco and cultural tourism journey.', side: "top", align: 'start' } },
+        { element: '#interactive-map', popover: { title: 'Interactive Map', description: 'Pinpoint historical locations natively on our interactive map.', side: "top", align: 'start' } },
+        { element: '#image-gallery', popover: { title: 'Image Gallery', description: 'Browse stunning photography from across the region.', side: "top", align: 'start' } }
       ]
     });
     driverObj.drive();
