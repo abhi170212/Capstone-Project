@@ -1,4 +1,8 @@
 const User = require('../models/User');
+const Post = require('../models/Post');
+const Review = require('../models/Review');
+const Itinerary = require('../models/Itinerary');
+const Booking = require('../models/Booking');
 
 // @desc    Get user dashboard data
 // @route   GET /api/users/dashboard
@@ -146,11 +150,29 @@ const getUserById = async (req, res) => {
 // @access  Private/Admin
 const deleteUser = async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id);
+    const userId = req.params.id;
+    const user = await User.findByIdAndDelete(userId);
     
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
+
+    // Cascade deletions to ensure no orphaned data remains
+    await Post.deleteMany({ user: userId });
+    await Review.deleteMany({ user: userId });
+    await Itinerary.deleteMany({ user: userId });
+    await Booking.deleteMany({ user: userId });
+    
+    // Remove user's likes and comments from all posts across the platform
+    await Post.updateMany(
+      {},
+      { 
+        $pull: { 
+          likes: userId,
+          comments: { user: userId }
+        } 
+      }
+    );
 
     res.json({
       success: true,
@@ -169,23 +191,40 @@ const updateUserRole = async (req, res) => {
   try {
     const { role } = req.body;
     
-    if (!['user', 'admin'].includes(role)) {
+    if (!['user', 'admin', 'coadmin', 'guest'].includes(role)) {
       return res.status(400).json({ message: 'Invalid role' });
     }
 
-    const user = await User.findByIdAndUpdate(
-      req.params.id,
-      { role },
-      { new: true, runValidators: true }
-    ).select('-password');
-
-    if (!user) {
+    const targetUser = await User.findById(req.params.id);
+    if (!targetUser) {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    if (targetUser.role === 'admin' && req.user.role !== 'system') { // Added quick check though 'system' isn't explicitly used, just to be safe.
+      return res.status(403).json({ message: 'Cannot modify admin privileges' });
+    }
+
+    const requesterRole = req.user.role;
+    
+    // Co-Admin restrictions
+    if (requesterRole === 'coadmin') {
+      if (role === 'admin' || role === 'coadmin') {
+        return res.status(403).json({ message: 'Coadmins cannot assign higher roles' });
+      }
+      if (targetUser.role === 'coadmin') {
+         return res.status(403).json({ message: 'Coadmins cannot modify other coadmins' });
+      }
+    }
+
+    targetUser.role = role;
+    await targetUser.save();
+    
+    const userToReturn = targetUser.toObject();
+    delete userToReturn.password;
+
     res.json({
       success: true,
-      data: user,
+      data: userToReturn,
     });
   } catch (error) {
     console.error(error);

@@ -10,6 +10,7 @@ import {
   Users, 
   MessageSquare, 
   BarChart3,
+  Settings,
   ArrowLeft,
   Menu,
   X
@@ -41,12 +42,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: 'Users', href: '/admin/users', icon: Users },
     { name: 'Reviews', href: '/admin/reviews', icon: MessageSquare },
     { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
+    { name: 'Settings', href: '/admin/settings', icon: Settings },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#FFF8EC]">
       {/* Top Bar */}
-      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
+      <header className="bg-[#FFF8EC] shadow-sm border-b border-[#546B41]/20 sticky top-0 z-40">
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-4">
             <button
@@ -55,17 +57,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             >
               {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
-            <Link href="/" className="flex items-center gap-2 text-gray-600 hover:text-gray-800">
+            <Link href="/" className="flex items-center gap-2 text-[#546B41]/70 hover:text-black font-bold">
               <ArrowLeft size={20} />
-              <span className="hidden sm:inline">Back to Site</span>
+              <span className="hidden sm:inline uppercase tracking-widest text-xs">Back to Site</span>
             </Link>
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right">
-              <p className="text-sm font-semibold text-gray-800">{user.name}</p>
-              <p className="text-xs text-gray-500">Administrator</p>
+              <p className="text-sm font-black text-black uppercase tracking-wider">{user.name}</p>
+              <p className="text-xs font-semibold text-[#546B41]/70 uppercase tracking-widest">Administrator</p>
             </div>
-            <div className="w-10 h-10 bg-gradient-to-r from-green-600 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+            <div className="w-10 h-10 bg-[#546B41] rounded-full flex items-center justify-center text-[#FFF8EC] font-bold">
               {user.name.charAt(0).toUpperCase()}
             </div>
           </div>
@@ -77,7 +79,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <aside
           className={`${
             isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-          } lg:translate-x-0 fixed lg:sticky top-16 left-0 z-30 w-64 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 transition-transform duration-300 overflow-y-auto`}
+          } lg:translate-x-0 fixed lg:sticky top-16 left-0 z-30 w-64 h-[calc(100vh-4rem)] bg-[#FFF8EC] border-r border-[#546B41]/20 transition-transform duration-300 overflow-y-auto`}
         >
           <nav className="p-4 space-y-2">
             {adminNavLinks.map((link) => {
@@ -87,14 +89,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-bold ${
                     isActive
-                      ? 'bg-gradient-to-r from-green-600 to-blue-600 text-white shadow-md'
-                      : 'text-gray-700 hover:bg-gray-100'
+                      ? 'bg-[#546B41] text-[#FFF8EC] shadow-md hover:bg-[#99AD7A]'
+                      : 'text-[#546B41] hover:bg-[#DCCCAC]'
                   }`}
                 >
                   <Icon size={20} />
-                  <span className="font-medium">{link.name}</span>
+                  <span>{link.name}</span>
                 </Link>
               );
             })}

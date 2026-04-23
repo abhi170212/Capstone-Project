@@ -6,7 +6,7 @@ export interface User {
   _id: string;
   name: string;
   email: string;
-  role?: 'user' | 'admin';
+  role?: 'user' | 'admin' | 'coadmin' | 'guest';
   token?: string;
   favorites?: string[];
   createdTrips?: string[];
@@ -95,5 +95,5 @@ export const useAuth = () => {
 };
 
 export const isAdmin = (user: User | null): boolean => {
-  return user?.role === 'admin';
+  return user?.role === 'admin' || user?.role === 'coadmin';
 };

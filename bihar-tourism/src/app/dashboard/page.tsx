@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
 import Link from 'next/link';
-import { MapPin, Heart, Trash2, Route as RouteIcon, FileDown, Navigation, Camera, ShieldAlert, CheckCircle, Ban, Edit3, Image as ImageIcon, Sparkles, UploadCloud, User as UserIcon } from 'lucide-react';
+import { MapPin, Heart, Trash2, Route as RouteIcon, FileDown, Navigation, Camera, ShieldAlert, CheckCircle, Ban, Edit3, Image as ImageIcon, Sparkles, UploadCloud, User as UserIcon, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { jsPDF } from 'jspdf';
 import PostCard from '@/components/PostCard';
@@ -312,34 +312,48 @@ export default function DashboardPage() {
           <div className="relative px-6 py-12 sm:px-12 flex flex-col md:flex-row items-center gap-8 md:gap-12">
             {/* Massive Extruded Avatar */}
             <div className="relative z-10 flex-shrink-0">
-              <div className="w-32 h-32 md:w-44 md:h-44 rounded-full border-[6px] border-[#DCCCAC] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] bg-[#FFF8EC] group-hover:border-[#99AD7A] transition-colors duration-500">
+              <div className="w-32 h-32 md:w-44 md:h-44 rounded-full border-[6px] border-[#DCCCAC] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] bg-[#FFF8EC] group-hover:border-[#99AD7A] transition-colors duration-500 relative">
+                {user.role === 'guest' && (
+                  <div className="absolute inset-[2px] rounded-full border-[6px] border-dashed border-[#546B41] animate-[spin_8s_linear_infinite] z-20 pointer-events-none" />
+                )}
                 {user.avatar ? (
-                   <img src={user.avatar} className="w-full h-full object-cover" alt="Profile"/>
+                   <img src={user.avatar} className="w-full h-full object-cover relative z-10" alt="Profile"/>
                 ) : (
-                   <div className="w-full h-full flex items-center justify-center bg-black/10 text-[#546B41]">
+                   <div className="w-full h-full flex items-center justify-center bg-black/10 text-[#546B41] relative z-10">
                      <UserIcon size={72}/>
                    </div>
                 )}
-              </div>
-              <button 
-                onClick={() => setShowProfileModal(true)}
-                className="absolute bottom-2 right-2 bg-black text-[#DCCCAC] p-3 md:p-4 rounded-full shadow-[0_0_20px_rgba(0,0,0,0.5)] hover:bg-[#99AD7A] hover:text-black hover:scale-110 transition-all border-2 border-[#DCCCAC]"
-                title="Edit Identity Avatar"
-              >
-                <Edit3 size={20} />
-              </button>
+            </div>
             </div>
 
             {/* Profile Info Metadata */}
             <div className="text-center md:text-left flex-1 text-[#FFF8EC] z-10">
-               <h1 className="text-4xl md:text-6xl font-black mb-3 flex flex-col md:flex-row justify-center md:justify-start items-center gap-4 tracking-tighter">
-                 {user.name} 
+               <h1 className="text-4xl md:text-6xl font-black mb-1 flex flex-wrap justify-center md:justify-start items-center gap-4 tracking-tighter">
+                 {user.name ? user.name.charAt(0).toUpperCase() + user.name.slice(1).toLowerCase() : ''}
+                 
+                 <button 
+                   onClick={() => setShowProfileModal(true)}
+                   className="bg-white/10 hover:bg-[#DCCCAC] hover:text-black text-white px-4 py-2 rounded-full text-sm font-black tracking-widest uppercase shadow-lg inline-flex items-center gap-2 border border-white/20 transition-all ml-2"
+                   title="Edit Profile"
+                 >
+                   <Edit3 size={16} /> Edit Profile
+                 </button>
                  {user.role === 'admin' && (
                     <span className="bg-red-600 text-white px-4 py-1.5 rounded-full text-[10px] sm:text-xs font-black tracking-[0.2em] shadow-lg inline-flex items-center gap-2 uppercase border border-red-400/50 -translate-y-1">
                       <ShieldAlert size={14}/> Systems Administrator
                     </span>
                  )}
+                 {user.role === 'coadmin' && (
+                    <span className="bg-orange-500 text-white px-4 py-1.5 rounded-full text-[10px] sm:text-xs font-black tracking-[0.2em] shadow-lg inline-flex items-center gap-2 uppercase border border-orange-400/50 -translate-y-1">
+                      <ShieldAlert size={14}/> Co-Administrator
+                    </span>
+                 )}
                </h1>
+               <div className="flex justify-center md:justify-start gap-1 mb-4">
+                 {user.role === 'admin' && [...Array(3)].map((_, i) => <Star key={i} size={20} className="fill-[#DCCCAC] text-[#DCCCAC] drop-shadow-md" />)}
+                 {user.role === 'coadmin' && [...Array(2)].map((_, i) => <Star key={i} size={20} className="fill-[#DCCCAC] text-[#DCCCAC] drop-shadow-md" />)}
+                 {user.role === 'guest' && <Star size={20} className="fill-[#DCCCAC] text-[#DCCCAC] drop-shadow-md" />}
+               </div>
                <p className="text-[#FFF8EC] font-medium text-lg md:text-xl max-w-2xl mb-8 opacity-95 border-l-4 border-[#99AD7A] pl-5 md:pl-6 leading-relaxed">
                  {user.bio || "Explorer of Bihar. Uncovering hidden histories and spiritual sanctuaries. Add a biography to introduce your traveler journey!"}
                </p>

@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { adminApi } from '@/lib/api';
-import { Users, Search, Trash2, Shield, User, Mail, Calendar, AlertTriangle } from 'lucide-react';
+import { Users, Search, Trash2, Shield, User as UserIcon, Mail, Calendar, Star } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 
 export default function AdminUsersPage() {
+  const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -95,6 +97,8 @@ export default function AdminUsersPage() {
           >
             <option value="">All Roles</option>
             <option value="user">Users</option>
+            <option value="guest">Guests</option>
+            <option value="coadmin">Co-Admins</option>
             <option value="admin">Admins</option>
           </select>
         </div>
@@ -123,14 +127,26 @@ export default function AdminUsersPage() {
                 >
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${
+                      <div className={`relative w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${
                         user.role === 'admin' 
                           ? 'bg-gradient-to-r from-purple-500 to-pink-500' 
+                          : user.role === 'coadmin' 
+                          ? 'bg-gradient-to-r from-orange-400 to-red-500'
+                          : user.role === 'guest'
+                          ? 'bg-gradient-to-r from-gray-400 to-gray-500'
                           : 'bg-gradient-to-r from-green-500 to-blue-500'
                       }`}>
+                        {user.role === 'guest' && (
+                          <div className="absolute inset-[-4px] rounded-full border border-dashed border-[#546B41] animate-[spin_4s_linear_infinite]" />
+                        )}
                         {user.name.charAt(0).toUpperCase()}
+                        <div className="absolute -bottom-2 flex gap-[1px] justify-center w-full">
+                           {user.role === 'admin' && [...Array(3)].map((_, i) => <Star key={i} size={10} className="fill-[#DCCCAC] text-[#DCCCAC] drop-shadow-md" />)}
+                           {user.role === 'coadmin' && [...Array(2)].map((_, i) => <Star key={i} size={10} className="fill-[#DCCCAC] text-[#DCCCAC] drop-shadow-md" />)}
+                           {user.role === 'guest' && <Star size={10} className="fill-[#DCCCAC] text-[#DCCCAC] drop-shadow-md" />}
+                        </div>
                       </div>
-                      <span className="font-semibold text-gray-800">{user.name}</span>
+                      <span className="font-semibold text-gray-800 ml-2">{user.name}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
@@ -143,14 +159,21 @@ export default function AdminUsersPage() {
                     <select
                       value={user.role}
                       onChange={(e) => handleRoleChange(user._id, e.target.value)}
-                      className={`px-3 py-1 rounded-full text-sm font-semibold border-0 focus:ring-2 focus:ring-blue-500 cursor-pointer ${
-                        user.role === 'admin'
-                          ? 'bg-purple-100 text-purple-700'
-                          : 'bg-green-100 text-green-700'
+                      disabled={user.role === 'admin' || (currentUser?.role === 'coadmin' && user.role === 'coadmin')}
+                      className={`px-3 py-1 rounded-full text-sm font-semibold border-0 focus:ring-2 focus:ring-blue-500 ${
+                        user.role === 'admin' || (currentUser?.role === 'coadmin' && user.role === 'coadmin')
+                          ? 'bg-purple-100 text-purple-700 cursor-not-allowed opacity-80'
+                          : user.role === 'coadmin'
+                          ? 'bg-orange-100 text-orange-700 cursor-pointer'
+                          : user.role === 'guest'
+                          ? 'bg-gray-100 text-gray-700 cursor-pointer'
+                          : 'bg-green-100 text-green-700 cursor-pointer'
                       }`}
                     >
                       <option value="user">User</option>
-                      <option value="admin">Admin</option>
+                      {user.role === 'admin' && <option value="admin">Admin</option>}
+                      {currentUser?.role === 'admin' && <option value="coadmin">Co-admin</option>}
+                      <option value="guest">Guest</option>
                     </select>
                   </td>
                   <td className="px-6 py-4">
@@ -200,14 +223,14 @@ export default function AdminUsersPage() {
               <p className="text-green-100 text-sm mb-1">Regular Users</p>
               <p className="text-3xl font-bold">{users.filter(u => u.role === 'user').length}</p>
             </div>
-            <User size={40} className="opacity-50" />
+            <UserIcon size={40} className="opacity-50" />
           </div>
         </div>
         <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-purple-100 text-sm mb-1">Admins</p>
-              <p className="text-3xl font-bold">{users.filter(u => u.role === 'admin').length}</p>
+              <p className="text-purple-100 text-sm mb-1">Admins / Co-Admins</p>
+              <p className="text-3xl font-bold">{users.filter(u => ['admin', 'coadmin'].includes(u.role)).length}</p>
             </div>
             <Shield size={40} className="opacity-50" />
           </div>

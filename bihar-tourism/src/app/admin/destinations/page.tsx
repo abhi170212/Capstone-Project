@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { adminApi, destinationApi } from '@/lib/api';
-import { MapPin, Plus, Edit2, Trash2, Search, X, Save } from 'lucide-react';
+import api from '@/lib/api';
+import { MapPin, Plus, Edit2, Trash2, Search, X, Save, UploadCloud } from 'lucide-react';
 
 export default function AdminDestinationsPage() {
   const [destinations, setDestinations] = useState<any[]>([]);
@@ -11,6 +12,7 @@ export default function AdminDestinationsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingDestination, setEditingDestination] = useState<any>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -73,11 +75,13 @@ export default function AdminDestinationsPage() {
       activities: destination.activities || [],
       coordinates: destination.coordinates || { lat: 25.0961, lng: 85.3131 },
     });
+    setImageFile(null);
     setShowModal(true);
   };
 
   const handleAddNew = () => {
     setEditingDestination(null);
+    setImageFile(null);
     setFormData({
       name: '',
       description: '',
@@ -100,11 +104,23 @@ export default function AdminDestinationsPage() {
     e.preventDefault();
 
     try {
+      let submitData = { ...formData };
+      
+      // Handle Image Upload if file is selected
+      if (imageFile) {
+        const fileData = new FormData();
+        fileData.append('images', imageFile);
+        const uploadRes = await api.post('/upload', fileData, {
+           headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        submitData.images = uploadRes.data.paths;
+      }
+
       if (editingDestination) {
-        await adminApi.updateDestination(editingDestination._id, formData);
+        await adminApi.updateDestination(editingDestination._id, submitData);
         alert('Destination updated successfully');
       } else {
-        await adminApi.addDestination(formData);
+        await adminApi.addDestination(submitData);
         alert('Destination added successfully');
       }
       setShowModal(false);
@@ -132,12 +148,12 @@ export default function AdminDestinationsPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Destination Management</h1>
-          <p className="text-gray-600">Manage all tourism destinations ({filteredDestinations.length} total)</p>
+          <h1 className="text-3xl font-black text-black mb-2 uppercase tracking-tight">Destination Management</h1>
+          <p className="text-[#546B41] font-medium tracking-wide">Manage all tourism destinations ({filteredDestinations.length} total)</p>
         </div>
         <button
           onClick={handleAddNew}
-          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+          className="flex items-center gap-2 px-6 py-3 bg-[#546B41] text-[#FFF8EC] rounded-xl font-bold hover:bg-[#DCCCAC] hover:text-black transition-all shadow-sm"
         >
           <Plus size={20} />
           Add Destination
@@ -145,15 +161,15 @@ export default function AdminDestinationsPage() {
       </div>
 
       {/* Search */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+      <div className="bg-[#FFF8EC] rounded-2xl p-4 shadow-sm border border-[#546B41]/20">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#546B41]" size={20} />
           <input
             type="text"
             placeholder="Search destinations..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full pl-10 pr-4 py-3 border border-[#546B41]/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#546B41] bg-white font-medium text-black"
           />
         </div>
       </div>
@@ -165,7 +181,7 @@ export default function AdminDestinationsPage() {
             key={dest._id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-all"
+            className="bg-[#FFF8EC] rounded-2xl overflow-hidden shadow-sm border border-[#546B41]/20 hover:border-[#546B41] transition-all"
           >
             <div className="relative h-48">
               <img
@@ -185,10 +201,10 @@ export default function AdminDestinationsPage() {
             </div>
 
             <div className="p-4">
-              <h3 className="text-xl font-bold text-gray-800 mb-2">{dest.name}</h3>
-              <p className="text-sm text-gray-600 mb-3 line-clamp-2">{dest.description}</p>
+              <h3 className="text-xl font-black text-black mb-2 uppercase tracking-wider">{dest.name}</h3>
+              <p className="text-sm font-bold text-black mb-3 line-clamp-2">{dest.description}</p>
               
-              <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+              <div className="flex items-center justify-between text-sm text-black font-bold mb-4">
                 <span className="flex items-center gap-1">
                   <MapPin size={14} />
                   {dest.location}
@@ -198,10 +214,10 @@ export default function AdminDestinationsPage() {
                 </span>
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex gap-2 font-bold">
                 <button
                   onClick={() => handleEdit(dest)}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#DCCCAC] text-[#546B41] rounded-lg hover:bg-[#99AD7A] hover:text-black transition-colors border border-[#546B41]/20"
                 >
                   <Edit2 size={16} />
                   Edit
@@ -220,9 +236,9 @@ export default function AdminDestinationsPage() {
       </div>
 
       {filteredDestinations.length === 0 && (
-        <div className="text-center py-12 bg-white rounded-2xl border-2 border-dashed border-gray-200">
-          <MapPin size={64} className="mx-auto text-gray-300 mb-4" />
-          <p className="text-gray-500 text-lg">No destinations found</p>
+        <div className="text-center py-12 bg-[#FFF8EC] rounded-2xl border-2 border-dashed border-[#546B41]/20">
+          <MapPin size={64} className="mx-auto text-black mb-4" />
+          <p className="text-black font-bold text-lg">No destinations found</p>
         </div>
       )}
 
@@ -232,10 +248,10 @@ export default function AdminDestinationsPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-[#FFF8EC] rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border-2 border-[#546B41]"
           >
-            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-gray-800">
+            <div className="sticky top-0 bg-[#FFF8EC] border-b border-[#546B41]/20 p-6 flex justify-between items-center z-10">
+              <h2 className="text-2xl font-black text-black uppercase tracking-tight">
                 {editingDestination ? 'Edit Destination' : 'Add New Destination'}
               </h2>
               <button
@@ -248,44 +264,63 @@ export default function AdminDestinationsPage() {
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                <label className="block text-xs font-black text-black uppercase tracking-widest mb-1">Name *</label>
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-[#546B41]/30 rounded-lg focus:ring-2 focus:ring-[#546B41] focus:border-transparent font-medium bg-white text-black"
                 />
               </div>
 
+              {/* Image Upload Input */}
+              <div className="bg-white border-2 border-dashed border-[#546B41]/30 rounded-xl p-4 text-center hover:bg-[#DCCCAC]/10 transition-colors cursor-pointer relative">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    if(e.target.files && e.target.files[0]) setImageFile(e.target.files[0]);
+                  }}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+                <UploadCloud size={24} className="mx-auto text-[#546B41] mb-2" />
+                <p className="text-xs font-black text-[#546B41] uppercase tracking-wider">
+                  {imageFile ? imageFile.name : 'Upload High-Res Cover Image'}
+                </p>
+                {editingDestination && editingDestination.images?.[0] && !imageFile && (
+                  <p className="text-[10px] text-gray-400 mt-1">Leaves existing image unchanged if empty</p>
+                )}
+              </div>
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+                <label className="block text-xs font-black text-black uppercase tracking-widest mb-1">Description *</label>
                 <textarea
                   required
                   rows={3}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-[#546B41]/30 rounded-lg focus:ring-2 focus:ring-[#546B41] focus:border-transparent font-medium bg-white text-black"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Location *</label>
+                  <label className="block text-xs font-black text-black uppercase tracking-widest mb-1">Location *</label>
                   <input
                     type="text"
                     required
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-[#546B41]/30 rounded-lg focus:ring-2 focus:ring-[#546B41] focus:border-transparent font-medium bg-white text-black"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Type *</label>
+                  <label className="block text-xs font-black text-black uppercase tracking-widest mb-1">Type *</label>
                   <select
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-[#546B41]/30 rounded-lg focus:ring-2 focus:ring-[#546B41] focus:border-transparent font-medium bg-white text-black"
                   >
                     <option value="cultural">Cultural</option>
                     <option value="eco">Eco</option>
@@ -296,7 +331,7 @@ export default function AdminDestinationsPage() {
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Rating</label>
+                  <label className="block text-xs font-black text-black uppercase tracking-widest mb-1">Rating</label>
                   <input
                     type="number"
                     step="0.1"
@@ -304,26 +339,26 @@ export default function AdminDestinationsPage() {
                     max="5"
                     value={formData.rating}
                     onChange={(e) => setFormData({ ...formData, rating: parseFloat(e.target.value) })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-[#546B41]/30 rounded-lg focus:ring-2 focus:ring-[#546B41] focus:border-transparent font-medium bg-white text-black"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Eco Score</label>
+                  <label className="block text-xs font-black text-black uppercase tracking-widest mb-1">Eco Score</label>
                   <input
                     type="number"
                     min="0"
                     max="100"
                     value={formData.ecoScore}
                     onChange={(e) => setFormData({ ...formData, ecoScore: parseInt(e.target.value) })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-[#546B41]/30 rounded-lg focus:ring-2 focus:ring-[#546B41] focus:border-transparent font-medium bg-white text-black"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Budget</label>
+                  <label className="block text-xs font-black text-black uppercase tracking-widest mb-1">Budget</label>
                   <select
                     value={formData.budget}
                     onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-[#546B41]/30 rounded-lg focus:ring-2 focus:ring-[#546B41] focus:border-transparent font-medium bg-white text-black"
                   >
                     <option value="Budget">Budget</option>
                     <option value="Mid-range">Mid-range</option>
@@ -334,21 +369,21 @@ export default function AdminDestinationsPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Best Season</label>
+                  <label className="block text-xs font-black text-black uppercase tracking-widest mb-1">Best Season</label>
                   <input
                     type="text"
                     value={formData.bestSeason}
                     onChange={(e) => setFormData({ ...formData, bestSeason: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-[#546B41]/30 rounded-lg focus:ring-2 focus:ring-[#546B41] focus:border-transparent font-medium bg-white text-black"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Entry Fee</label>
+                  <label className="block text-xs font-black text-black uppercase tracking-widest mb-1">Entry Fee</label>
                   <input
                     type="text"
                     value={formData.entryFee}
                     onChange={(e) => setFormData({ ...formData, entryFee: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-[#546B41]/30 rounded-lg focus:ring-2 focus:ring-[#546B41] focus:border-transparent font-medium bg-white text-black"
                   />
                 </div>
               </div>
@@ -357,13 +392,13 @@ export default function AdminDestinationsPage() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-6 py-3 border-2 border-[#546B41] text-[#546B41] font-bold rounded-lg hover:bg-[#DCCCAC] transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all"
+                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#546B41] font-bold text-[#FFF8EC] rounded-lg hover:bg-[#DCCCAC] hover:text-black transition-all border border-[#546B41]"
                 >
                   <Save size={20} />
                   {editingDestination ? 'Update' : 'Create'} Destination

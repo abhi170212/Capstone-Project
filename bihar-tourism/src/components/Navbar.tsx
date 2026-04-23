@@ -5,12 +5,14 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
-import { Home, Map, Calendar, Compass, MoreHorizontal, User as UserIcon, LogOut, Info, Mail, Search, Award } from 'lucide-react';
+import { Home, Map, Calendar, Compass, MoreHorizontal, User as UserIcon, LogOut, Info, Mail, Search, Award, Shield } from 'lucide-react';
 
 export default function Navbar() {
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const { user, logout } = useAuth();
   const pathname = usePathname();
+
+  const isAdmin = user?.role === 'admin';
 
   const navLinks = [
     { name: 'Home', href: '/' },
@@ -78,6 +80,14 @@ export default function Navbar() {
           <div className="hidden md:flex items-center flex-shrink-0 border-l border-[#546B41]/30 pl-4 ml-2">
             {user ? (
               <div className="flex items-center space-x-2">
+                {isAdmin && (
+                  <Link
+                    href="/admin"
+                    className="px-4 py-2 text-[#FFF8EC] bg-[#546B41] font-bold border border-[#546B41] hover:bg-[#99AD7A] rounded-lg transition-colors whitespace-nowrap shadow-sm"
+                  >
+                    Admin Panel
+                  </Link>
+                )}
                 <Link
                   href="/dashboard"
                   className="px-4 py-2 text-black font-bold border border-[#546B41] hover:bg-[#DCCCAC] rounded-lg transition-colors whitespace-nowrap"
@@ -182,6 +192,11 @@ export default function Navbar() {
                 <h4 className="text-[10px] uppercase font-black tracking-widest text-[#546B41] mb-3">Account Integration</h4>
                 {user ? (
                   <div className="space-y-2">
+                    {isAdmin && (
+                      <Link href="/admin" className="w-full flex items-center gap-3 px-4 py-3 bg-[#546B41] text-[#FFF8EC] font-bold hover:bg-[#99AD7A] rounded-xl transition-colors shadow-sm" onClick={() => setIsMoreMenuOpen(false)}>
+                        <Shield size={18} /> Admin Panel
+                      </Link>
+                    )}
                     <Link href="/dashboard" className="w-full flex items-center gap-3 px-4 py-3 bg-[#FFF8EC] text-black font-bold hover:bg-[#DCCCAC] rounded-xl transition-colors border border-[#546B41]/10" onClick={() => setIsMoreMenuOpen(false)}>
                       <UserIcon size={18} /> User Dashboard
                     </Link>

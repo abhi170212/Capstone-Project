@@ -32,7 +32,11 @@ export default function LoginPage() {
     try {
       const response = await api.post('/auth/login', { email, password });
       login(response.data);
-      router.push('/dashboard');
+      if (response.data.role === 'admin') {
+        router.push('/admin');
+      } else {
+        router.push('/dashboard');
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to authenticate');
     } finally {

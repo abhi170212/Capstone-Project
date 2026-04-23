@@ -112,14 +112,14 @@ export default function PostCard({ post, currentUser, onDelete, isAdmin }: PostC
       <div className="p-4 flex items-center justify-between border-b border-gray-50">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-[#DCCCAC] text-[#546B41] font-bold flex items-center justify-center border border-[#546B41]">
-            {post.user.avatar ? (
+            {post.user?.avatar ? (
               <img src={post.user.avatar} className="w-full h-full rounded-full object-cover" alt="avatar" />
             ) : (
-              post.user.name.charAt(0).toUpperCase()
+              post.user?.name?.charAt(0).toUpperCase() || '?'
             )}
           </div>
           <div>
-            <h3 className="font-bold text-[15px] leading-none">{post.user.name}</h3>
+            <h3 className="font-bold text-[15px] leading-none">{post.user?.name || 'Unknown User'}</h3>
             {post.location && (
               <p className="text-xs text-gray-500 mt-1 flex items-center">
                 <MapPin size={10} className="mr-0.5" /> {post.location}
@@ -132,7 +132,7 @@ export default function PostCard({ post, currentUser, onDelete, isAdmin }: PostC
           <span className="text-xs font-bold text-gray-400 bg-gray-50 px-2 py-1 rounded-full">
             {post.category}
           </span>
-          {(isAdmin || (currentUser && currentUser._id === post.user._id)) && onDelete && (
+          {(isAdmin || (currentUser && currentUser._id === post.user?._id)) && onDelete && (
             <button 
               onClick={() => onDelete(post._id)}
               className="text-gray-400 hover:text-red-500 transition-colors"
@@ -212,7 +212,7 @@ export default function PostCard({ post, currentUser, onDelete, isAdmin }: PostC
       {/* Caption Section */}
       <div className="px-4 pb-2">
         <p className="text-sm">
-          <span className="font-bold mr-2">{post.user.name}</span>
+          <span className="font-bold mr-2">{post.user?.name || 'Unknown User'}</span>
           {post.caption}
         </p>
         <p className="text-[10px] uppercase text-gray-400 font-bold mt-2 tracking-wider">
