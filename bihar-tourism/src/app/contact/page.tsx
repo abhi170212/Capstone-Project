@@ -70,7 +70,7 @@ export default function Contact() {
             >
               <div className="absolute top-0 left-0 w-full h-2 bg-[#546B41]"></div>
               <h2 className="text-4xl font-black text-black mb-8 tracking-tight">TRANSMIT DATA</h2>
-              
+
               {submitted ? (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -191,7 +191,7 @@ export default function Contact() {
               {/* Contact Cards */}
               <div className="bg-white rounded-3xl shadow-xl p-10 border border-[#546B41]/10">
                 <h2 className="text-4xl font-black text-black mb-8 tracking-tight">NODE DETAILS</h2>
-                
+
                 <div className="space-y-8">
                   {[
                     {
@@ -280,9 +280,9 @@ export default function Contact() {
               Initialize location protocol
             </p>
           </motion.div>
-          
+
           <div className="rounded-3xl overflow-hidden shadow-2xl border-4 border-[#546B41]/10">
-             <MapComponent height="500px" />
+            <MapComponent height="500px" />
           </div>
         </div>
       </section>

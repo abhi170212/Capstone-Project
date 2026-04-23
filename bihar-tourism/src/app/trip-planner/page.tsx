@@ -4,13 +4,13 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { destinationApi, itineraryApi, ItineraryData } from '@/lib/api';
 import { Destination, Itinerary } from '@/types';
-import { 
-  Plus, 
-  Trash2, 
-  Calendar, 
-  Save, 
-  MapPin, 
-  Clock, 
+import {
+  Plus,
+  Trash2,
+  Calendar,
+  Save,
+  MapPin,
+  Clock,
   ChevronRight,
   PlaneTakeoff,
   History
@@ -21,7 +21,7 @@ export default function TripPlanner() {
   const [itineraries, setItineraries] = useState<Itinerary[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  
+
   const [currentPlan, setCurrentPlan] = useState<ItineraryData>({
     name: 'My Bihar Adventure',
     days: [
@@ -126,13 +126,13 @@ export default function TripPlanner() {
             <p className="text-[#DCCCAC] mt-2 font-medium text-lg border-l-4 border-[#99AD7A] pl-3">Design your perfect Bihar itinerary day by day.</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 relative z-10 w-full md:w-auto">
-            <button 
+            <button
               onClick={() => setShowSaved(!showSaved)}
               className="flex items-center justify-center gap-2 px-6 py-3.5 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl font-bold text-white hover:bg-black/60 shadow-lg tracking-wider uppercase text-sm transition-all"
             >
               <History size={16} /> {showSaved ? 'Hide Bank' : 'Load Saved'}
             </button>
-            <button 
+            <button
               onClick={saveItinerary}
               disabled={saving}
               className="flex items-center justify-center gap-2 px-8 py-3.5 bg-[#DCCCAC] text-black rounded-2xl font-black shadow-[0_10px_20px_rgba(0,0,0,0.3)] hover:shadow-[0_15px_30px_rgba(0,0,0,0.4)] hover:-translate-y-0.5 hover:bg-white transition-all disabled:opacity-50 uppercase tracking-widest text-sm"
@@ -143,7 +143,7 @@ export default function TripPlanner() {
         </div>
 
         {showSaved && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             className="mb-12 grid grid-cols-1 md:grid-cols-3 gap-6"
@@ -152,7 +152,7 @@ export default function TripPlanner() {
               <div key={itin._id} className="bg-white p-6 rounded-3xl border-2 border-[#546B41]/10 shadow-xl hover:shadow-2xl hover:border-[#546B41]/40 transition-all group">
                 <h4 className="font-black text-xl text-black mb-1">{itin.name}</h4>
                 <p className="text-xs font-bold text-[#546B41] uppercase tracking-widest mb-5 border-b border-gray-100 pb-3">{itin.days.length} Days Itinerary</p>
-                <button 
+                <button
                   onClick={() => {
                     setCurrentPlan({
                       name: itin.name,
@@ -186,30 +186,29 @@ export default function TripPlanner() {
                 <h3 className="text-2xl font-black text-black flex items-center gap-3 tracking-tight">
                   <Calendar size={22} className="text-[#546B41]" /> Timeline
                 </h3>
-                <button 
+                <button
                   onClick={addDay}
                   className="p-2.5 bg-[#546B41] text-[#FFF8EC] rounded-xl hover:bg-black hover:-translate-y-0.5 transition-all shadow-md"
                 >
                   <Plus size={18} strokeWidth={3} />
                 </button>
               </div>
-              
+
               <div className="space-y-3">
                 {currentPlan.days.map(day => (
-                  <div 
+                  <div
                     key={day.day}
                     onClick={() => setActiveDay(day.day)}
-                    className={`p-4 rounded-2xl cursor-pointer transition-all flex justify-between items-center border-2 border-transparent ${
-                      activeDay === day.day 
-                        ? 'bg-[#546B41] text-[#FFF8EC] shadow-lg scale-[1.02]' 
+                    className={`p-4 rounded-2xl cursor-pointer transition-all flex justify-between items-center border-2 border-transparent ${activeDay === day.day
+                        ? 'bg-[#546B41] text-[#FFF8EC] shadow-lg scale-[1.02]'
                         : 'bg-[#FFF8EC] text-black hover:border-[#546B41]/30 hover:bg-white'
-                    }`}
+                      }`}
                   >
                     <span className="font-black tracking-wider uppercase text-sm">Day {day.day}</span>
                     <div className="flex items-center gap-3">
                       <span className="text-xs font-bold opacity-80">{day.activities.length} acts</span>
                       {day.day > 1 && (
-                        <button 
+                        <button
                           onClick={(e) => { e.stopPropagation(); removeDay(day.day); }}
                           className="p-1.5 hover:bg-white/20 hover:text-red-300 rounded-lg transition-colors"
                         >
@@ -228,7 +227,7 @@ export default function TripPlanner() {
               </h3>
               <div className="h-[400px] overflow-y-auto space-y-3 pr-2 custom-scrollbar">
                 {destinations.map(dest => (
-                  <div 
+                  <div
                     key={dest._id}
                     className="flex items-center justify-between p-3 bg-[#FFF8EC] rounded-2xl border border-[#546B41]/10 hover:border-[#546B41]/40 hover:shadow-md transition-all group"
                   >
@@ -239,7 +238,7 @@ export default function TripPlanner() {
                         <p className="text-[10px] font-bold text-[#546B41] uppercase tracking-widest">{dest.type}</p>
                       </div>
                     </div>
-                    <button 
+                    <button
                       onClick={() => addActivity(dest._id)}
                       className="p-2.5 bg-white text-[#546B41] border border-[#546B41]/20 rounded-xl group-hover:bg-[#546B41] group-hover:text-white group-hover:shadow-md transition-all"
                     >
@@ -261,10 +260,10 @@ export default function TripPlanner() {
                   <p className="text-gray-500 font-medium">Inject destinations from the sidebar to assemble.</p>
                 </div>
                 <div className="w-full sm:w-auto text-right">
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     value={currentPlan.name}
-                    onChange={(e) => setCurrentPlan({...currentPlan, name: e.target.value})}
+                    onChange={(e) => setCurrentPlan({ ...currentPlan, name: e.target.value })}
                     className="w-full sm:w-auto text-lg font-black text-[#546B41] bg-[#FFF8EC] px-5 py-3 rounded-2xl border-2 border-[#546B41]/20 focus:border-[#546B41] outline-none transition-colors shadow-inner"
                   />
                 </div>
@@ -273,7 +272,7 @@ export default function TripPlanner() {
               <div className="space-y-6 relative">
                 <AnimatePresence mode="popLayout">
                   {currentPlan.days.find(d => d.day === activeDay)?.activities.length === 0 ? (
-                    <motion.div 
+                    <motion.div
                       key="empty-state"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -285,81 +284,81 @@ export default function TripPlanner() {
                     </motion.div>
                   ) : (
                     currentPlan.days.find(d => d.day === activeDay)?.activities.map((act, idx) => (
-                      <motion.div 
+                      <motion.div
                         key={`${activeDay}-${idx}`}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         className="group flex flex-col sm:flex-row gap-6 p-6 bg-white border-2 border-gray-100 rounded-3xl hover:border-[#546B41]/30 hover:shadow-xl transition-all relative overflow-hidden"
                       >
-                         <div className="absolute left-0 top-0 bottom-0 w-2.5 bg-[#DCCCAC] group-hover:bg-[#546B41] transition-colors" />
-                         
-                         <div className="flex-1">
-                            <div className="flex justify-between items-start mb-4">
-                               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                                  <select 
-                                    value={act.time}
-                                    onChange={(e) => {
-                                      const newDays = [...currentPlan.days];
-                                      const dayIdx = newDays.findIndex(d => d.day === activeDay);
-                                      newDays[dayIdx].activities[idx].time = e.target.value;
-                                      setCurrentPlan({...currentPlan, days: newDays});
-                                    }}
-                                    className="bg-black text-[#DCCCAC] font-black text-[10px] uppercase tracking-widest px-4 py-2 rounded-xl outline-none focus:ring-2 focus:ring-[#99AD7A] cursor-pointer shadow-lg w-max"
-                                  >
-                                    <option>Morning</option>
-                                    <option>Afternoon</option>
-                                    <option>Evening</option>
-                                    <option>Night</option>
-                                  </select>
-                                  <h4 className="text-xl md:text-2xl font-black text-black tracking-tight">{act.location}</h4>
-                               </div>
-                               <button 
-                                 onClick={() => removeActivity(activeDay, idx)}
-                                 className="text-gray-300 hover:text-red-500 bg-gray-50 hover:bg-red-50 p-2.5 rounded-full transition-all"
-                               >
-                                 <Trash2 size={18} />
-                               </button>
+                        <div className="absolute left-0 top-0 bottom-0 w-2.5 bg-[#DCCCAC] group-hover:bg-[#546B41] transition-colors" />
+
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start mb-4">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                              <select
+                                value={act.time}
+                                onChange={(e) => {
+                                  const newDays = [...currentPlan.days];
+                                  const dayIdx = newDays.findIndex(d => d.day === activeDay);
+                                  newDays[dayIdx].activities[idx].time = e.target.value;
+                                  setCurrentPlan({ ...currentPlan, days: newDays });
+                                }}
+                                className="bg-black text-[#DCCCAC] font-black text-[10px] uppercase tracking-widest px-4 py-2 rounded-xl outline-none focus:ring-2 focus:ring-[#99AD7A] cursor-pointer shadow-lg w-max"
+                              >
+                                <option>Morning</option>
+                                <option>Afternoon</option>
+                                <option>Evening</option>
+                                <option>Night</option>
+                              </select>
+                              <h4 className="text-xl md:text-2xl font-black text-black tracking-tight">{act.location}</h4>
                             </div>
-                            <textarea 
-                              value={act.description}
-                              onChange={(e) => {
-                                const newDays = [...currentPlan.days];
-                                const dayIdx = newDays.findIndex(d => d.day === activeDay);
-                                newDays[dayIdx].activities[idx].description = e.target.value;
-                                setCurrentPlan({...currentPlan, days: newDays});
-                              }}
-                              className="w-full text-black font-medium text-sm bg-[#FFF8EC] p-5 rounded-2xl border border-transparent focus:border-[#546B41]/30 focus:shadow-inner resize-none transition-all outline-none leading-relaxed"
-                              rows={2}
-                            />
-                         </div>
-                         <div className="hidden md:block w-36 h-36 rounded-2xl overflow-hidden shadow-md shrink-0 border-4 border-[#FFF8EC]">
-                            <img 
-                              src={destinations.find(d => d._id === act.destinationId)?.images[0]} 
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                            />
-                         </div>
+                            <button
+                              onClick={() => removeActivity(activeDay, idx)}
+                              className="text-gray-300 hover:text-red-500 bg-gray-50 hover:bg-red-50 p-2.5 rounded-full transition-all"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </div>
+                          <textarea
+                            value={act.description}
+                            onChange={(e) => {
+                              const newDays = [...currentPlan.days];
+                              const dayIdx = newDays.findIndex(d => d.day === activeDay);
+                              newDays[dayIdx].activities[idx].description = e.target.value;
+                              setCurrentPlan({ ...currentPlan, days: newDays });
+                            }}
+                            className="w-full text-black font-medium text-sm bg-[#FFF8EC] p-5 rounded-2xl border border-transparent focus:border-[#546B41]/30 focus:shadow-inner resize-none transition-all outline-none leading-relaxed"
+                            rows={2}
+                          />
+                        </div>
+                        <div className="hidden md:block w-36 h-36 rounded-2xl overflow-hidden shadow-md shrink-0 border-4 border-[#FFF8EC]">
+                          <img
+                            src={destinations.find(d => d._id === act.destinationId)?.images[0]}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                          />
+                        </div>
                       </motion.div>
                     ))
                   )}
                 </AnimatePresence>
-                
+
                 {currentPlan.days.find(d => d.day === activeDay)?.activities.length! > 0 && (
-                   <div className="pt-6 flex justify-center">
-                      <button 
-                        onClick={() => setActiveDay(prev => Math.min(prev + 1, currentPlan.days.length))}
-                        className="flex items-center gap-2 text-[#546B41] font-black uppercase tracking-widest text-sm hover:gap-4 hover:text-black py-4 px-8 bg-[#FFF8EC] rounded-2xl transition-all shadow-sm border border-[#546B41]/10"
-                      >
-                         Advance Day Matrix <ChevronRight size={18} strokeWidth={3} />
-                      </button>
-                   </div>
+                  <div className="pt-6 flex justify-center">
+                    <button
+                      onClick={() => setActiveDay(prev => Math.min(prev + 1, currentPlan.days.length))}
+                      className="flex items-center gap-2 text-[#546B41] font-black uppercase tracking-widest text-sm hover:gap-4 hover:text-black py-4 px-8 bg-[#FFF8EC] rounded-2xl transition-all shadow-sm border border-[#546B41]/10"
+                    >
+                      Advance Day Matrix <ChevronRight size={18} strokeWidth={3} />
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
           </div>
         </div>
       </div>
-      
+
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;

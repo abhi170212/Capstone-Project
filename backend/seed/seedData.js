@@ -117,7 +117,7 @@ const festivals = [
     description:
       'Chhath Puja is the most celebrated folk festival of Bihar, dedicated to the Sun God (Surya) and Chhathi Maiya. Celebrated over four days, devotees offer prayers at riverbanks during sunrise and sunset. It is one of the most environmentally friendly festivals, with no use of idols or synthetic colors.',
     images: [
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Chhath_Puja_at_Ganga_ghat.jpg/1280px-Chhath_Puja_at_Ganga_ghat.jpg',
+      '/destinations/patna.png',
     ],
   },
   {
@@ -127,7 +127,7 @@ const festivals = [
     description:
       'Sonepur Mela, held at the confluence of the Ganga and Gandak rivers, is one of the largest livestock and trade fairs in Asia. Traditionally held after Kartik Purnima, it runs for about a month and attracts traders, artisans, performers, and tourists from across India and the world.',
     images: [
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Sonepur_Mela.jpg/1280px-Sonepur_Mela.jpg',
+      '/destinations/vaishali.png',
     ],
   },
   {
@@ -137,7 +137,7 @@ const festivals = [
     description:
       'Rajgir Mahotsav is a cultural extravaganza organized by the Bihar government to showcase the art, music, dance, and cultural heritage of Bihar. Held amid the ancient hills of Rajgir, the three-day festival features folk performances, classical music, and artisan markets.',
     images: [
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Rajgir_Peace_Pagoda.jpg/1280px-Rajgir_Peace_Pagoda.jpg',
+      '/destinations/rajgir.png',
     ],
   },
   {
@@ -147,7 +147,7 @@ const festivals = [
     description:
       'Buddha Purnima marks the birth, enlightenment, and death of Gautama Buddha and is celebrated with great devotion in Bodh Gaya. Thousands of Buddhist pilgrims from Tibet, Japan, Sri Lanka, Thailand, and around the world visit the Mahabodhi Temple to offer prayers and meditate.',
     images: [
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Mahabodhi_Temple_in_Bodhgaya.jpg/1280px-Mahabodhi_Temple_in_Bodhgaya.jpg',
+      '/destinations/bodh_gaya.png',
     ],
   },
 ];

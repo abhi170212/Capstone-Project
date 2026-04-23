@@ -3,11 +3,12 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
+import { Home, Map, Calendar, Compass, MoreHorizontal, User as UserIcon, LogOut, Info, Mail, Search, Award } from 'lucide-react';
 
 export default function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const { user, logout } = useAuth();
   const pathname = usePathname();
 
@@ -102,75 +103,107 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-black hover:text-[#546B41] focus:outline-none p-2"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                {isMenuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
-            </button>
+          {/* Mobile Profile/Logo Right (No Hamburger) */}
+          <div className="md:hidden flex items-center pr-2">
+            {!user && (
+              <Link href="/login" className="px-3 py-1.5 text-xs text-black font-bold border border-[#546B41] rounded-lg transition-colors whitespace-nowrap">
+                Login
+              </Link>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          exit={{ opacity: 0, height: 0 }}
-          className="md:hidden bg-[#FFF8EC] border-t border-[#546B41]/20"
-        >
-          <div className="px-4 py-4 space-y-2">
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
-              return (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  className={`block px-4 py-3 font-bold rounded-lg transition-all ${isActive
-                    ? 'text-black bg-[#DCCCAC] shadow-sm ring-1 ring-[#546B41]/30'
-                    : 'text-black hover:bg-[#99AD7A]'
-                    }`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {link.name}
-                </Link>
-              );
-            })}
-
-            {/* Mobile Auth Links */}
-            <div className="border-t border-[#546B41]/20 pt-2 mt-2">
-              {user ? (
-                <>
-                  <Link href="/dashboard" className="block px-4 py-3 text-black font-bold hover:bg-[#DCCCAC] rounded-lg transition-colors" onClick={() => setIsMenuOpen(false)}>
-                    Dashboard
-                  </Link>
-                  <button onClick={() => { logout(); setIsMenuOpen(false); }} className="block w-full text-left px-4 py-3 text-black font-bold hover:bg-[#DCCCAC] rounded-lg transition-colors mt-2">
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link href="/login" className="block px-4 py-3 text-black border border-[#546B41] font-bold hover:bg-[#DCCCAC] rounded-lg transition-colors" onClick={() => setIsMenuOpen(false)}>
-                    Login
-                  </Link>
-                  <Link href="/signup" className="block px-4 py-3 text-black bg-[#99AD7A] hover:bg-[#DCCCAC] font-bold rounded-lg transition-colors text-center mt-2" onClick={() => setIsMenuOpen(false)}>
-                    Sign Up
-                  </Link>
-                </>
-              )}
+      {/* Fixed Mobile Bottom Navigation */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#FFF8EC] border-t-2 border-[#546B41]/20 pb-safe z-[60] shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+        <div className="flex justify-between items-center px-6 py-2">
+          {[
+            { name: 'Home', href: '/', icon: Home },
+            { name: 'Destinations', href: '/destinations', icon: Compass },
+            { name: 'Planner', href: '/trip-planner', icon: Calendar },
+            { name: 'Map', href: '/map', icon: Map },
+          ].map((item) => {
+            const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+            const Icon = item.icon;
+            return (
+              <Link key={item.name} href={item.href} className="flex flex-col items-center justify-center p-2 group transition-all">
+                <div className={`p-1.5 rounded-full transition-all ${isActive ? 'bg-[#99AD7A] text-black border border-[#546B41]/30 -translate-y-1' : 'text-gray-500 group-hover:bg-[#DCCCAC] group-hover:text-black'}`}>
+                  <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
+                </div>
+                <span className={`text-[10px] mt-1 font-bold ${isActive ? 'text-black' : 'text-gray-500'}`}>{item.name}</span>
+              </Link>
+            )
+          })}
+          
+          <button onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)} className="flex flex-col items-center justify-center p-2 group transition-all relative">
+            <div className={`p-1.5 rounded-full transition-all ${isMoreMenuOpen ? 'bg-[#99AD7A] text-black border border-[#546B41]/30 -translate-y-1' : 'text-gray-500 group-hover:bg-[#DCCCAC] group-hover:text-black'}`}>
+              <MoreHorizontal size={22} strokeWidth={isMoreMenuOpen ? 2.5 : 2} />
             </div>
-          </div>
-        </motion.div>
-      )}
+            <span className={`text-[10px] mt-1 font-bold ${isMoreMenuOpen ? 'text-black' : 'text-gray-500'}`}>More</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile More Menu Drawer */}
+      <AnimatePresence>
+        {isMoreMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: "100%" }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="md:hidden fixed inset-x-0 bottom-[68px] bg-[#FFF8EC] border-t-2 border-[#546B41]/20 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-[50] overflow-hidden"
+          >
+            <div className="p-6 pb-8 space-y-4 max-h-[70vh] overflow-y-auto">
+              {/* Secondary Navigation */}
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                 {[
+                   { name: 'Smart Finder', href: '/smart-finder', icon: Search },
+                   { name: 'Festivals', href: '/festivals', icon: Award },
+                   { name: 'About Bihar', href: '/about', icon: Info },
+                   { name: 'Contact Us', href: '/contact', icon: Mail },
+                 ].map(link => (
+                    <Link
+                      key={link.name}
+                      href={link.href}
+                      className="bg-white border border-[#546B41]/10 p-4 rounded-2xl shadow-sm hover:border-[#546B41]/40 flex flex-col items-center justify-center gap-2 group transition-all"
+                      onClick={() => setIsMoreMenuOpen(false)}
+                    >
+                      <div className="w-10 h-10 rounded-full bg-[#DCCCAC]/30 flex items-center justify-center group-hover:bg-[#DCCCAC] transition-all">
+                        <link.icon size={20} className="text-[#546B41]" />
+                      </div>
+                      <span className="text-xs font-bold text-black text-center">{link.name}</span>
+                    </Link>
+                 ))}
+              </div>
+
+              {/* Mobile Auth Links */}
+              <div className="bg-white border border-[#546B41]/10 rounded-2xl p-4 shadow-sm">
+                <h4 className="text-[10px] uppercase font-black tracking-widest text-[#546B41] mb-3">Account Integration</h4>
+                {user ? (
+                  <div className="space-y-2">
+                    <Link href="/dashboard" className="w-full flex items-center gap-3 px-4 py-3 bg-[#FFF8EC] text-black font-bold hover:bg-[#DCCCAC] rounded-xl transition-colors border border-[#546B41]/10" onClick={() => setIsMoreMenuOpen(false)}>
+                      <UserIcon size={18} /> User Dashboard
+                    </Link>
+                    <button onClick={() => { logout(); setIsMoreMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-3 bg-red-50 text-red-600 font-bold hover:bg-red-100 rounded-xl transition-colors">
+                      <LogOut size={18} /> Terminate Session
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Link href="/login" className="w-full flex justify-center items-center gap-2 px-4 py-3 text-black border-2 border-[#546B41] font-bold hover:bg-[#DCCCAC] rounded-xl transition-colors" onClick={() => setIsMoreMenuOpen(false)}>
+                      Login to Network
+                    </Link>
+                    <Link href="/signup" className="w-full flex justify-center items-center gap-2 px-4 py-3 text-black bg-[#99AD7A] hover:bg-[#DCCCAC] font-bold rounded-xl transition-colors text-center" onClick={() => setIsMoreMenuOpen(false)}>
+                      Register Operative
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }

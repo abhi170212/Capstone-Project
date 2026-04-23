@@ -12,9 +12,9 @@ export default function VoiceAssistant() {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [voiceType, setVoiceType] = useState<'male' | 'female'>('female');
-  const [messages, setMessages] = useState<{role: 'user'|'bot', text: string}[]>([]);
+  const [messages, setMessages] = useState<{ role: 'user' | 'bot', text: string }[]>([]);
   const [mounted, setMounted] = useState(false);
-  
+
   const recognitionRef = useRef<any>(null);
   const synthRef = useRef<SpeechSynthesis | null>(null);
 
@@ -51,7 +51,7 @@ export default function VoiceAssistant() {
     const voices = synthRef.current.getVoices();
     // Try to find Indian English voices first, then general English
     let filteredVoices = voices.filter(v => v.lang.includes('en'));
-    
+
     // Very basic heuristic for male vs female robotic voices
     if (type === 'female') {
       return filteredVoices.find(v => v.name.includes('Female') || v.name.includes('Zira') || v.name.includes('Samantha') || v.name.includes('Google UK English Female')) || filteredVoices[0];
@@ -62,7 +62,7 @@ export default function VoiceAssistant() {
 
   const speak = (text: string) => {
     if (!synthRef.current) return;
-    
+
     // Cancel any ongoing speech
     synthRef.current.cancel();
 
@@ -71,11 +71,11 @@ export default function VoiceAssistant() {
     if (selectedVoice) {
       utterance.voice = selectedVoice;
     }
-    
+
     utterance.onstart = () => setIsSpeaking(true);
     utterance.onend = () => setIsSpeaking(false);
     utterance.onerror = () => setIsSpeaking(false);
-    
+
     synthRef.current.speak(utterance);
   };
 
@@ -113,28 +113,28 @@ export default function VoiceAssistant() {
   const handleUserVoiceInput = async (transcript: string) => {
     // Add user message to UI
     setMessages(prev => [...prev, { role: 'user', text: transcript }]);
-    
+
     try {
       // Show loading bot state temporarily
       setMessages(prev => [...prev, { role: 'bot', text: '...' }]);
-      
-      const response = await api.post('/ai/chat', { 
+
+      const response = await api.post('/ai/chat', {
         prompt: transcript,
         context: window.location.pathname
       });
-      
+
       const aiText = response.data.text;
-      
+
       // Update the bot message with real text
       setMessages(prev => {
         const newMsgs = [...prev];
         newMsgs[newMsgs.length - 1] = { role: 'bot', text: aiText };
         return newMsgs;
       });
-      
+
       // Speak the response out loud
       speak(aiText);
-      
+
     } catch (err) {
       console.error("AI Chat Error:", err);
       const errMsg = "I'm having trouble connecting to my servers right now.";
@@ -156,7 +156,7 @@ export default function VoiceAssistant() {
         onClick={handleMicClick}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
-        className="fixed bottom-8 right-8 w-16 h-16 bg-[#99AD7A] rounded-full flex items-center justify-center border-2 border-[#546B41] shadow-[4px_4px_0px_#546B41] z-40 transition-all hover:bg-[#DCCCAC]"
+        className="fixed bottom-[80px] sm:bottom-8 right-4 sm:right-8 w-14 h-14 sm:w-16 sm:h-16 bg-[#99AD7A] rounded-full flex items-center justify-center border-2 border-[#546B41] shadow-[4px_4px_0px_#546B41] z-40 transition-all hover:bg-[#DCCCAC]"
         title="AI Voice Guide"
       >
         <Mic size={28} className="text-black" />
@@ -169,7 +169,7 @@ export default function VoiceAssistant() {
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 50, scale: 0.9 }}
-            className="fixed bottom-28 right-8 w-[350px] bg-[#FFF8EC] border-2 border-[#546B41] rounded-3xl overflow-hidden shadow-[8px_8px_0px_#546B41] z-50 flex flex-col"
+            className="fixed bottom-[140px] sm:bottom-28 right-4 sm:right-8 w-[calc(100vw-32px)] sm:w-[350px] max-w-[350px] bg-[#FFF8EC] border-2 border-[#546B41] rounded-3xl overflow-hidden shadow-[8px_8px_0px_#546B41] z-50 flex flex-col"
           >
             {/* Header */}
             <div className="bg-[#DCCCAC] border-b-2 border-[#546B41] p-4 flex justify-between items-center">
@@ -177,11 +177,11 @@ export default function VoiceAssistant() {
                 <Bot size={24} className="text-black" />
                 <h3 className="font-bold text-black text-lg">AI Tourism Guide</h3>
               </div>
-              <button 
+              <button
                 onClick={() => {
                   stopSpeaking();
                   setIsOpen(false);
-                }} 
+                }}
                 className="text-black hover:scale-110 transition-transform"
               >
                 <X size={24} />
@@ -190,13 +190,13 @@ export default function VoiceAssistant() {
 
             {/* Voice Settings */}
             <div className="flex bg-[#FFF8EC] border-b-2 border-[#546B41] divide-x-2 divide-[#546B41]">
-              <button 
+              <button
                 onClick={() => setVoiceType('female')}
                 className={`flex-1 py-2 text-sm font-bold transition-colors ${voiceType === 'female' ? 'bg-[#99AD7A] text-black' : 'hover:bg-[#DCCCAC]/50 text-black/70'}`}
               >
                 Female Voice
               </button>
-              <button 
+              <button
                 onClick={() => setVoiceType('male')}
                 className={`flex-1 py-2 text-sm font-bold transition-colors ${voiceType === 'male' ? 'bg-[#99AD7A] text-black' : 'hover:bg-[#DCCCAC]/50 text-black/70'}`}
               >
@@ -228,7 +228,7 @@ export default function VoiceAssistant() {
             <div className="p-6 bg-[#DCCCAC] border-t-2 border-[#546B41] flex flex-col items-center justify-center gap-4 relative">
               {isSpeaking && (
                 <div className="absolute top-0 left-0 w-full h-1 bg-[#546B41]/20 overflow-hidden">
-                  <motion.div 
+                  <motion.div
                     initial={{ x: "-100%" }}
                     animate={{ x: "100%" }}
                     transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
@@ -236,10 +236,10 @@ export default function VoiceAssistant() {
                   />
                 </div>
               )}
-              
+
               <div className="flex items-center gap-4">
                 {isSpeaking && (
-                  <button 
+                  <button
                     onClick={stopSpeaking}
                     className="w-10 h-10 rounded-full bg-white border border-[#546B41] flex items-center justify-center hover:bg-red-100 transition-colors tooltip"
                     title="Stop Speaking"
@@ -247,7 +247,7 @@ export default function VoiceAssistant() {
                     <PauseCircle size={20} className="text-red-500" />
                   </button>
                 )}
-                
+
                 <button
                   onClick={toggleListening}
                   className={`w-16 h-16 rounded-full flex items-center justify-center border-2 border-[#546B41] transition-transform ${isListening ? 'bg-red-500 scale-110 shadow-[0_0_20px_rgba(239,68,68,0.5)]' : 'bg-[#99AD7A] hover:bg-white hover:scale-105'}`}

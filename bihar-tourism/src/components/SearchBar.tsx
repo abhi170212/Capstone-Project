@@ -47,11 +47,10 @@ export default function SearchBar({ onSearch, onCategoryFilter }: SearchBarProps
             <button
               key={category}
               onClick={() => handleCategoryChange(category)}
-              className={`flex-1 px-4 py-3 rounded-lg font-bold transition-all duration-200 border-2 ${
-                selectedCategory === category
+              className={`flex-1 px-4 py-3 rounded-lg font-bold transition-all duration-200 border-2 ${selectedCategory === category
                   ? 'bg-[#99AD7A] text-black border-[#546B41]'
                   : 'bg-[#FFF8EC] text-black border-transparent hover:bg-[#99AD7A]/50'
-              }`}
+                }`}
             >
               {category === 'all' ? 'All' : category.charAt(0).toUpperCase() + category.slice(1)}
             </button>
