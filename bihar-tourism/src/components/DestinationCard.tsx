@@ -9,7 +9,7 @@ interface DestinationCardProps {
 }
 
 export default function DestinationCard({ destination }: DestinationCardProps) {
-  const mainImage = destination.images && destination.images.length > 0
+  const mainImage = destination.images && destination.images.length > 0 && destination.images[0]
     ? destination.images[0]
     : '/hero-images/2.png';
 

@@ -43,20 +43,22 @@ body {
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 12px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--accent-sand);
+  background: var(--bg-cream);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
   background: var(--primary-olive);
-  border-radius: 6px;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--secondary-muted);
+  background: var(--accent-sand);
 }
 
 /* Hide scrollbar utility for carousels */
