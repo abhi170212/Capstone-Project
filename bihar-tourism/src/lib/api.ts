@@ -186,6 +186,16 @@ export const adminApi = {
     const response = await api.get('/admin/analytics');
     return response.data;
   },
+  // Posts
+  deletePost: async (id: string) => {
+    const response = await api.delete(`/posts/${id}`);
+    return response.data;
+  },
+  // Comments
+  deleteComment: async (postId: string, commentId: string) => {
+    const response = await api.delete(`/posts/${postId}/comment/${commentId}`);
+    return response.data;
+  },
 };
 
 export const userApi = {

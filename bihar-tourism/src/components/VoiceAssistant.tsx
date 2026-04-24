@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, User, Bot, X, Volume2, Loader2, PauseCircle } from 'lucide-react';
+import { Mic, User, Bot, X, Volume2, Loader2, PauseCircle, Music2, Utensils, Shirt } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
+import BiharMusicPlayer from './BiharMusicPlayer';
 
 export default function VoiceAssistant() {
   const { user } = useAuth();
@@ -14,6 +15,7 @@ export default function VoiceAssistant() {
   const [voiceType, setVoiceType] = useState<'male' | 'female'>('female');
   const [messages, setMessages] = useState<{ role: 'user' | 'bot', text: string }[]>([]);
   const [mounted, setMounted] = useState(false);
+  const [showMusicModal, setShowMusicModal] = useState(false);
 
   const recognitionRef = useRef<any>(null);
   const synthRef = useRef<SpeechSynthesis | null>(null);
@@ -151,16 +153,44 @@ export default function VoiceAssistant() {
 
   return (
     <>
-      {/* Floating Global Mic Button */}
-      <motion.button
-        onClick={handleMicClick}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        className="fixed bottom-[80px] sm:bottom-8 right-4 sm:right-8 w-14 h-14 sm:w-16 sm:h-16 bg-[#99AD7A] rounded-full flex items-center justify-center border-2 border-[#546B41] shadow-[4px_4px_0px_#546B41] z-40 transition-all hover:bg-[#DCCCAC]"
-        title="AI Voice Guide"
-      >
-        <Mic size={28} className="text-black" />
-      </motion.button>
+      {/* Floating Global Action Bar */}
+      <div className="fixed bottom-[80px] sm:bottom-8 right-4 sm:right-8 z-40 flex items-center gap-3 sm:gap-4">
+        {/* Culture Icons */}
+        <div className="flex gap-2 bg-[#FFF8EC]/90 backdrop-blur-md p-2 rounded-full border-2 border-[#546B41] shadow-[4px_4px_0px_#546B41]">
+          <button 
+            onClick={() => setShowMusicModal(true)}
+            className="w-10 h-10 sm:w-12 sm:h-12 bg-[#546B41] text-[#FFF8EC] rounded-full flex items-center justify-center hover:bg-[#DCCCAC] hover:text-black transition-colors"
+            title="Songs of Bihar"
+          >
+            <Music2 size={20} />
+          </button>
+          <button 
+            onClick={() => alert("Cuisine modal coming soon!")}
+            className="w-10 h-10 sm:w-12 sm:h-12 bg-[#99AD7A] text-black rounded-full flex items-center justify-center hover:bg-[#DCCCAC] transition-colors"
+            title="Cuisine of Bihar"
+          >
+            <Utensils size={20} />
+          </button>
+          <button 
+            onClick={() => alert("Attires modal coming soon!")}
+            className="w-10 h-10 sm:w-12 sm:h-12 bg-[#DCCCAC] text-black rounded-full flex items-center justify-center hover:bg-[#99AD7A] transition-colors"
+            title="Attires of Bihar"
+          >
+            <Shirt size={20} />
+          </button>
+        </div>
+
+        {/* AI Mic Button */}
+        <motion.button
+          onClick={handleMicClick}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className="w-14 h-14 sm:w-16 sm:h-16 bg-[#99AD7A] rounded-full flex items-center justify-center border-2 border-[#546B41] shadow-[4px_4px_0px_#546B41] transition-all hover:bg-[#DCCCAC]"
+          title="AI Voice Guide"
+        >
+          <Mic size={28} className="text-black" />
+        </motion.button>
+      </div>
 
       {/* Voice Interface Modal */}
       <AnimatePresence>
@@ -262,6 +292,11 @@ export default function VoiceAssistant() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <BiharMusicPlayer 
+        isOpen={showMusicModal} 
+        onClose={() => setShowMusicModal(false)} 
+      />
     </>
   );
 }

@@ -133,7 +133,7 @@ export default function AdminDashboard() {
             {analytics.topDestinations.map((dest: any, index: number) => (
               <div
                 key={dest.destinationId}
-                className="flex items-center justify-between p-4 bg-white rounded-xl hover:bg-[#DCCCAC]/20 border border-[#546B41]/10 transition-colors"
+                className="flex items-center justify-between p-4 bg-[#FFF8EC] rounded-xl hover:bg-[#DCCCAC]/30 border border-[#546B41]/20 transition-colors"
               >
                 <div className="flex items-center gap-4">
                   <div className="w-8 h-8 bg-[#546B41] rounded-full flex items-center justify-center text-[#FFF8EC] font-bold text-sm">

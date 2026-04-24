@@ -20,6 +20,7 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const postRoutes = require('./routes/postRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const aiRoutes = require('./routes/aiRoutes');
+const songRoutes = require('./routes/songRoutes');
 const notFound = require('./middleware/notFound');
 const errorHandler = require('./middleware/errorHandler');
 const path = require('path');
@@ -56,6 +57,7 @@ app.get('/', (req, res) => {
       bookings: '/api/bookings',
       notifications: '/api/notifications',
       posts: '/api/posts',
+      songs: '/api/songs',
     },
   });
 });
@@ -77,6 +79,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/songs', songRoutes);
 
 // Static routing for images
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
