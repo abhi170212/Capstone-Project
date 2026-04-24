@@ -154,11 +154,49 @@ const deletePost = async (req, res) => {
   }
 };
 
+// @desc    Delete a comment
+// @route   DELETE /api/posts/:id/comment/:commentId
+// @access  Private
+const deleteComment = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    // Find comment
+    const comment = post.comments.find(
+      (c) => c._id.toString() === req.params.commentId
+    );
+
+    if (!comment) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+
+    // Check ownership OR Admin
+    if (comment.user.toString() !== req.user.id && req.user.role !== 'admin') {
+      return res.status(401).json({ message: 'Not authorized to delete this comment' });
+    }
+
+    post.comments = post.comments.filter(
+      (c) => c._id.toString() !== req.params.commentId
+    );
+
+    await post.save();
+
+    res.json(post.comments);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error deleting comment' });
+  }
+};
+
 module.exports = {
   createPost,
   getPosts,
   getUserPosts,
   toggleLike,
   addComment,
-  deletePost
+  deletePost,
+  deleteComment
 };

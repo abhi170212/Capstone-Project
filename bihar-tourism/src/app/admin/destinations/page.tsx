@@ -190,10 +190,10 @@ export default function AdminDestinationsPage() {
                 className="w-full h-full object-cover"
               />
               <div className="absolute top-2 right-2">
-                <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                  dest.type === 'cultural' ? 'bg-blue-100 text-blue-700' :
-                  dest.type === 'eco' ? 'bg-green-100 text-green-700' :
-                  'bg-purple-100 text-purple-700'
+                <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-black shadow-[0_2px_0_0_rgba(0,0,0,1)] ${
+                  dest.type === 'cultural' ? 'bg-[#99AD7A] text-black' :
+                  dest.type === 'eco' ? 'bg-[#546B41] text-[#FFF8EC]' :
+                  'bg-[#DCCCAC] text-black'
                 }`}>
                   {dest.type}
                 </span>
@@ -224,7 +224,7 @@ export default function AdminDestinationsPage() {
                 </button>
                 <button
                   onClick={() => handleDelete(dest._id, dest.name)}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border border-[#546B41]/20 bg-[#FFF8EC] text-red-600 rounded-lg hover:bg-red-50 hover:border-red-200 transition-colors"
                 >
                   <Trash2 size={16} />
                   Delete

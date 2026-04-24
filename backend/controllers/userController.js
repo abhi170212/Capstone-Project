@@ -135,9 +135,34 @@ const getUserById = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    const posts = await Post.find({ user: req.params.id }).sort({ createdAt: -1 });
+
+    const postsWithComments = await Post.find({ 'comments.user': req.params.id })
+      .select('_id caption comments')
+      .sort({ createdAt: -1 });
+
+    let userComments = [];
+    postsWithComments.forEach(post => {
+      post.comments.forEach(comment => {
+        if (comment.user.toString() === req.params.id) {
+          userComments.push({
+            _id: comment._id,
+            postId: post._id,
+            postCaption: post.caption,
+            text: comment.text,
+            date: comment.date
+          });
+        }
+      });
+    });
+
     res.json({
       success: true,
-      data: user,
+      data: {
+        ...user.toObject(),
+        posts,
+        comments: userComments
+      },
     });
   } catch (error) {
     console.error(error);

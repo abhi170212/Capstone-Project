@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
   },
 });
 
-function checkFileType(file, cb) {
+function checkImageFileType(file, cb) {
   const filetypes = /jpg|jpeg|png|webp/;
   const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
   const mimetype = filetypes.test(file.mimetype);
@@ -29,14 +29,33 @@ function checkFileType(file, cb) {
   }
 }
 
-const upload = multer({
+function checkAudioFileType(file, cb) {
+  const filetypes = /mp3|wav|ogg|m4a/;
+  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+  const mimetype = /audio\/.*/.test(file.mimetype);
+
+  if (extname && mimetype) {
+    return cb(null, true);
+  } else {
+    cb('Audio files only!');
+  }
+}
+
+const uploadImage = multer({
   storage,
   fileFilter: function (req, file, cb) {
-    checkFileType(file, cb);
+    checkImageFileType(file, cb);
   },
 });
 
-router.post('/', protect, upload.array('images', 10), (req, res) => {
+const uploadAudio = multer({
+  storage,
+  fileFilter: function (req, file, cb) {
+    checkAudioFileType(file, cb);
+  },
+});
+
+router.post('/', protect, uploadImage.array('images', 10), (req, res) => {
   if (!req.files || req.files.length === 0) {
     return res.status(400).json({ message: 'No image uploaded' });
   }
@@ -44,6 +63,15 @@ router.post('/', protect, upload.array('images', 10), (req, res) => {
   // Construct absolute local server paths assuming Express configures `app.use('/uploads')`
   const filePaths = req.files.map(file => `${req.protocol}://${req.get('host')}/uploads/${file.filename}`);
   res.status(200).json({ paths: filePaths });
+});
+
+router.post('/audio', protect, uploadAudio.single('audio'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: 'No audio file uploaded' });
+  }
+
+  const filePath = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+  res.status(200).json({ path: filePath });
 });
 
 module.exports = router;

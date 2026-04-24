@@ -13,7 +13,8 @@ import {
   Settings,
   ArrowLeft,
   Menu,
-  X
+  X,
+  Music
 } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -42,6 +43,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: 'Users', href: '/admin/users', icon: Users },
     { name: 'Reviews', href: '/admin/reviews', icon: MessageSquare },
     { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
+    { name: 'Music', href: '/admin/music', icon: Music },
     { name: 'Settings', href: '/admin/settings', icon: Settings },
   ];
 
