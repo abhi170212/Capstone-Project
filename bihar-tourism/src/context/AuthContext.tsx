@@ -13,6 +13,8 @@ export interface User {
   avatar?: string;
   bio?: string;
   coverImage?: string;
+  likedSongs?: string[];
+  playlists?: any[];
 }
 
 interface AuthContextType {

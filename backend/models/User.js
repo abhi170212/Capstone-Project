@@ -38,6 +38,14 @@ const userSchema = new mongoose.Schema({
     duration: String,
     dateSaved: { type: Date, default: Date.now }
   }],
+  likedSongs: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Song'
+  }],
+  playlists: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Playlist'
+  }],
   isBanned: {
     type: Boolean,
     default: false,

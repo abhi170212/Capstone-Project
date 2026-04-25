@@ -24,6 +24,10 @@ api.interceptors.request.use(
         }
       }
     }
+    // Remove default Content-Type if sending FormData so browser can set it with boundary
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
+    }
     return config;
   },
   (error) => {

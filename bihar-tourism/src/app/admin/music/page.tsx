@@ -9,7 +9,9 @@ export default function AdminMusicPage() {
   const [songs, setSongs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [newSong, setNewSong] = useState({ title: '', artist: '', youtubeUrl: '', coverImage: '' });
+  const [newSong, setNewSong] = useState({ title: '', artist: '' });
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   useEffect(() => {
     fetchSongs();
@@ -28,10 +30,46 @@ export default function AdminMusicPage() {
 
   const handleAddSong = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!audioFile) {
+      alert('Please select an audio file.');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await api.post('/songs', newSong);
-      setNewSong({ title: '', artist: '', youtubeUrl: '', coverImage: '' });
+      let coverImage = '';
+      if (imageFile) {
+        const imageFormData = new FormData();
+        imageFormData.append('images', imageFile);
+        const imageRes = await api.post('/upload', imageFormData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        coverImage = imageRes.data.paths[0];
+      }
+
+      const audioFormData = new FormData();
+      audioFormData.append('audio', audioFile);
+      const audioRes = await api.post('/upload/audio', audioFormData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      const audioUrl = audioRes.data.path;
+
+      await api.post('/songs', {
+        title: newSong.title,
+        artist: newSong.artist,
+        audioUrl,
+        coverImage,
+      });
+
+      setNewSong({ title: '', artist: '' });
+      setAudioFile(null);
+      setImageFile(null);
+      // Reset file inputs visually by form reset not cleanly possible here without ref, but value='' could work if we had refs.
+      const audioInput = document.getElementById('audio-upload') as HTMLInputElement;
+      if (audioInput) audioInput.value = '';
+      const imageInput = document.getElementById('image-upload') as HTMLInputElement;
+      if (imageInput) imageInput.value = '';
+
       fetchSongs();
     } catch (error) {
       console.error('Failed to add song:', error);
@@ -104,25 +142,25 @@ export default function AdminMusicPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-black uppercase mb-1 flex items-center gap-1"><LinkIcon size={12}/> YouTube URL</label>
+                <label className="block text-xs font-black uppercase mb-1 flex items-center gap-1"><LinkIcon size={12}/> Audio File (MP3, WAV)</label>
                 <input 
-                  type="url" 
+                  type="file" 
+                  id="audio-upload"
                   required
-                  value={newSong.youtubeUrl}
-                  onChange={e => setNewSong({...newSong, youtubeUrl: e.target.value})}
-                  className="w-full bg-white border-2 border-black p-3 font-bold focus:outline-none focus:ring-4 focus:ring-[#546B41]/20 transition-all text-sm"
-                  placeholder="https://youtube.com/watch?v=..."
+                  accept="audio/*"
+                  onChange={e => setAudioFile(e.target.files ? e.target.files[0] : null)}
+                  className="w-full bg-white border-2 border-black p-3 font-bold focus:outline-none focus:ring-4 focus:ring-[#546B41]/20 transition-all text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#546B41] file:text-white hover:file:bg-[#3f5231]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-black uppercase mb-1 flex items-center gap-1"><ImageIcon size={12}/> Cover Image URL (Optional)</label>
+                <label className="block text-xs font-black uppercase mb-1 flex items-center gap-1"><ImageIcon size={12}/> Cover Image (Optional)</label>
                 <input 
-                  type="url" 
-                  value={newSong.coverImage}
-                  onChange={e => setNewSong({...newSong, coverImage: e.target.value})}
-                  className="w-full bg-white border-2 border-black p-3 font-bold focus:outline-none focus:ring-4 focus:ring-[#546B41]/20 transition-all text-sm"
-                  placeholder="https://images.unsplash.com/..."
+                  type="file" 
+                  id="image-upload"
+                  accept="image/*"
+                  onChange={e => setImageFile(e.target.files ? e.target.files[0] : null)}
+                  className="w-full bg-white border-2 border-black p-3 font-bold focus:outline-none focus:ring-4 focus:ring-[#546B41]/20 transition-all text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#546B41] file:text-white hover:file:bg-[#3f5231]"
                 />
               </div>
 
@@ -174,12 +212,12 @@ export default function AdminMusicPage() {
                        <p className="font-bold text-gray-500 text-sm mb-4">{song.artist}</p>
                      </div>
                      <a 
-                       href={song.youtubeUrl} 
+                       href={song.audioUrl} 
                        target="_blank" 
                        rel="noopener noreferrer"
                        className="text-xs font-black uppercase tracking-widest text-[#546B41] flex items-center gap-1 hover:underline"
                      >
-                       <LinkIcon size={12} /> View on YouTube
+                       <Music size={12} /> Play Audio
                      </a>
                   </div>
                 </motion.div>

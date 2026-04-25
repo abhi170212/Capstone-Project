@@ -6,6 +6,8 @@ import { Mic, User, Bot, X, Volume2, Loader2, PauseCircle, Music2, Utensils, Shi
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
 import BiharMusicPlayer from './BiharMusicPlayer';
+import BiharAttireModal from './BiharAttireModal';
+import BiharFoodModal from './BiharFoodModal';
 
 export default function VoiceAssistant() {
   const { user } = useAuth();
@@ -16,6 +18,8 @@ export default function VoiceAssistant() {
   const [messages, setMessages] = useState<{ role: 'user' | 'bot', text: string }[]>([]);
   const [mounted, setMounted] = useState(false);
   const [showMusicModal, setShowMusicModal] = useState(false);
+  const [showAttireModal, setShowAttireModal] = useState(false);
+  const [showFoodModal, setShowFoodModal] = useState(false);
 
   const recognitionRef = useRef<any>(null);
   const synthRef = useRef<SpeechSynthesis | null>(null);
@@ -165,14 +169,14 @@ export default function VoiceAssistant() {
             <Music2 size={20} />
           </button>
           <button 
-            onClick={() => alert("Cuisine modal coming soon!")}
-            className="w-10 h-10 sm:w-12 sm:h-12 bg-[#99AD7A] text-black rounded-full flex items-center justify-center hover:bg-[#DCCCAC] transition-colors"
+            onClick={() => setShowFoodModal(true)}
+            className="w-10 h-10 sm:w-12 sm:h-12 bg-[#DCCCAC] text-black rounded-full flex items-center justify-center hover:bg-[#99AD7A] transition-colors"
             title="Cuisine of Bihar"
           >
             <Utensils size={20} />
           </button>
           <button 
-            onClick={() => alert("Attires modal coming soon!")}
+            onClick={() => setShowAttireModal(true)}
             className="w-10 h-10 sm:w-12 sm:h-12 bg-[#DCCCAC] text-black rounded-full flex items-center justify-center hover:bg-[#99AD7A] transition-colors"
             title="Attires of Bihar"
           >
@@ -296,6 +300,16 @@ export default function VoiceAssistant() {
       <BiharMusicPlayer 
         isOpen={showMusicModal} 
         onClose={() => setShowMusicModal(false)} 
+      />
+
+      <BiharAttireModal
+        isOpen={showAttireModal}
+        onClose={() => setShowAttireModal(false)}
+      />
+
+      <BiharFoodModal
+        isOpen={showFoodModal}
+        onClose={() => setShowFoodModal(false)}
       />
     </>
   );

@@ -11,7 +11,9 @@ const getDashboardData = async (req, res) => {
   try {
     const user = await User.findById(req.user.id)
       .populate('favorites')
-      .populate('createdTrips');
+      .populate('createdTrips')
+      .populate('likedSongs')
+      .populate('playlists');
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -27,6 +29,8 @@ const getDashboardData = async (req, res) => {
       favorites: user.favorites,
       createdTrips: user.createdTrips,
       savedRoutes: user.savedRoutes || [],
+      likedSongs: user.likedSongs || [],
+      playlists: user.playlists || [],
     });
   } catch (error) {
     console.error(error);
@@ -57,6 +61,38 @@ const toggleFavorite = async (req, res) => {
     await user.save();
     
     res.json({ favorites: user.favorites });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// @desc    Toggle like on a song
+// @route   POST /api/users/songs/:songId/like
+// @access  Private
+const toggleLikeSong = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    const songId = req.params.songId;
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const isLiked = user.likedSongs.some(id => id.toString() === songId);
+
+    if (isLiked) {
+      user.likedSongs = user.likedSongs.filter((id) => id.toString() !== songId);
+    } else {
+      user.likedSongs.push(songId);
+    }
+
+    await user.save();
+    
+    // Populate the liked songs so frontend gets the full song objects
+    await user.populate('likedSongs');
+    
+    res.json({ likedSongs: user.likedSongs });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
@@ -374,6 +410,7 @@ module.exports = {
   generateAvatar,
   saveRoute,
   deleteRoute,
+  toggleLikeSong,
   banUser,
   unbanUser
 };
