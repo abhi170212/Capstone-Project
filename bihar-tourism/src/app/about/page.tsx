@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import ImageGallery from '@/components/ImageGallery';
 import PanoramaViewer from '@/components/PanoramaViewer';
 import FamousPersonalities from '@/components/FamousPersonalities';
+import BiharHistoryTimeline from '@/components/BiharHistoryTimeline';
 
 export default function About() {
   return (
@@ -209,15 +210,52 @@ export default function About() {
       <FamousPersonalities />
 
       {/* Gallery Section */}
-      <section className="py-32 px-4 bg-[#FFF8EC]">
+      <section className="py-24 px-4 bg-[#FFF8EC]">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black text-black mb-4 tracking-tight">
-              VISUAL <span className="text-[#546B41]">DOCUMENTATION</span>
+          <div className="text-center mb-6 flex flex-col items-center">
+            <h2 className="text-2xl md:text-4xl font-bold text-black tracking-widest uppercase mb-2">
+              Visual
             </h2>
-            <div className="w-32 h-1.5 bg-[#DCCCAC] mx-auto mt-4 mb-6 rounded-full shadow-lg"></div>
+            <h1 className="text-5xl md:text-[5.5rem] font-black text-[#546B41] tracking-tighter leading-none drop-shadow-lg drop-shadow-[#546B41]/20 uppercase">
+              DOCUMENTATION
+            </h1>
           </div>
-          <ImageGallery />
+          <ImageGallery title="" />
+        </div>
+      </section>
+
+      {/* History Timeline Section */}
+      <section className="py-24 px-4 bg-[#FFF8EC] relative">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16 flex flex-col items-center">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="w-12 h-[2px] bg-[#546B41]"></span>
+              <span className="text-[#546B41] font-black tracking-widest uppercase text-sm">A Journey Through Time</span>
+              <span className="w-12 h-[2px] bg-[#546B41]"></span>
+            </div>
+            <h2 className="text-2xl md:text-4xl font-bold text-black tracking-widest uppercase mb-2">
+              The Chronicles Of
+            </h2>
+            
+            <div className="relative inline-block overflow-hidden">
+              <div className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-hidden bg-black">
+                <iframe
+                  src="https://www.youtube.com/embed/yGp_o04GYF8?autoplay=1&mute=1&controls=0&loop=1&playlist=yGp_o04GYF8&modestbranding=1&rel=0&playsinline=1"
+                  className="absolute top-1/2 left-1/2 w-[300%] h-[300%] md:w-[150%] md:h-[150%] -translate-x-1/2 -translate-y-1/2 opacity-90"
+                  allow="autoplay; encrypted-media"
+                />
+              </div>
+              <h1 className="relative text-7xl md:text-[8rem] font-black tracking-tighter leading-none bg-[#FFF8EC] text-black mix-blend-lighten px-6 py-2 z-10">
+                MAGADHA
+              </h1>
+            </div>
+
+            <div className="w-24 h-2 bg-[#DCCCAC] mx-auto mt-6 mb-8 rounded-full shadow-[2px_2px_0_0_rgba(0,0,0,1)] border-2 border-black"></div>
+            <p className="text-lg md:text-xl text-gray-700 font-bold max-w-2xl mx-auto leading-relaxed">
+              Hover over the timeline to explore the monumental events that shaped the history of Bihar and the world.
+            </p>
+          </div>
+          <BiharHistoryTimeline />
         </div>
       </section>
     </div>

@@ -18,7 +18,6 @@ import {
 
 export default function TripPlanner() {
   const [destinations, setDestinations] = useState<Destination[]>([]);
-  const [itineraries, setItineraries] = useState<Itinerary[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -30,17 +29,14 @@ export default function TripPlanner() {
   });
 
   const [activeDay, setActiveDay] = useState(1);
-  const [showSaved, setShowSaved] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [destRes, itinRes] = await Promise.all([
-          destinationApi.getAll(),
-          itineraryApi.getAll()
+        const [destRes] = await Promise.all([
+          destinationApi.getAll()
         ]);
         setDestinations(destRes.data);
-        setItineraries(itinRes.data);
       } catch (err) {
         console.error('Failed to fetch data:', err);
       } finally {
@@ -72,12 +68,21 @@ export default function TripPlanner() {
     setCurrentPlan(prev => {
       const newDays = [...prev.days];
       const dayIdx = newDays.findIndex(d => d.day === activeDay);
-      newDays[dayIdx].activities.push({
-        destinationId: destId,
-        location: dest.name,
-        time: 'Morning',
-        description: `Visit ${dest.name}`
-      });
+      
+      const currentDay = newDays[dayIdx];
+      newDays[dayIdx] = {
+        ...currentDay,
+        activities: [
+          ...currentDay.activities,
+          {
+            destinationId: destId,
+            location: dest.name,
+            time: 'Morning',
+            description: `Visit ${dest.name}`
+          }
+        ]
+      };
+      
       return { ...prev, days: newDays };
     });
   };
@@ -86,7 +91,16 @@ export default function TripPlanner() {
     setCurrentPlan(prev => {
       const newDays = [...prev.days];
       const dayIdx = newDays.findIndex(d => d.day === dayNum);
-      newDays[dayIdx].activities.splice(actIdx, 1);
+      
+      const currentDay = newDays[dayIdx];
+      const newActivities = [...currentDay.activities];
+      newActivities.splice(actIdx, 1);
+      
+      newDays[dayIdx] = {
+        ...currentDay,
+        activities: newActivities
+      };
+      
       return { ...prev, days: newDays };
     });
   };
@@ -95,9 +109,7 @@ export default function TripPlanner() {
     setSaving(true);
     try {
       await itineraryApi.create(currentPlan);
-      const res = await itineraryApi.getAll();
-      setItineraries(res.data);
-      alert('Itinerary saved successfully!');
+      alert('Itinerary saved successfully! You can view it in your Dashboard.');
     } catch (err) {
       console.error('Failed to save:', err);
       alert('Error saving itinerary');
@@ -127,12 +139,6 @@ export default function TripPlanner() {
           </div>
           <div className="flex flex-col sm:flex-row gap-3 relative z-10 w-full md:w-auto">
             <button
-              onClick={() => setShowSaved(!showSaved)}
-              className="flex items-center justify-center gap-2 px-6 py-3.5 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl font-bold text-white hover:bg-black/60 shadow-lg tracking-wider uppercase text-sm transition-all"
-            >
-              <History size={16} /> {showSaved ? 'Hide Bank' : 'Load Saved'}
-            </button>
-            <button
               onClick={saveItinerary}
               disabled={saving}
               className="flex items-center justify-center gap-2 px-8 py-3.5 bg-[#DCCCAC] text-black rounded-2xl font-black shadow-[0_10px_20px_rgba(0,0,0,0.3)] hover:shadow-[0_15px_30px_rgba(0,0,0,0.4)] hover:-translate-y-0.5 hover:bg-white transition-all disabled:opacity-50 uppercase tracking-widest text-sm"
@@ -141,42 +147,6 @@ export default function TripPlanner() {
             </button>
           </div>
         </div>
-
-        {showSaved && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            className="mb-12 grid grid-cols-1 md:grid-cols-3 gap-6"
-          >
-            {itineraries.map(itin => (
-              <div key={itin._id} className="bg-white p-6 rounded-3xl border-2 border-[#546B41]/10 shadow-xl hover:shadow-2xl hover:border-[#546B41]/40 transition-all group">
-                <h4 className="font-black text-xl text-black mb-1">{itin.name}</h4>
-                <p className="text-xs font-bold text-[#546B41] uppercase tracking-widest mb-5 border-b border-gray-100 pb-3">{itin.days.length} Days Itinerary</p>
-                <button
-                  onClick={() => {
-                    setCurrentPlan({
-                      name: itin.name,
-                      description: itin.description,
-                      days: itin.days.map(d => ({
-                        day: d.day,
-                        activities: d.activities.map(a => ({
-                          time: a.time,
-                          location: a.location,
-                          description: a.description,
-                          destinationId: a.destinationId?._id
-                        }))
-                      }))
-                    });
-                    setShowSaved(false);
-                  }}
-                  className="w-full text-white bg-black py-2 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#546B41] transition-colors shadow-md group-hover:-translate-y-0.5"
-                >
-                  Deploy Plan
-                </button>
-              </div>
-            ))}
-          </motion.div>
-        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Planner Sidebar */}
@@ -301,7 +271,9 @@ export default function TripPlanner() {
                                 onChange={(e) => {
                                   const newDays = [...currentPlan.days];
                                   const dayIdx = newDays.findIndex(d => d.day === activeDay);
-                                  newDays[dayIdx].activities[idx].time = e.target.value;
+                                  const newActivities = [...newDays[dayIdx].activities];
+                                  newActivities[idx] = { ...newActivities[idx], time: e.target.value };
+                                  newDays[dayIdx] = { ...newDays[dayIdx], activities: newActivities };
                                   setCurrentPlan({ ...currentPlan, days: newDays });
                                 }}
                                 className="bg-black text-[#DCCCAC] font-black text-[10px] uppercase tracking-widest px-4 py-2 rounded-xl outline-none focus:ring-2 focus:ring-[#99AD7A] cursor-pointer shadow-lg w-max"
@@ -325,7 +297,9 @@ export default function TripPlanner() {
                             onChange={(e) => {
                               const newDays = [...currentPlan.days];
                               const dayIdx = newDays.findIndex(d => d.day === activeDay);
-                              newDays[dayIdx].activities[idx].description = e.target.value;
+                              const newActivities = [...newDays[dayIdx].activities];
+                              newActivities[idx] = { ...newActivities[idx], description: e.target.value };
+                              newDays[dayIdx] = { ...newDays[dayIdx], activities: newActivities };
                               setCurrentPlan({ ...currentPlan, days: newDays });
                             }}
                             className="w-full text-black font-medium text-sm bg-[#FFF8EC] p-5 rounded-2xl border border-transparent focus:border-[#546B41]/30 focus:shadow-inner resize-none transition-all outline-none leading-relaxed"
@@ -359,7 +333,8 @@ export default function TripPlanner() {
         </div>
       </div>
 
-      <style jsx global>{`
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }
@@ -373,7 +348,7 @@ export default function TripPlanner() {
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: #cbd5e1;
         }
-      `}</style>
+      `}} />
     </div>
   );
 }

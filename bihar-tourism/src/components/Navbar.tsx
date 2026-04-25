@@ -38,8 +38,12 @@ export default function Navbar() {
             className="flex-shrink-0"
           >
             <Link href="/" className="flex items-center space-x-3">
-              <div className="w-12 h-12 rounded-full border-2 border-[#546B41] flex items-center justify-center bg-[#DCCCAC] text-black font-bold text-xl">
-                BT
+              <div className="w-12 h-12 rounded-full border-2 border-[#546B41] bg-white overflow-hidden flex items-center justify-center shadow-sm">
+                <img 
+                  src="https://paintmaps.com/og_image/map_chart/map_chart_239c.png" 
+                  alt="Bihar Tourism Logo" 
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-black">

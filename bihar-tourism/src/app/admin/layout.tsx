@@ -16,7 +16,8 @@ import {
   X,
   Music,
   Shirt,
-  Utensils
+  Utensils,
+  UserCircle
 } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -48,6 +49,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: 'Music', href: '/admin/music', icon: Music },
     { name: 'Attires', href: '/admin/attires', icon: Shirt },
     { name: 'Cuisine', href: '/admin/foods', icon: Utensils },
+    { name: 'Personalities', href: '/admin/personalities', icon: UserCircle },
     { name: 'Settings', href: '/admin/settings', icon: Settings },
   ];
 

@@ -124,10 +124,18 @@ export const itineraryApi = {
     const response = await api.get<{ success: boolean; count: number; data: any[] }>('/itineraries');
     return response.data;
   },
+  getMyItineraries: async () => {
+    const response = await api.get<{ success: boolean; count: number; data: any[] }>('/itineraries/my');
+    return response.data;
+  },
   getById: async (id: string) => {
     const response = await api.get<{ success: boolean; data: any }>(`/itineraries/${id}`);
     return response.data;
   },
+  delete: async (id: string) => {
+    const response = await api.delete<{ success: boolean }>(`/itineraries/${id}`);
+    return response.data;
+  }
 };
 
 export const authApi = {

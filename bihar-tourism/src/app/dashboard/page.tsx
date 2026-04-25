@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
 import Link from 'next/link';
-import { MapPin, Heart, Trash2, Route as RouteIcon, FileDown, Navigation, Camera, ShieldAlert, CheckCircle, Ban, Edit3, Image as ImageIcon, Sparkles, UploadCloud, User as UserIcon, Star } from 'lucide-react';
+import { MapPin, Heart, Trash2, Route as RouteIcon, FileDown, Navigation, Camera, ShieldAlert, CheckCircle, Ban, Edit3, Image as ImageIcon, Sparkles, UploadCloud, User as UserIcon, Star, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { jsPDF } from 'jspdf';
 import PostCard from '@/components/PostCard';
@@ -23,6 +23,8 @@ export default function DashboardPage() {
 
   // Social State
   const [myPosts, setMyPosts] = useState<any[]>([]);
+  const [myItineraries, setMyItineraries] = useState<any[]>([]);
+  const [selectedItinerary, setSelectedItinerary] = useState<any>(null);
   const [newPost, setNewPost] = useState({ caption: '', location: '', category: 'General' });
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isPosting, setIsPosting] = useState(false);
@@ -59,6 +61,7 @@ export default function DashboardPage() {
     if (user) {
       fetchDashboardData();
       fetchMyPosts();
+      fetchMyItineraries();
       fetchDestinationsList();
       if (user.role === 'admin') {
         fetchAllUsers();
@@ -98,6 +101,16 @@ export default function DashboardPage() {
     }
   };
 
+  const fetchMyItineraries = async () => {
+    if(!user) return;
+    try {
+      const res = await api.get('/itineraries/my');
+      setMyItineraries(res.data.data || []);
+    } catch (err) {
+      console.error('Failed to fetch itineraries', err);
+    }
+  };
+
   const fetchAllUsers = async () => {
     try {
       const res = await api.get('/admin/users');
@@ -134,6 +147,17 @@ export default function DashboardPage() {
     } catch (error) {
       console.error('Failed to remove route', error);
       alert('Failed to delete route.');
+    }
+  };
+
+  const deleteItinerary = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this trip itinerary?')) return;
+    try {
+      await api.delete(`/itineraries/${id}`);
+      setMyItineraries(myItineraries.filter(itin => itin._id !== id));
+    } catch (err) {
+      console.error('Failed to delete itinerary', err);
+      alert('Failed to delete itinerary.');
     }
   };
 
@@ -487,6 +511,54 @@ export default function DashboardPage() {
                     </div>
                   )}
                 </div>
+
+                {/* Custom Itineraries Section */}
+                <div className="bg-white rounded-3xl shadow-xl p-6 border border-[#546B41]/10 lg:col-span-3">
+                  <h2 className="text-xl font-black text-black mb-6 border-b-2 border-gray-100 pb-4 flex items-center tracking-tight">
+                    <Calendar className="w-6 h-6 mr-3 text-[#546B41]" /> Custom Trip Itineraries
+                  </h2>
+                  {myItineraries.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                      {myItineraries.map((itin: any) => (
+                        <div key={itin._id} className="bg-[#FFF8EC] rounded-2xl p-6 border border-[#546B41]/20 hover:shadow-xl hover:border-[#546B41]/50 transition-all relative overflow-hidden group">
+                          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#DCCCAC] to-[#546B41]"></div>
+                          <div className="flex justify-between items-start mb-2">
+                            <h3 className="font-extrabold text-lg text-black line-clamp-1">{itin.name}</h3>
+                            <button onClick={() => deleteItinerary(itin._id)} className="text-gray-300 hover:text-red-500 p-1.5 rounded-full bg-white hover:bg-red-50 transition opacity-0 group-hover:opacity-100 shadow-sm" title="Delete Itinerary">
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                          <div className="flex justify-between items-center text-xs text-[#546B41] font-black uppercase tracking-widest mb-5 border-b border-[#546B41]/10 pb-3">
+                            <span>{itin.days.length} Days Planned</span>
+                            {itin.createdAt && (
+                              <span className="text-[10px] text-gray-400 tracking-wider">
+                                {new Date(itin.createdAt).toLocaleDateString()} • {new Date(itin.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                              </span>
+                            )}
+                          </div>
+                          <div className="space-y-2 mb-4">
+                            {itin.days.slice(0, 2).map((day: any) => (
+                              <p key={day.day} className="text-xs text-gray-600 font-medium line-clamp-1">
+                                <span className="font-bold text-black">Day {day.day}:</span> {day.activities.length} activities
+                              </p>
+                            ))}
+                            {itin.days.length > 2 && <p className="text-xs text-gray-400 italic">...and more</p>}
+                          </div>
+                          <button onClick={() => setSelectedItinerary(itin)} className="w-full bg-[#546B41] text-[#FFF8EC] py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-black transition-colors shadow-md group-hover:-translate-y-0.5">
+                            Open Matrix
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center p-12 bg-[#FFF8EC] rounded-3xl border-2 border-[#546B41]/20 border-dashed">
+                      <Calendar size={48} className="mx-auto text-[#DCCCAC] mb-4"/>
+                      <p className="text-black font-extrabold text-xl mb-2">No Trip Plans</p>
+                      <p className="text-gray-500 mb-4">Use the Strategic Planner to build your custom itinerary.</p>
+                      <Link href="/trip-planner" className="inline-block bg-[#546B41] text-white px-6 py-2 rounded-xl font-bold hover:bg-black transition-colors">Go to Planner</Link>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
@@ -716,6 +788,52 @@ export default function DashboardPage() {
                       <div className="absolute inset-0 w-full bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out skew-x-12"></div>
                       {isUpdatingProfile ? 'Applying Secure Overrides...' : 'Publish Identity Update'}
                     </button>
+                  </div>
+                </motion.div>
+             </div>
+           )}
+        </AnimatePresence>
+
+        {/* Modal Interceptor for Itinerary Matrix */}
+        <AnimatePresence>
+           {selectedItinerary && (
+             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
+                <motion.div 
+                   initial={{ scale: 0.9, y: 20, opacity: 0 }}
+                   animate={{ scale: 1, y: 0, opacity: 1 }}
+                   exit={{ scale: 0.9, y: 20, opacity: 0 }}
+                   className="bg-[#FFF8EC] rounded-[2rem] w-full max-w-2xl shadow-[0_30px_60px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col relative border border-[#546B41]/20 max-h-[90vh]"
+                >
+                  <div className="bg-[#546B41] text-[#FFF8EC] px-8 py-6 flex justify-between items-center relative overflow-hidden shrink-0">
+                    <h3 className="text-2xl font-black flex items-center gap-3 relative z-10 tracking-tight">{selectedItinerary.name}</h3>
+                    <button onClick={() => setSelectedItinerary(null)} className="relative z-10 text-[#DCCCAC] hover:text-white font-black text-sm uppercase tracking-widest transition-colors bg-black/20 px-4 py-2 rounded-full hover:bg-black/40">Close</button>
+                  </div>
+                  
+                  <div className="p-8 overflow-y-auto space-y-6 custom-scrollbar">
+                    {selectedItinerary.days.map((day: any) => (
+                      <div key={day.day} className="bg-white rounded-2xl p-6 border border-[#546B41]/10 shadow-sm hover:border-[#546B41]/30 transition-colors">
+                        <h4 className="font-black text-lg text-[#546B41] uppercase tracking-widest mb-4 border-b border-gray-100 pb-2 flex items-center gap-2">
+                          <Calendar size={18} /> Day {day.day}
+                        </h4>
+                        {day.activities.length > 0 ? (
+                          <div className="space-y-4">
+                            {day.activities.map((act: any, idx: number) => (
+                              <div key={idx} className="flex gap-4 items-start">
+                                <div className="bg-[#DCCCAC]/30 text-[#546B41] px-3 py-1.5 rounded-lg text-xs font-black tracking-widest uppercase shrink-0 mt-0.5 border border-[#546B41]/10">
+                                  {act.time || 'Anytime'}
+                                </div>
+                                <div className="bg-[#FFF8EC] p-4 rounded-xl flex-1 border border-[#546B41]/5">
+                                  <p className="font-black text-black text-base">{act.location}</p>
+                                  {act.description && <p className="text-sm text-gray-600 mt-2 leading-relaxed">{act.description}</p>}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-gray-400 italic text-sm">No activities planned for this day.</p>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </motion.div>
              </div>

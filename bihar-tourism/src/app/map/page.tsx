@@ -306,10 +306,10 @@ export default function InteractiveMapPage() {
         {isPanelOpen && activeDestination && (
           <Rnd
             default={{
-              x: window.innerWidth > 768 ? window.innerWidth - 440 : (window.innerWidth - 340) / 2,
+              x: typeof window !== 'undefined' && window.innerWidth > 768 ? window.innerWidth - 440 : typeof window !== 'undefined' ? (window.innerWidth - 340) / 2 : 0,
               y: 60,
               width: 400,
-              height: 600,
+              height: typeof window !== 'undefined' ? Math.min(600, window.innerHeight - 150) : 600,
             }}
             size={isFullscreen ? { width: '90%', height: '80%' } : undefined}
             position={isFullscreen ? { x: window.innerWidth * 0.05, y: window.innerHeight * 0.1 } : undefined}
@@ -346,7 +346,11 @@ export default function InteractiveMapPage() {
             </div>
 
             {/* Window Body - Scrollable */}
-            <div className="flex-1 p-5 overflow-y-auto flex flex-col pointer-events-auto cursor-default">
+            <div 
+              className="flex-1 min-h-0 p-5 overflow-y-auto custom-scrollbar flex flex-col pointer-events-auto cursor-default"
+              onWheelCapture={(e) => e.stopPropagation()}
+              onTouchMoveCapture={(e) => e.stopPropagation()}
+            >
               
               {/* Destination Banner */}
               {activeDestination.images && activeDestination.images.length > 0 && (
