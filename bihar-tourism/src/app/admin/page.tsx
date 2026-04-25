@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { adminApi } from '@/lib/api';
+import api, { adminApi } from '@/lib/api';
 import { 
   Users, 
   MapPin, 
@@ -16,21 +16,37 @@ import Link from 'next/link';
 
 export default function AdminDashboard() {
   const [analytics, setAnalytics] = useState<any>(null);
+  const [itineraries, setItineraries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchAnalytics = async () => {
+    const fetchData = async () => {
       try {
-        const res = await adminApi.getAnalytics();
-        setAnalytics(res.data);
+        const [analyticsRes, itinerariesRes] = await Promise.all([
+          adminApi.getAnalytics(),
+          api.get('/itineraries') // Uses the global itineraryApi endpoint which returns all for admins
+        ]);
+        setAnalytics(analyticsRes.data);
+        setItineraries(itinerariesRes.data?.data || []);
       } catch (err) {
-        console.error('Failed to fetch analytics:', err);
+        console.error('Failed to fetch admin data:', err);
       } finally {
         setLoading(false);
       }
     };
-    fetchAnalytics();
+    fetchData();
   }, []);
+
+  const deleteItinerary = async (id: string) => {
+    if (!confirm('Are you sure you want to completely delete this itinerary?')) return;
+    try {
+      await api.delete(`/itineraries/${id}`);
+      setItineraries(itineraries.filter(itin => itin._id !== id));
+    } catch (err) {
+      console.error('Failed to delete itinerary', err);
+      alert('Failed to delete itinerary.');
+    }
+  };
 
   if (loading) {
     return (
@@ -184,6 +200,65 @@ export default function AdminDashboard() {
             <p className="font-bold tracking-wide uppercase text-sm">Moderate Reviews</p>
           </Link>
         </div>
+      </motion.div>
+
+      {/* Global User Itineraries */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-[#FFF8EC] rounded-2xl p-6 shadow-sm border border-[#546B41]/20 mt-8"
+      >
+        <h2 className="text-2xl font-black text-black mb-6 uppercase tracking-wider flex items-center gap-3">
+          <Plane className="text-[#546B41]" /> User Trip Plans Matrix
+        </h2>
+        
+        {itineraries.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-[#546B41]/10 text-[#546B41] text-xs font-black uppercase tracking-widest">
+                  <th className="p-4 border-b border-[#546B41]/20">Plan Name</th>
+                  <th className="p-4 border-b border-[#546B41]/20">Operative (User)</th>
+                  <th className="p-4 border-b border-[#546B41]/20">Duration</th>
+                  <th className="p-4 border-b border-[#546B41]/20">Created</th>
+                  <th className="p-4 border-b border-[#546B41]/20">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {itineraries.filter((i: any) => i.user).map((itin: any) => (
+                  <tr key={itin._id} className="hover:bg-white transition-colors group">
+                    <td className="p-4 font-bold text-black text-sm">{itin.name}</td>
+                    <td className="p-4 text-gray-600 font-medium text-sm">
+                      {itin.user ? (
+                        <div>
+                          <p className="font-bold">{itin.user.name}</p>
+                          <p className="text-xs">{itin.user.email}</p>
+                        </div>
+                      ) : (
+                        <span className="text-red-500 italic text-xs">Legacy / Unlinked</span>
+                      )}
+                    </td>
+                    <td className="p-4">
+                      <span className="bg-[#DCCCAC]/30 text-[#546B41] px-3 py-1 rounded-full text-xs font-black tracking-widest uppercase">
+                        {itin.days?.length || 0} Days
+                      </span>
+                    </td>
+                    <td className="p-4 text-xs font-bold text-gray-500">
+                      {new Date(itin.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="p-4">
+                      <button onClick={() => deleteItinerary(itin._id)} className="text-gray-300 hover:text-red-500 p-2 bg-white rounded-full transition-colors shadow-sm opacity-0 group-hover:opacity-100" title="Delete Itinerary">
+                        <Trash2 size={16} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="text-gray-500 font-medium p-4 text-center bg-white rounded-xl">No itineraries have been created by users yet.</p>
+        )}
       </motion.div>
     </div>
   );
