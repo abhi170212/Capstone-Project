@@ -4,9 +4,13 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Music2, Utensils, Shirt } from 'lucide-react';
 import BiharMusicPlayer from './BiharMusicPlayer';
+import BiharAttireModal from './BiharAttireModal';
+import BiharFoodModal from './BiharFoodModal';
 
 export default function CultureShowcase() {
   const [showMusicModal, setShowMusicModal] = useState(false);
+  const [showAttireModal, setShowAttireModal] = useState(false);
+  const [showFoodModal, setShowFoodModal] = useState(false);
 
   const cards = [
     {
@@ -27,7 +31,7 @@ export default function CultureShowcase() {
       bg: 'bg-[#DCCCAC]',
       textColor: 'text-black',
       border: 'border-black',
-      onClick: () => alert("Foods of Bihar modal coming soon!")
+      onClick: () => setShowFoodModal(true)
     },
     {
       id: 'dress',
@@ -37,7 +41,7 @@ export default function CultureShowcase() {
       bg: 'bg-[#99AD7A]',
       textColor: 'text-black',
       border: 'border-black',
-      onClick: () => alert("Attires of Bihar modal coming soon!")
+      onClick: () => setShowAttireModal(true)
     }
   ];
 
@@ -96,6 +100,17 @@ export default function CultureShowcase() {
       <BiharMusicPlayer 
         isOpen={showMusicModal} 
         onClose={() => setShowMusicModal(false)} 
+      />
+
+      <BiharAttireModal
+        isOpen={showAttireModal}
+        onClose={() => setShowAttireModal(false)}
+      />
+
+      {/* Food Modal */}
+      <BiharFoodModal
+        isOpen={showFoodModal}
+        onClose={() => setShowFoodModal(false)}
       />
     </>
   );

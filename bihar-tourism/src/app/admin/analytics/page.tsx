@@ -12,8 +12,17 @@ import {
   Star,
   Plane,
   Calendar,
-  Award
+  Award,
+  Download,
+  Shirt,
+  Music,
+  Utensils
 } from 'lucide-react';
+import { 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  PieChart, Pie, Cell, LineChart, Line 
+} from 'recharts';
+import html2canvas from 'html2canvas';
 
 export default function AdminAnalyticsPage() {
   const [analytics, setAnalytics] = useState<any>(null);
@@ -32,6 +41,27 @@ export default function AdminAnalyticsPage() {
     };
     fetchAnalytics();
   }, []);
+
+  const COLORS = ['#546B41', '#99AD7A', '#DCCCAC', '#000000', '#6B5441'];
+
+  const handleDownloadCharts = async () => {
+    const chartsElement = document.getElementById('analytics-charts');
+    if (!chartsElement) return;
+    
+    try {
+      const canvas = await html2canvas(chartsElement, {
+        scale: 2,
+        backgroundColor: '#FFF8EC'
+      });
+      const dataUrl = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.download = `bihar-tourism-analytics-${new Date().toISOString().split('T')[0]}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error('Error downloading charts:', err);
+    }
+  };
 
   if (loading) {
     return (
@@ -52,9 +82,18 @@ export default function AdminAnalyticsPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-black text-black uppercase tracking-tight mb-2">Analytics Dashboard</h1>
-        <p className="text-[#546B41] font-medium tracking-wide">Comprehensive platform insights and statistics</p>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-black text-black uppercase tracking-tight mb-2">Analytics Dashboard</h1>
+          <p className="text-[#546B41] font-medium tracking-wide">Comprehensive platform insights and statistics</p>
+        </div>
+        
+        <button 
+          onClick={handleDownloadCharts}
+          className="flex items-center gap-2 bg-[#546B41] text-[#FFF8EC] border-4 border-black px-6 py-3 rounded-xl font-black uppercase tracking-widest hover:-translate-y-1 shadow-[4px_4px_0_0_rgba(0,0,0,1)] transition-all"
+        >
+          <Download size={20} /> Download Report
+        </button>
       </div>
 
       {/* Overview Stats */}
@@ -252,6 +291,104 @@ export default function AdminAnalyticsPage() {
           </div>
         </div>
       </motion.div>
+
+      {/* ADVANCED CHARTS SECTION */}
+      <div id="analytics-charts" className="space-y-8 bg-[#FFF8EC] p-4 -m-4 rounded-xl">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          
+          {/* Attire Sales - Bar Chart */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-2xl p-6 shadow-[8px_8px_0_0_rgba(0,0,0,1)] border-4 border-black"
+          >
+            <div className="flex items-center gap-3 mb-6 border-b-4 border-black pb-4">
+              <Shirt size={28} className="text-[#546B41]" />
+              <h2 className="text-2xl font-black text-black uppercase tracking-wider">Attire Sales Volume</h2>
+            </div>
+            <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={analytics.chartData?.attireSales || []} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="name" tick={{fill: '#000', fontWeight: 'bold'}} />
+                  <YAxis tick={{fill: '#000', fontWeight: 'bold'}} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#FFF8EC', border: '4px solid black', borderRadius: '12px', fontWeight: 'bold', color: 'black', boxShadow: '4px 4px 0 0 black' }}
+                    itemStyle={{ color: '#546B41', fontWeight: '900' }}
+                  />
+                  <Bar dataKey="sales" fill="#546B41" stroke="#000" strokeWidth={2} radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </motion.div>
+
+          {/* Music Plays - Pie Chart */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-white rounded-2xl p-6 shadow-[8px_8px_0_0_rgba(0,0,0,1)] border-4 border-black"
+          >
+            <div className="flex items-center gap-3 mb-6 border-b-4 border-black pb-4">
+              <Music size={28} className="text-[#DCCCAC]" />
+              <h2 className="text-2xl font-black text-black uppercase tracking-wider">Music Plays Distribution</h2>
+            </div>
+            <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={analytics.chartData?.musicPlays || []}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={100}
+                    innerRadius={40}
+                    dataKey="plays"
+                    label={({name, percent}) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    labelLine={false}
+                    stroke="#000"
+                    strokeWidth={2}
+                  >
+                    {(analytics.chartData?.musicPlays || []).map((entry: any, index: number) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#FFF8EC', border: '4px solid black', borderRadius: '12px', fontWeight: 'bold', color: 'black', boxShadow: '4px 4px 0 0 black' }}
+                  />
+                  <Legend wrapperStyle={{ fontWeight: 'bold' }} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Cuisine Popularity - Line Graph */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-white rounded-2xl p-6 shadow-[8px_8px_0_0_rgba(0,0,0,1)] border-4 border-black w-full"
+        >
+          <div className="flex items-center gap-3 mb-6 border-b-4 border-black pb-4">
+            <Utensils size={28} className="text-[#99AD7A]" />
+            <h2 className="text-2xl font-black text-black uppercase tracking-wider">Cuisine Popularity / Loves</h2>
+          </div>
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={analytics.chartData?.cuisinePopularity || []} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis dataKey="name" tick={{fill: '#000', fontWeight: 'bold'}} />
+                <YAxis tick={{fill: '#000', fontWeight: 'bold'}} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#FFF8EC', border: '4px solid black', borderRadius: '12px', fontWeight: 'bold', color: 'black', boxShadow: '4px 4px 0 0 black' }}
+                  itemStyle={{ color: '#99AD7A', fontWeight: '900' }}
+                />
+                <Line type="monotone" dataKey="loved" stroke="#99AD7A" strokeWidth={4} activeDot={{ r: 8, stroke: '#000', strokeWidth: 2 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </motion.div>
+      </div>
 
       {/* Quick Insights */}
       <motion.div

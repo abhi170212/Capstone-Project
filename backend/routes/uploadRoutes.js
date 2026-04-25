@@ -25,19 +25,17 @@ function checkImageFileType(file, cb) {
   if (extname && mimetype) {
     return cb(null, true);
   } else {
-    cb('Images only!');
+    cb(new Error('Images only!'));
   }
 }
 
 function checkAudioFileType(file, cb) {
-  const filetypes = /mp3|wav|ogg|m4a/;
-  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = /audio\/.*/.test(file.mimetype);
-
-  if (extname && mimetype) {
+  // Be extremely permissive here because browser mimetypes for audio are notoriously inconsistent
+  // Admin is the only one uploading, so we trust the input.
+  if (file && file.originalname) {
     return cb(null, true);
   } else {
-    cb('Audio files only!');
+    cb(new Error('Invalid file uploaded!'));
   }
 }
 

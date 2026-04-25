@@ -14,7 +14,9 @@ import {
   ArrowLeft,
   Menu,
   X,
-  Music
+  Music,
+  Shirt,
+  Utensils
 } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -44,6 +46,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: 'Reviews', href: '/admin/reviews', icon: MessageSquare },
     { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
     { name: 'Music', href: '/admin/music', icon: Music },
+    { name: 'Attires', href: '/admin/attires', icon: Shirt },
+    { name: 'Cuisine', href: '/admin/foods', icon: Utensils },
     { name: 'Settings', href: '/admin/settings', icon: Settings },
   ];
 

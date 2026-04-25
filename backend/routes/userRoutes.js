@@ -12,7 +12,8 @@ const {
   updateUserRole,
   deleteUser,
   banUser,
-  unbanUser
+  unbanUser,
+  toggleLikeSong
 } = require('../controllers/userController');
 const { protect, admin } = require('../middleware/authMiddleware');
 
@@ -23,6 +24,7 @@ router.put('/profile', protect, updateProfile);
 router.post('/generate-avatar', protect, generateAvatar);
 router.post('/routes', protect, saveRoute);
 router.delete('/routes/:routeId', protect, deleteRoute);
+router.post('/songs/:songId/like', protect, toggleLikeSong);
 
 // Admin routes
 router.get('/admin/users', protect, admin, getAllUsers);

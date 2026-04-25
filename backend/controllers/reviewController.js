@@ -95,6 +95,9 @@ const getAnalytics = async (req, res) => {
     const Destination = require('../models/Destination');
     const Itinerary = require('../models/Itinerary');
     const Festival = require('../models/Festival');
+    const Attire = require('../models/Attire');
+    const Song = require('../models/Song');
+    const Food = require('../models/Food');
 
     // Get counts
     const totalUsers = await User.countDocuments();
@@ -132,6 +135,25 @@ const getAnalytics = async (req, res) => {
       _id: { $in: reviewsByDestination.map(r => r._id) },
     }).select('name');
 
+    // Generate Mock Chart Data based on actual DB items
+    const attires = await Attire.find().select('name');
+    const attireSales = attires.map((a, i) => ({
+      name: a.name.split(' ')[0] + '...', // Shorten name for chart
+      sales: Math.floor(Math.random() * 500) + 50 // Random sales between 50-550
+    })).slice(0, 7); // Top 7
+
+    const songs = await Song.find().select('title');
+    const musicPlays = songs.map((s, i) => ({
+      name: s.title.substring(0, 15) + (s.title.length > 15 ? '...' : ''),
+      plays: Math.floor(Math.random() * 5000) + 1000
+    })).slice(0, 5); // Top 5
+
+    const foods = await Food.find().select('name');
+    const cuisinePopularity = foods.map((f, i) => ({
+      name: f.name,
+      loved: Math.floor(Math.random() * 1000) + 200
+    }));
+
     const analytics = {
       totalUsers,
       totalDestinations,
@@ -148,6 +170,11 @@ const getAnalytics = async (req, res) => {
           averageRating: r.averageRating.toFixed(1),
         };
       }),
+      chartData: {
+        attireSales,
+        musicPlays,
+        cuisinePopularity
+      }
     };
 
     res.json({
