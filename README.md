@@ -10,102 +10,121 @@ Built with a focus on **Eco-Tourism** and **Cultural Heritage**, the application
 
 ---
 
-## 🚀 Key Features
+## 🖼️ Platform Visuals
+
+<table align="center">
+  <tr>
+    <td align="center"><b>Landing Page</b><br><img src="docs/assets/screenshots/home.png" width="400"></td>
+    <td align="center"><b>Destinations Grid</b><br><img src="docs/assets/screenshots/destinations.png" width="400"></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Cultural Heritage</b><br><img src="docs/assets/screenshots/cultural.png" width="400"></td>
+    <td align="center"><b>Strategic Planner</b><br><img src="docs/assets/screenshots/itinerary.png" width="400"></td>
+  </tr>
+  <tr>
+    <td align="center"><b>BiharAudio Music Player</b><br><img src="docs/assets/screenshots/music_player.png" width="400"></td>
+    <td align="center"><b>Famous Personalities</b><br><img src="docs/assets/screenshots/personalities.png" width="400"></td>
+  </tr>
+</table>
+
+---
+
+## 🚀 Advanced Features
+
+### 🤖 AI-Powered Intelligence
+The platform leverages **Google Gemini AI** to provide a truly smart tourism experience:
+- **Contextual Recommendations**: Get travel suggestions based on your interests, budget, and the current season.
+- **Personality Insights**: Deep-dive into the lives of Bihar's famous personalities with AI-generated biographical summaries.
+- **AI Voice Assistant**: A fully interactive voice-controlled assistant that helps you navigate the site and answers your travel-related queries in real-time.
 
 ### 🗺️ Interactive Exploration
-- **Tactical Mapping**: Detailed interactive maps using Leaflet.js with custom markers for Eco and Cultural sites.
-- **3D & AR Integration**: Immersive 3D visualizations using Three.js and React Three Fiber.
-- **360° Panoramas**: Virtual tours of Bihar's most iconic landmarks.
+- **Tactical Mapping**: Built with `Leaflet.js`, the interactive map features custom iconography for Eco and Cultural sites, real-time filtering, and interactive popups.
+- **360° Matrix Projection**: An advanced 3D visualization layer using `React Three Fiber` that allows users to experience Bihar's landmarks in a virtual space.
+- **Augmented Experience**: Integrated 360° panoramas providing a high-fidelity virtual tour of sacred sites and forest reserves.
 
-### 🤖 AI-Powered Experience
-- **Gemini AI Integration**: Context-aware travel recommendations and personality insights.
-- **Voice Assistant**: Interactive AI voice assistant for hands-free navigation and queries.
+### 🎭 Cultural & Heritage Hub
+- **BiharAudio**: A premium, Spotify-inspired music player that showcases the rich folk and classical music traditions of Bihar.
+- **Heritage Showcase**: Dedicated immersive sections for Bihar's unique cuisine, traditional attire, and historical timeline.
+- **Famous Personalities**: A curated gallery of legends—from ancient philosophers like Aryabhata to modern-day heroes—with interactive bio-cards.
 
-### 🎭 Cultural & Heritage Showcase
-- **Famous Personalities**: An interactive gallery of historical and modern figures from Bihar with deep-dive biographies.
-- **Music Player**: A Spotify-inspired premium music player featuring Bihar's folk and classical music.
-- **Food & Dress**: Dedicated sections exploring the unique culinary and sartorial traditions of the state.
-
-### 📅 Travel Management
-- **Itinerary Planner**: Personal dashboard for users to save, manage, and export their travel plans.
-- **Admin Dashboard**: Comprehensive management system for content moderation, user roles, and site analytics.
-- **PDF Export**: Generate professional travel brochures and itineraries on the fly.
+### 📅 Strategic Travel Planner
+- **Dynamic Itineraries**: Build, save, and manage complex travel plans using the "Strategic Planner."
+- **Dashboard Integration**: Secure user accounts keep all your plans, bookmarks, and reviews in one place.
+- **Export to PDF**: Generate high-quality, professional travel brochures of your custom itinerary with a single click using `jspdf` and `html2canvas`.
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Tech Stack & Architecture
 
-### Frontend
-![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)
-![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-38B2AC?style=for-the-badge&logo=tailwind-css)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript)
-![Framer Motion](https://img.shields.io/badge/Framer_Motion-12-FF69B4?style=for-the-badge&logo=framer)
-![Three.js](https://img.shields.io/badge/Three.js-0.183-black?style=for-the-badge&logo=three.js)
+### 🌐 Frontend (Modern React Ecosystem)
+- **Framework**: `Next.js 15` (App Router) for superior performance and SEO.
+- **Styling**: `Tailwind CSS 4.0` with custom design tokens for a "Modern Heritage" aesthetic.
+- **Animations**: `Framer Motion` for smooth micro-interactions and page transitions.
+- **Visualization**: `Three.js` & `Recharts` for interactive 3D and data analytics.
 
-### Backend
-![Node.js](https://img.shields.io/badge/Node.js-20-339933?style=for-the-badge&logo=node.js)
-![Express](https://img.shields.io/badge/Express-4.19-black?style=for-the-badge&logo=express)
-![MongoDB](https://img.shields.io/badge/MongoDB-8.5-47A248?style=for-the-badge&logo=mongodb)
-![Gemini AI](https://img.shields.io/badge/Gemini_AI-Google-4285F4?style=for-the-badge&logo=google-gemini)
-![JWT](https://img.shields.io/badge/JWT-Auth-black?style=for-the-badge&logo=json-web-tokens)
+### ⚡ Backend (Scalable Micro-Architecture)
+- **Environment**: `Node.js` & `Express.js` REST API.
+- **Database**: `MongoDB` with `Mongoose` for flexible data modeling.
+- **Authentication**: `JWT` (JSON Web Tokens) with secure password hashing via `bcryptjs`.
+- **Media**: `Multer` for handling high-quality image and audio uploads.
 
 ---
 
-## 📁 Project Structure
+## 📁 Detailed Project Structure
 
 ```bash
 Capstone-Project/
-├── backend/                # Express server & API
-│   ├── controllers/        # Business logic
-│   ├── models/             # Mongoose schemas
-│   ├── routes/             # API endpoints
-│   └── server.js           # Entry point
-├── bihar-tourism/          # Next.js Frontend
+├── backend/                # API Service Layer
+│   ├── controllers/        # Logical Request Handlers
+│   ├── models/             # Data Schemas (User, Destination, Itinerary)
+│   ├── routes/             # RESTful API Endpoints
+│   ├── middleware/         # Auth & Error Handlers
+│   ├── uploads/            # Local Asset Storage
+│   └── server.js           # Server Entry & DB Connection
+├── bihar-tourism/          # Client Interface
 │   ├── src/
-│   │   ├── app/            # App Router pages
-│   │   ├── components/     # UI Components
-│   │   └── data/           # Static assets & constants
-│   └── public/             # Static assets (images, icons)
-└── docs/                   # Documentation & Assets
+│   │   ├── app/            # Next.js Pages & Layouts
+│   │   ├── components/     # Atomic UI Components
+│   │   ├── lib/            # API Clients & Utility Functions
+│   │   ├── types/          # TypeScript Definitions
+│   │   └── data/           # Static Constants
+│   └── public/             # Static Assets & Global Styles
+└── docs/                   # Platform Documentation
+    └── assets/             # Brand Assets & Screenshots
 ```
 
 ---
 
-## ⚙️ Installation & Setup
+## ⚙️ Quick Start
 
-### 1. Clone the Repository
+### 1. Prerequisites
+- Node.js (v18+)
+- MongoDB (Local or Atlas)
+- Google Cloud API Key (for Gemini)
+
+### 2. Installation
 ```bash
+# Clone the repo
 git clone https://github.com/abhi170212/Capstone-Project.git
-cd Capstone-Project
-```
 
-### 2. Backend Setup
-```bash
+# Backend Setup
 cd backend
 npm install
-# Create a .env file with your MONGO_URI, JWT_SECRET, and GEMINI_API_KEY
+# Configure .env: PORT, MONGODB_URI, JWT_SECRET, GOOGLE_API_KEY
 npm run dev
-```
 
-### 3. Frontend Setup
-```bash
-cd bihar-tourism
+# Frontend Setup
+cd ../bihar-tourism
 npm install
 npm run dev
 ```
 
-The application will be available at `http://localhost:3000`.
+The application will be live at `http://localhost:3000`.
 
 ---
 
 ## 🎨 Design Philosophy
-The platform follows a **Neobrutalist & Modern Heritage** aesthetic. High-contrast colors, bold typography, and smooth micro-interactions create a premium feel that respects historical roots while embracing the future.
-
----
-
-## 📄 License
-This project is part of the **Capstone Project** and is for educational and promotional purposes.
+The UI follows a **Neobrutalist & Modern Heritage** philosophy. We use high-contrast "Nature Green" and "Ancient Sand" color palettes, bold typography, and glassmorphism effects to bridge the gap between Bihar's historical depth and a futuristic digital experience.
 
 ---
 
