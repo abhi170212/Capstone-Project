@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, MessageCircle, MapPin, ChevronLeft, ChevronRight, Send, Trash2 } from 'lucide-react';
 import api from '@/lib/api';
+import toast from 'react-hot-toast';
 
 interface Post {
   _id: string;
@@ -64,7 +65,7 @@ export default function PostCard({ post, currentUser, onDelete, isAdmin }: PostC
 
   const toggleLike = async () => {
     if (!currentUser) {
-      alert("Please login to interact with posts!");
+      toast('Please login to interact with posts!', { icon: '🔐' });
       return;
     }
     
@@ -84,14 +85,14 @@ export default function PostCard({ post, currentUser, onDelete, isAdmin }: PostC
       console.error(err);
       // Revert optimism if failed
       setIsLiked(!isLiked);
-      alert(err.response?.data?.message || 'Failed to toggle like');
+      toast.error(err.response?.data?.message || 'Failed to toggle like');
     }
   };
 
   const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUser) {
-      alert("Please login to comment!");
+      toast('Please login to comment!', { icon: '🔐' });
       return;
     }
     if (!newComment.trim()) return;
@@ -102,7 +103,7 @@ export default function PostCard({ post, currentUser, onDelete, isAdmin }: PostC
       setNewComment('');
     } catch (err: any) {
       console.error(err);
-      alert(err.response?.data?.message || 'Failed to post comment');
+      toast.error(err.response?.data?.message || 'Failed to post comment');
     }
   };
 

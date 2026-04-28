@@ -8,6 +8,7 @@ import api from '@/lib/api';
 import BiharMusicPlayer from './BiharMusicPlayer';
 import BiharAttireModal from './BiharAttireModal';
 import BiharFoodModal from './BiharFoodModal';
+import toast from 'react-hot-toast';
 
 export default function VoiceAssistant() {
   const { user } = useAuth();
@@ -96,7 +97,7 @@ export default function VoiceAssistant() {
     if (!user) {
       const loginMsg = "Please login first to use the interactive voice assistant.";
       speak(loginMsg);
-      alert(loginMsg);
+      toast.error(loginMsg);
       return;
     }
     setIsOpen(true);

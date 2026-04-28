@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Loader2, Utensils, X } from 'lucide-react';
 import api from '@/lib/api';
+import toast from 'react-hot-toast';
 
 interface Shop {
   name: string;
@@ -109,9 +110,10 @@ export default function AdminFoods() {
       }
       setIsModalOpen(false);
       fetchFoods();
+      toast.success(editingFood ? 'Food updated successfully!' : 'Food added successfully!');
     } catch (err) {
       console.error(err);
-      alert('Failed to save food');
+      toast.error('Failed to save food.');
     }
   };
 

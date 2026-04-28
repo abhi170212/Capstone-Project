@@ -15,6 +15,7 @@ import {
   PlaneTakeoff,
   History
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function TripPlanner() {
   const [destinations, setDestinations] = useState<Destination[]>([]);
@@ -109,10 +110,10 @@ export default function TripPlanner() {
     setSaving(true);
     try {
       await itineraryApi.create(currentPlan);
-      alert('Itinerary saved successfully! You can view it in your Dashboard.');
+      toast.success('Itinerary saved! View it in your Dashboard.');
     } catch (err) {
       console.error('Failed to save:', err);
-      alert('Error saving itinerary');
+      toast.error('Error saving itinerary. Please try again.');
     } finally {
       setSaving(false);
     }

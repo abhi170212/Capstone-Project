@@ -4,9 +4,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, Play, Pause, SkipBack, SkipForward, Volume2, 
-  ListMusic, Music2, Loader2, Heart, Shuffle, Repeat, 
-  Repeat1, Plus, MoreHorizontal, Share2, Search
+  ListMusic, Music, Music2, Loader2, Heart, Shuffle, Repeat, 
+  Repeat1, Plus, MoreHorizontal, Share2, Search, Trash2
 } from 'lucide-react';
+import toast, { Toaster } from 'react-hot-toast';
 import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 
@@ -189,12 +190,22 @@ export default function BiharMusicPlayer({ isOpen, onClose }: BiharMusicPlayerPr
 
   const toggleLike = async (songId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!user) return alert("Please log in to like songs");
+    if (!user) {
+      toast.error('Please log in to like songs', { icon: '🔒' });
+      return;
+    }
     try {
+      const wasLiked = isLiked(songId);
       await api.post(`/users/songs/${songId}/like`);
-      await refreshUserData(); // This updates user.likedSongs in context
+      await refreshUserData();
+      if (wasLiked) {
+        toast('Removed from Liked Songs', { icon: '💔' });
+      } else {
+        toast.success('Added to Liked Songs! ♪', { icon: '💚' });
+      }
     } catch (err) {
       console.error(err);
+      toast.error('Failed to update liked songs');
     }
   };
 
@@ -207,36 +218,88 @@ export default function BiharMusicPlayer({ isOpen, onClose }: BiharMusicPlayerPr
   };
 
   const handleCreatePlaylist = async () => {
-    if (!newPlaylistName.trim()) return;
+    if (!newPlaylistName.trim()) {
+      toast.error('Please enter a playlist name');
+      return;
+    }
+    const loadingToast = toast.loading('Creating playlist...');
     try {
       const res = await api.post('/playlists', { name: newPlaylistName });
       setPlaylists([...playlists, res.data]);
       setShowCreatePlaylist(false);
       setNewPlaylistName('');
       refreshUserData();
+      toast.success(`Playlist "${newPlaylistName}" created! 🎶`, { id: loadingToast });
     } catch (err) {
       console.error(err);
+      toast.error('Failed to create playlist', { id: loadingToast });
     }
   };
 
   const handleAddToPlaylist = async (playlistId: string) => {
     if (!addToPlaylistSongId) return;
+    const loadingToast = toast.loading('Adding to playlist...');
     try {
       await api.post(`/playlists/${playlistId}/songs`, { songId: addToPlaylistSongId });
-      // Refresh playlists
       const res = await api.get('/playlists/my-playlists');
       setPlaylists(res.data);
       setAddToPlaylistSongId(null);
-      alert("Added to playlist!");
+      toast.success('Added to playlist! 🎵', { id: loadingToast });
     } catch (err: any) {
-      alert(err.response?.data?.message || "Failed to add to playlist");
+      toast.error(err.response?.data?.message || 'Failed to add to playlist', { id: loadingToast });
     }
   };
 
   const handleShare = (e: React.MouseEvent) => {
     e.stopPropagation();
     navigator.clipboard.writeText(window.location.href);
-    alert("Music Player link copied!");
+    toast.success('Link copied to clipboard! 🔗');
+  };
+
+  const handleDeletePlaylist = (playlistId: string, playlistName: string) => {
+    toast(
+      (t) => (
+        <div className="flex flex-col gap-3">
+          <p className="text-sm font-semibold">Delete <span className="text-red-400">"{playlistName}"</span>?</p>
+          <p className="text-xs text-gray-400">This action cannot be undone.</p>
+          <div className="flex gap-2">
+            <button
+              onClick={async () => {
+                toast.dismiss(t.id);
+                const deleteToast = toast.loading('Deleting playlist...');
+                try {
+                  await api.delete(`/playlists/${playlistId}`);
+                  setPlaylists(prev => prev.filter(p => p._id !== playlistId));
+                  if (currentView === playlistId) setCurrentView('all');
+                  toast.success(`"${playlistName}" deleted`, { id: deleteToast });
+                } catch (err: any) {
+                  toast.error(err.response?.data?.message || 'Failed to delete', { id: deleteToast });
+                }
+              }}
+              className="flex-1 bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-1.5 px-3 rounded-lg transition-colors"
+            >
+              Delete
+            </button>
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="flex-1 bg-white/10 hover:bg-white/20 text-white text-xs font-bold py-1.5 px-3 rounded-lg transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ),
+      {
+        duration: 8000,
+        style: {
+          background: '#1e1e1e',
+          color: '#fff',
+          border: '1px solid rgba(239,68,68,0.3)',
+          borderRadius: '12px',
+          padding: '16px',
+        },
+      }
+    );
   };
 
   const playSongList = (songs: BiharSong[], startIndex: number) => {
@@ -261,6 +324,26 @@ export default function BiharMusicPlayer({ isOpen, onClose }: BiharMusicPlayerPr
   if (!isOpen) return null;
 
   return (
+    <>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: '#1e1e1e',
+            color: '#fff',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: '12px',
+            fontSize: '14px',
+            fontWeight: '600',
+          },
+          success: {
+            iconTheme: { primary: '#99AD7A', secondary: '#000' },
+          },
+          error: {
+            iconTheme: { primary: '#ef4444', secondary: '#fff' },
+          },
+        }}
+      />
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
@@ -311,13 +394,24 @@ export default function BiharMusicPlayer({ isOpen, onClose }: BiharMusicPlayerPr
                     )}
                   </div>
                   {playlists.map((pl) => (
-                    <button
+                    <div
                       key={pl._id}
-                      onClick={() => setCurrentView(pl._id)}
-                      className={`block w-full text-left text-sm py-2 truncate transition-colors ${currentView === pl._id ? 'text-white font-bold' : 'text-gray-400 hover:text-white'}`}
+                      className={`group flex items-center justify-between py-2 rounded-md px-1 transition-colors ${currentView === pl._id ? 'text-white' : 'text-gray-400 hover:text-white'}`}
                     >
-                      {pl.name}
-                    </button>
+                      <button
+                        onClick={() => setCurrentView(pl._id)}
+                        className={`flex-1 text-left text-sm truncate font-${currentView === pl._id ? 'bold' : 'medium'} transition-colors`}
+                      >
+                        {pl.name}
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleDeletePlaylist(pl._id, pl.name); }}
+                        className="opacity-0 group-hover:opacity-100 ml-1 p-1 rounded hover:bg-red-500/20 hover:text-red-400 text-gray-600 transition-all flex-shrink-0"
+                        title="Delete playlist"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
                   ))}
                   {!user && (
                     <p className="text-xs text-gray-600 italic">Log in to create playlists</p>
@@ -435,10 +529,37 @@ export default function BiharMusicPlayer({ isOpen, onClose }: BiharMusicPlayerPr
                         );
                       })}
                       {viewSongsList.length === 0 && (
-                         <div className="text-center py-20 text-gray-500">
-                            <Music size={48} className="mx-auto mb-4 opacity-50" />
-                            <p>No songs found in this list.</p>
-                         </div>
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="flex flex-col items-center justify-center py-24 text-gray-500"
+                        >
+                          <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center mb-6">
+                            {currentView === 'liked' ? (
+                              <Heart size={40} className="text-gray-600" />
+                            ) : (
+                              <Music size={40} className="text-gray-600" />
+                            )}
+                          </div>
+                          <h3 className="text-white text-lg font-bold mb-2">
+                            {currentView === 'liked'
+                              ? 'No Liked Songs Yet'
+                              : 'This Playlist is Empty'}
+                          </h3>
+                          <p className="text-gray-500 text-sm text-center max-w-xs">
+                            {currentView === 'liked'
+                              ? 'Start liking songs by clicking the ♥ icon next to any track.'
+                              : 'Add songs to this playlist using the ••• menu on any track.'}
+                          </p>
+                          {currentView !== 'liked' && currentView !== 'all' && (
+                            <button
+                              onClick={() => setCurrentView('all')}
+                              className="mt-6 px-6 py-2 bg-[#99AD7A] text-black font-bold rounded-full text-sm hover:bg-[#a6bb85] transition-colors"
+                            >
+                              Browse All Songs
+                            </button>
+                          )}
+                        </motion.div>
                       )}
                     </div>
                   </>
@@ -584,5 +705,6 @@ export default function BiharMusicPlayer({ isOpen, onClose }: BiharMusicPlayerPr
         </div>
       )}
     </AnimatePresence>
+    </>
   );
 }

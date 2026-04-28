@@ -6,6 +6,7 @@ import { adminApi } from '@/lib/api';
 import { Users, Search, Trash2, Shield, User as UserIcon, Mail, Calendar, Star } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import UserDetailsModal from './UserDetailsModal';
+import toast from 'react-hot-toast';
 
 export default function AdminUsersPage() {
   const { user: currentUser } = useAuth();
@@ -38,9 +39,9 @@ export default function AdminUsersPage() {
     try {
       await adminApi.deleteUser(userId);
       setUsers(users.filter(u => u._id !== userId));
-      alert('User deleted successfully');
+      toast.success('User deleted successfully.');
     } catch (err: any) {
-      alert('Failed to delete user: ' + (err.response?.data?.message || err.message));
+      toast.error('Failed to delete user: ' + (err.response?.data?.message || err.message));
     }
   };
 
@@ -48,9 +49,9 @@ export default function AdminUsersPage() {
     try {
       await adminApi.updateUserRole(userId, newRole);
       setUsers(users.map(u => u._id === userId ? { ...u, role: newRole } : u));
-      alert('User role updated successfully');
+      toast.success('User role updated successfully.');
     } catch (err: any) {
-      alert('Failed to update role: ' + (err.response?.data?.message || err.message));
+      toast.error('Failed to update role: ' + (err.response?.data?.message || err.message));
     }
   };
 
@@ -59,7 +60,7 @@ export default function AdminUsersPage() {
       const res = await adminApi.getUserById(userId);
       setSelectedUser(res.data);
     } catch (err: any) {
-      alert('Failed to fetch user details');
+      toast.error('Failed to fetch user details.');
     }
   };
 
@@ -71,8 +72,9 @@ export default function AdminUsersPage() {
         ...prev,
         posts: prev.posts.filter((p: any) => p._id !== postId)
       }));
+      toast.success('Post deleted.');
     } catch (err: any) {
-      alert('Failed to delete post: ' + (err.response?.data?.message || err.message));
+      toast.error('Failed to delete post: ' + (err.response?.data?.message || err.message));
     }
   };
 
@@ -84,8 +86,9 @@ export default function AdminUsersPage() {
         ...prev,
         comments: prev.comments.filter((c: any) => c._id !== commentId)
       }));
+      toast.success('Comment deleted.');
     } catch (err: any) {
-      alert('Failed to delete comment: ' + (err.response?.data?.message || err.message));
+      toast.error('Failed to delete comment: ' + (err.response?.data?.message || err.message));
     }
   };
 

@@ -123,10 +123,40 @@ const removeSongFromPlaylist = async (req, res) => {
   }
 };
 
+// @desc    Delete a playlist
+// @route   DELETE /api/playlists/:id
+// @access  Private
+const deletePlaylist = async (req, res) => {
+  try {
+    const playlist = await Playlist.findById(req.params.id);
+
+    if (!playlist) {
+      return res.status(404).json({ message: 'Playlist not found' });
+    }
+
+    if (playlist.user.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+
+    await Playlist.findByIdAndDelete(req.params.id);
+
+    // Remove from user's playlists array
+    await User.findByIdAndUpdate(req.user.id, {
+      $pull: { playlists: playlist._id }
+    });
+
+    res.json({ message: 'Playlist deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 module.exports = {
   createPlaylist,
   getMyPlaylists,
   getPlaylistById,
   addSongToPlaylist,
-  removeSongFromPlaylist
+  removeSongFromPlaylist,
+  deletePlaylist
 };

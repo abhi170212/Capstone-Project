@@ -6,6 +6,7 @@ import { X, ShoppingBag, Loader2, ArrowLeft, Plus, Minus, Trash2, Shirt, MapPin 
 import api from '@/lib/api';
 import CheckoutModal from './CheckoutModal';
 import { useAuth } from '@/context/AuthContext';
+import toast from 'react-hot-toast';
 
 interface BiharAttireModalProps {
   isOpen: boolean;
@@ -382,7 +383,7 @@ export default function BiharAttireModal({ isOpen, onClose }: BiharAttireModalPr
                       disabled={cart.length === 0}
                       onClick={() => {
                         if (!user) {
-                          alert("Please log in to checkout.");
+                          toast.error('Please log in to checkout.');
                           return;
                         }
                         setShowCheckout(true);
