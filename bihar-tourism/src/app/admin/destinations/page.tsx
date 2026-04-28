@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { adminApi, destinationApi } from '@/lib/api';
 import api from '@/lib/api';
 import { MapPin, Plus, Edit2, Trash2, Search, X, Save, UploadCloud } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function AdminDestinationsPage() {
   const [destinations, setDestinations] = useState<any[]>([]);
@@ -52,9 +53,9 @@ export default function AdminDestinationsPage() {
     try {
       await adminApi.deleteDestination(id);
       setDestinations(destinations.filter(d => d._id !== id));
-      alert('Destination deleted successfully');
+      toast.success('Destination deleted successfully.');
     } catch (err: any) {
-      alert('Failed to delete: ' + (err.response?.data?.message || err.message));
+      toast.error('Failed to delete: ' + (err.response?.data?.message || err.message));
     }
   };
 
@@ -118,15 +119,15 @@ export default function AdminDestinationsPage() {
 
       if (editingDestination) {
         await adminApi.updateDestination(editingDestination._id, submitData);
-        alert('Destination updated successfully');
+        toast.success('Destination updated successfully.');
       } else {
         await adminApi.addDestination(submitData);
-        alert('Destination added successfully');
+        toast.success('Destination added successfully.');
       }
       setShowModal(false);
       fetchDestinations();
     } catch (err: any) {
-      alert('Failed to save: ' + (err.response?.data?.message || err.message));
+      toast.error('Failed to save: ' + (err.response?.data?.message || err.message));
     }
   };
 

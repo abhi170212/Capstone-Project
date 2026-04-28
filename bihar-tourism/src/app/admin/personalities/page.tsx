@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Loader2, UserCircle } from 'lucide-react';
 import api from '@/lib/api';
+import toast from 'react-hot-toast';
 
 interface Personality {
   _id: string;
@@ -71,9 +72,10 @@ export default function AdminPersonalities() {
       }
       setIsModalOpen(false);
       fetchPersonalities();
+      toast.success(editingPersonality ? 'Personality updated!' : 'Personality added!');
     } catch (err) {
       console.error(err);
-      alert('Failed to save personality');
+      toast.error('Failed to save personality.');
     }
   };
 

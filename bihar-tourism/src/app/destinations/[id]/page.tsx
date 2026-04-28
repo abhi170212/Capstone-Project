@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { jsPDF } from 'jspdf';
+import toast from 'react-hot-toast';
 
 // Calculator icon component
 function Calculator({ size }: { size: number }) {
@@ -78,16 +79,18 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
 
   const toggleFavorite = async () => {
     if (!user) {
-      alert("Please login to save destinations.");
+      toast.error('Please login to save destinations.');
       return;
     }
     try {
       const res = await api.post(`/users/favorites/${id}`);
       updateUser({ favorites: res.data.favorites });
-      setIsFavorite(res.data.favorites.includes(id));
+      const nowFavorite = res.data.favorites.includes(id);
+      setIsFavorite(nowFavorite);
+      toast.success(nowFavorite ? '❤️ Destination saved!' : 'Removed from saved destinations.');
     } catch (err: any) {
       console.error('Failed to toggle favorite', err);
-      alert('Error saving destination: ' + (err.response?.data?.message || err.message));
+      toast.error('Error saving destination: ' + (err.response?.data?.message || err.message));
     }
   };
 
@@ -126,7 +129,7 @@ export default function DestinationDetail({ params }: { params: Promise<{ id: st
   const submitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
-      alert("Please login to submit a review.");
+      toast.error('Please login to submit a review.');
       return;
     }
     setSubmittingReview(true);

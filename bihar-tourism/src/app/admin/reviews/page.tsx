@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { adminApi } from '@/lib/api';
 import { MessageSquare, Trash2, Star, Search, User, MapPin, Calendar } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function AdminReviewsPage() {
   const [reviews, setReviews] = useState<any[]>([]);
@@ -34,9 +35,9 @@ export default function AdminReviewsPage() {
     try {
       await adminApi.deleteReview(reviewId);
       setReviews(reviews.filter(r => r._id !== reviewId));
-      alert('Review deleted successfully');
+      toast.success('Review deleted successfully.');
     } catch (err: any) {
-      alert('Failed to delete review: ' + (err.response?.data?.message || err.message));
+      toast.error('Failed to delete review: ' + (err.response?.data?.message || err.message));
     }
   };
 

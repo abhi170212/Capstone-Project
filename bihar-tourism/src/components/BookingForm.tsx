@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { bookingApi } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { Calendar, Users, Mail, Phone, User, MessageSquare, CheckCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface BookingFormProps {
   destinationId: string;
@@ -52,11 +53,12 @@ export default function BookingForm({ destinationId, destinationName, pricePerPe
       });
 
       setSuccess(true);
+      toast.success('Booking confirmed! A confirmation will be sent to your email.');
       setTimeout(() => {
         onClose();
       }, 3000);
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Failed to create booking');
+      toast.error(error.response?.data?.message || 'Failed to create booking');
     } finally {
       setLoading(false);
     }

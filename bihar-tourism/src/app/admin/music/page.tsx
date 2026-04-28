@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { Music, Plus, Trash2, Link as LinkIcon, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 
 export default function AdminMusicPage() {
   const [songs, setSongs] = useState<any[]>([]);
@@ -31,7 +32,7 @@ export default function AdminMusicPage() {
   const handleAddSong = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!audioFile) {
-      alert('Please select an audio file.');
+      toast.error('Please select an audio file.');
       return;
     }
 
@@ -71,9 +72,10 @@ export default function AdminMusicPage() {
       if (imageInput) imageInput.value = '';
 
       fetchSongs();
+      toast.success('Track published successfully!');
     } catch (error) {
       console.error('Failed to add song:', error);
-      alert((error as any).response?.data?.message || 'Failed to add song. Ensure all required fields are filled.');
+      toast.error((error as any).response?.data?.message || 'Failed to add song. Ensure all required fields are filled.');
     } finally {
       setIsSubmitting(false);
     }
@@ -84,9 +86,10 @@ export default function AdminMusicPage() {
     try {
       await api.delete(`/songs/${id}`);
       setSongs(songs.filter(s => s._id !== id));
+      toast.success('Song deleted successfully.');
     } catch (error) {
       console.error('Failed to delete song:', error);
-      alert('Failed to delete song.');
+      toast.error('Failed to delete song.');
     }
   };
 

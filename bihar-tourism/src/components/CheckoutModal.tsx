@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, CreditCard, CheckCircle, Loader2, ShieldCheck } from 'lucide-react';
 import api from '@/lib/api';
+import toast from 'react-hot-toast';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -58,13 +59,14 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, totalPrice, 
       });
 
       setSuccess(true);
+      toast.success('Payment successful! Your order has been placed.');
       setTimeout(() => {
         setSuccess(false);
         onSuccess();
       }, 3000);
     } catch (err) {
       console.error(err);
-      alert('Payment failed. Please try again.');
+      toast.error('Payment failed. Please try again.');
     } finally {
       setLoading(false);
     }

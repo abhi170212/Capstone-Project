@@ -9,6 +9,7 @@ import { MapPin, Heart, Trash2, Route as RouteIcon, FileDown, Navigation, Camera
 import { motion, AnimatePresence } from 'framer-motion';
 import { jsPDF } from 'jspdf';
 import PostCard from '@/components/PostCard';
+import toast from 'react-hot-toast';
 
 type TabState = 'routes' | 'social' | 'admin';
 
@@ -130,9 +131,10 @@ export default function DashboardPage() {
         ...prev,
         favorites: prev.favorites.filter((dest: any) => dest._id !== destId)
       }));
+      toast.success('Destination removed from favorites.');
     } catch (error) {
       console.error('Failed to remove favorite', error);
-      alert('Failed to remove favorite.');
+      toast.error('Failed to remove favorite.');
     }
   };
 
@@ -144,9 +146,10 @@ export default function DashboardPage() {
         ...prev,
         savedRoutes: response.data.savedRoutes
       }));
+      toast.success('Route deleted successfully.');
     } catch (error) {
       console.error('Failed to remove route', error);
-      alert('Failed to delete route.');
+      toast.error('Failed to delete route.');
     }
   };
 
@@ -155,15 +158,19 @@ export default function DashboardPage() {
     try {
       await api.delete(`/itineraries/${id}`);
       setMyItineraries(myItineraries.filter(itin => itin._id !== id));
+      toast.success('Itinerary deleted.');
     } catch (err) {
       console.error('Failed to delete itinerary', err);
-      alert('Failed to delete itinerary.');
+      toast.error('Failed to delete itinerary.');
     }
   };
 
   const handleCreatePost = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (selectedFiles.length === 0) return alert('Please select at least one image');
+    if (selectedFiles.length === 0) {
+      toast.error('Please select at least one image.');
+      return;
+    }
     
     setIsPosting(true);
     try {
@@ -186,10 +193,10 @@ export default function DashboardPage() {
       
       setNewPost({ caption: '', location: '', category: 'General' });
       setSelectedFiles([]);
-      alert('Post successfully uploaded!');
+      toast.success('Post successfully uploaded!');
     } catch(err: any) {
       console.error(err);
-      alert(err.response?.data?.message || 'Failed to create post');
+      toast.error(err.response?.data?.message || 'Failed to create post');
     } finally {
       setIsPosting(false);
     }
@@ -200,8 +207,9 @@ export default function DashboardPage() {
     try {
       await api.delete(`/posts/${id}`);
       setMyPosts(myPosts.filter(p => p._id !== id));
+      toast.success('Post deleted.');
     } catch(err) {
-      alert("Failed to delete post");
+      toast.error("Failed to delete post");
     }
   };
 
@@ -210,20 +218,25 @@ export default function DashboardPage() {
     try {
       await api.put(`/admin/users/${uId}/${currentBanState ? 'unban' : 'ban'}`);
       setAllUsers(allUsers.map(u => u._id === uId ? {...u, isBanned: !currentBanState} : u));
+      toast.success(`User ${currentBanState ? 'unbanned' : 'banned'} successfully.`);
     } catch(err: any) {
-      alert(err.response?.data?.message || "Failed changing ban state");
+      toast.error(err.response?.data?.message || "Failed changing ban state");
     }
   };
 
   const handleGenerateAvatar = async () => {
-    if(!aiPrompt.trim()) return alert("Enter an AI generation prompt style!");
+    if(!aiPrompt.trim()) {
+      toast.error("Enter an AI generation prompt style!");
+      return;
+    }
     setIsUpdatingProfile(true);
     try {
       const res = await api.post('/users/generate-avatar', { prompt: aiPrompt });
       setPreviewAvatar(res.data.url);
       setProfileAvatarFile(null); // Clear physical upload context
+      toast.success('AI avatar generated!');
     } catch(err) {
-      alert("AI Image generation failure");
+      toast.error("AI Image generation failure");
     } finally {
       setIsUpdatingProfile(false);
     }
@@ -242,8 +255,9 @@ export default function DashboardPage() {
       const res = await api.put('/users/profile', { avatar: finalAvatar, bio: editBio });
       updateUser({ ...user, avatar: res.data.avatar, bio: res.data.bio, name: res.data.name });
       setShowProfileModal(false);
+      toast.success('Profile updated successfully!');
     } catch(err) {
-      alert("Failed to commit profile updates");
+      toast.error("Failed to commit profile updates");
     } finally {
       setIsUpdatingProfile(false);
     }

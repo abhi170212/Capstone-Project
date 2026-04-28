@@ -10,9 +10,11 @@ import {
   Plane, 
   Calendar,
   TrendingUp,
-  Star
+  Star,
+  Trash2
 } from 'lucide-react';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 
 export default function AdminDashboard() {
   const [analytics, setAnalytics] = useState<any>(null);
@@ -42,9 +44,10 @@ export default function AdminDashboard() {
     try {
       await api.delete(`/itineraries/${id}`);
       setItineraries(itineraries.filter(itin => itin._id !== id));
+      toast.success('Itinerary deleted successfully.');
     } catch (err) {
       console.error('Failed to delete itinerary', err);
-      alert('Failed to delete itinerary.');
+      toast.error('Failed to delete itinerary.');
     }
   };
 

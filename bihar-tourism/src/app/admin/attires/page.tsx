@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Loader2, Shirt } from 'lucide-react';
 import api from '@/lib/api';
+import toast from 'react-hot-toast';
 
 interface Attire {
   _id: string;
@@ -92,9 +93,10 @@ export default function AdminAttires() {
       }
       setIsModalOpen(false);
       fetchAttires();
+      toast.success(editingAttire ? 'Attire updated successfully!' : 'Attire added successfully!');
     } catch (err) {
       console.error(err);
-      alert('Failed to save attire');
+      toast.error('Failed to save attire.');
     }
   };
 
