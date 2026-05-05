@@ -4,7 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { AuthProvider } from "@/context/AuthContext";
-import VoiceAssistant from "@/components/VoiceAssistant";
+import AIAssistant from "@/components/AIAssistant";
 import { Toaster } from "react-hot-toast";
 
 const poppins = Poppins({
@@ -51,7 +51,7 @@ export default function RootLayout({
           />
           <Navbar />
           <main className="min-h-screen pb-20 md:pb-0">{children}</main>
-          <VoiceAssistant />
+          <AIAssistant />
           <Footer />
         </AuthProvider>
       </body>
