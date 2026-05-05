@@ -23,6 +23,14 @@ const festivalSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+    category: {
+      type: String,
+      default: 'General',
+    },
+    highlight: {
+      type: String,
+      default: '',
+    },
   },
   { timestamps: true }
 );

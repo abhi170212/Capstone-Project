@@ -89,6 +89,10 @@ export const festivalApi = {
     const response = await api.get<{ success: boolean; count: number; data: Festival[] }>('/festivals');
     return response.data;
   },
+  getById: async (id: string) => {
+    const response = await api.get<{ success: boolean; data: Festival }>(`/festivals/${id}`);
+    return response.data;
+  },
 };
 
 export const recommendationApi = {
@@ -165,6 +169,19 @@ export const adminApi = {
   },
   deleteDestination: async (id: string) => {
     const response = await api.delete(`/admin/delete-destination/${id}`);
+    return response.data;
+  },
+  // Festivals
+  addFestival: async (data: any) => {
+    const response = await api.post('/festivals', data);
+    return response.data;
+  },
+  updateFestival: async (id: string, data: any) => {
+    const response = await api.put(`/festivals/${id}`, data);
+    return response.data;
+  },
+  deleteFestival: async (id: string) => {
+    const response = await api.delete(`/festivals/${id}`);
     return response.data;
   },
   // Users
