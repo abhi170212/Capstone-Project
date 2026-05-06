@@ -5,6 +5,7 @@ import ImageGallery from '@/components/ImageGallery';
 import PanoramaViewer from '@/components/PanoramaViewer';
 import FamousPersonalities from '@/components/FamousPersonalities';
 import BiharHistoryTimeline from '@/components/BiharHistoryTimeline';
+import BiharAtAGlance from '@/components/BiharAtAGlance';
 
 export default function About() {
   return (
@@ -205,6 +206,9 @@ export default function About() {
           </div>
         </div>
       </section>
+
+      {/* Bihar At A Glance Section */}
+      <BiharAtAGlance />
 
       {/* Famous Personalities Section */}
       <FamousPersonalities />

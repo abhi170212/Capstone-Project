@@ -115,7 +115,8 @@ export default function DashboardPage() {
   const fetchAllUsers = async () => {
     try {
       const res = await api.get('/admin/users');
-      setAllUsers(res.data);
+      const data = res.data;
+      setAllUsers(Array.isArray(data) ? data : (data.data || data.users || []));
     } catch (err) {
       console.error('Failed to fetch users', err);
     }
@@ -438,14 +439,7 @@ export default function DashboardPage() {
             <Camera size={18}/> My Social Posts
           </button>
           
-          {user.role === 'admin' && (
-            <button 
-              onClick={() => setActiveTab('admin')}
-              className={`px-6 py-3 rounded-full font-bold whitespace-nowrap transition-colors ml-auto grid-flow-col gap-2 flex items-center border ${activeTab === 'admin' ? 'bg-red-50 border-red-500 text-red-600 shadow-md' : 'bg-white text-gray-500 hover:bg-red-50 hover:text-red-600 border-transparent'}`}
-            >
-              <ShieldAlert size={18}/> Moderation Panel
-            </button>
-          )}
+
         </motion.div>
 
         <AnimatePresence mode="wait">
@@ -658,63 +652,7 @@ export default function DashboardPage() {
               </div>
             )}
 
-            {/* TAB 3: ADMIN MODERATION */}
-            {activeTab === 'admin' && user.role === 'admin' && (
-              <div className="bg-white border-2 border-red-500/20 rounded-3xl shadow-2xl overflow-hidden p-8 relative">
-                <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-red-600 to-orange-500"></div>
-                <h2 className="text-3xl font-black text-black mb-8 flex items-center gap-4 pb-6 border-b-2 border-gray-100">
-                  <ShieldAlert className="text-red-500 w-10 h-10"/> Administrative Enforcements
-                </h2>
-                
-                <div className="overflow-x-auto rounded-2xl border border-gray-100">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="bg-gray-100 text-gray-500 text-xs font-black uppercase tracking-widest">
-                        <th className="p-5 border-b">Matrix ID</th>
-                        <th className="p-5 border-b">Communications</th>
-                        <th className="p-5 border-b">Override</th>
-                        <th className="p-5 border-b">Status</th>
-                        <th className="p-5 border-b">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {allUsers.map((u: any) => (
-                        <tr key={u._id} className="hover:bg-gray-50 transition-colors">
-                          <td className="p-5 font-black text-[#546B41] text-sm tabular-nums">{u.name}</td>
-                          <td className="p-5 text-gray-500 font-medium text-sm">{u.email}</td>
-                          <td className="p-5">
-                            <span className={`px-3 py-1.5 rounded-lg text-xs font-black tracking-wider ${u.role === 'admin' ? 'bg-purple-100 text-purple-700 shadow-sm' : 'bg-blue-50 text-blue-600'}`}>
-                              {u.role.toUpperCase()}
-                            </span>
-                          </td>
-                          <td className="p-5">
-                            {u.isBanned ? (
-                              <span className="flex items-center gap-1.5 text-red-600 font-black text-xs bg-red-100 px-3 py-1.5 rounded-lg shadow-sm w-max uppercase tracking-wider">
-                                <Ban size={14}/> Banned Layer
-                              </span>
-                            ) : (
-                              <span className="flex items-center gap-1.5 text-emerald-600 font-black text-xs bg-emerald-100 px-3 py-1.5 rounded-lg shadow-sm w-max uppercase tracking-wider">
-                                <CheckCircle size={14}/> Secure
-                              </span>
-                            )}
-                          </td>
-                          <td className="p-5">
-                            {u.role !== 'admin' && (
-                              <button 
-                                onClick={() => toggleBan(u._id, !!u.isBanned)}
-                                className={`px-5 py-2.5 rounded-xl font-black text-[10px] tracking-widest uppercase transition-all shadow-md ${u.isBanned ? 'bg-black text-white hover:bg-gray-800' : 'bg-red-500 text-white hover:bg-red-600 hover:-translate-y-0.5'}`}
-                              >
-                               {u.isBanned ? 'Authorize Key' : 'Initiate Ban'}
-                              </button>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
+
           </motion.div>
         </AnimatePresence>
 
