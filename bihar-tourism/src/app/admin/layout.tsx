@@ -18,7 +18,8 @@ import {
   Shirt,
   Utensils,
   UserCircle,
-  Calendar
+  Calendar,
+  MessageSquareWarning
 } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -52,6 +53,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: 'Cuisine', href: '/admin/foods', icon: Utensils },
     { name: 'Festivals', href: '/admin/festivals', icon: Calendar },
     { name: 'Personalities', href: '/admin/personalities', icon: UserCircle },
+    { name: 'Issues', href: '/admin/issues', icon: MessageSquareWarning },
     { name: 'Settings', href: '/admin/settings', icon: Settings },
   ];
 

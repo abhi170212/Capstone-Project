@@ -264,4 +264,27 @@ export const bookingApi = {
   },
 };
 
+export const issueApi = {
+  create: async (data: { subject: string; category: string; message: string }) => {
+    const response = await api.post('/issues', data);
+    return response.data;
+  },
+  getMyIssues: async () => {
+    const response = await api.get('/issues/my');
+    return response.data;
+  },
+  getAll: async () => {
+    const response = await api.get('/issues');
+    return response.data;
+  },
+  update: async (id: string, data: any) => {
+    const response = await api.put(`/issues/${id}`, data);
+    return response.data;
+  },
+  delete: async (id: string) => {
+    const response = await api.delete(`/issues/${id}`);
+    return response.data;
+  },
+};
+
 export default api;
