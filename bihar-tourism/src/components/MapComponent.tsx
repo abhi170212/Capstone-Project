@@ -25,6 +25,7 @@ interface MapComponentProps {
   clickedLocation?: { lat: number, lng: number } | null;
   onRouteCalculated?: (route: any) => void;
   isDarkMode?: boolean;
+  height?: string;
 }
 
 export default function MapComponent(props: MapComponentProps) {

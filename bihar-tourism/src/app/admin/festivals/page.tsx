@@ -10,8 +10,8 @@ interface Festival {
   name: string;
   location: string;
   month: string;
-  category: string;
-  highlight: string;
+  category?: string;
+  highlight?: string;
   description: string;
   images: string[];
 }

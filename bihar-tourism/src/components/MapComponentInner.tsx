@@ -15,6 +15,7 @@ interface MapComponentProps {
   clickedLocation?: { lat: number, lng: number } | null;
   onRouteCalculated?: (route: any) => void;
   isDarkMode?: boolean;
+  height?: string;
 }
 
 // Controller component that fits bounds dynamically based on the current polyline
@@ -36,7 +37,8 @@ export default function MapComponentInner({
   userLocation,
   clickedLocation,
   onRouteCalculated,
-  isDarkMode = false
+  isDarkMode = false,
+  height = '500px'
 }: MapComponentProps) {
   const [mounted, setMounted] = useState(false);
   const [routeLine, setRouteLine] = useState<[number, number][]>([]);
@@ -136,7 +138,7 @@ export default function MapComponentInner({
   });
 
   return (
-    <div className="w-full relative z-0 transition-all duration-500 h-full">
+    <div className="w-full relative z-0 transition-all duration-500" style={{ height }}>
       <MapContainer
         center={[centerLat, centerLng] as [number, number]} 
         zoom={7}
