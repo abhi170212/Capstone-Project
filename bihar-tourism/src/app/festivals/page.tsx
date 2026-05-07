@@ -14,9 +14,9 @@ interface Festival {
   month: string;
   location: string;
   images: string[];
-  category: string;
+  category?: string;
   description: string;
-  highlight: string;
+  highlight?: string;
 }
 
 export default function FestivalsPage() {

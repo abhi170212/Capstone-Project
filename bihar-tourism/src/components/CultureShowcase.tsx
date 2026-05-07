@@ -70,7 +70,7 @@ export default function CultureShowcase() {
                 className={`${card.bg} ${card.border} border-4 rounded-3xl p-8 cursor-pointer shadow-[0_8px_0_0_rgba(0,0,0,1)] hover:-translate-y-2 hover:shadow-[0_12px_0_0_rgba(0,0,0,1)] transition-all group overflow-hidden relative`}
               >
                 <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                  {React.cloneElement(card.icon as React.ReactElement, { size: 120 })}
+                  {React.cloneElement(card.icon as React.ReactElement<any>, { size: 120 })}
                 </div>
                 
                 <div className="relative z-10 flex flex-col h-full">
